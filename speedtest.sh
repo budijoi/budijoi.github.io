@@ -53,6 +53,6 @@ COBA LAGI NANTI"
 fi
 
 # Mengirim pesan ke akun Telegram pribadi
-URL="https://raw.githubusercontent.com/budijoi/budijoi.github.io/main/MV.jpg"
+URL="https://raw.githubusercontent.com/budijoi/budijoi.github.io/main/speed.jpg"
 curl -F "chat_id=$CHAT_ID" -F "caption=$MSG" -F "photo=$URL" \
 https://api.telegram.org/bot$BOT_TOKEN/sendphoto
