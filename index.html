@@ -2,741 +2,427 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Joi Ai Apps</title>
     
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes scaleUp { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
-        .animate-scale-up { animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent; /* Remove blue highlight on tap */
+        }
         
-        /* Smooth scrolling */
-        html { scroll-behavior: smooth; }
+        /* Custom Scrollbar hide */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .modal-enter {
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Prevent iOS zoom on inputs */
+        input, textarea {
+            font-size: 16px !important;
+        }
     </style>
 </head>
-<body class="min-h-screen font-sans bg-slate-950 text-white overflow-x-hidden">
+<body class="text-slate-800 min-h-screen relative overflow-x-hidden selection:bg-indigo-100 selection:text-indigo-600">
 
-    <div id="root"></div>
+    <!-- Background Decoration (Fixed) -->
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-80 h-80 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-2000"></div>
+    </div>
 
-    <script type="module">
-        // --- KONFIGURASI FIREBASE ---
-        // PENTING: Ganti isi variabel ini dengan config dari Firebase Console Anda!
-        const firebaseConfig = {
-            apiKey: "API_KEY_ANDA_DISINI",
-            authDomain: "PROJECT_ID.firebaseapp.com",
-            projectId: "PROJECT_ID",
-            storageBucket: "PROJECT_ID.appspot.com",
-            messagingSenderId: "SENDER_ID",
-            appId: "APP_ID"
-        };
+    <!-- Main Content Wrapper (Scrollable) -->
+    <div class="w-full min-h-screen py-8 px-4 flex justify-center items-start sm:items-center">
         
-        const appId = 'default-app-id'; // Sesuaikan jika perlu
-
-        // Import module Firebase dari CDN
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        // Inisialisasi Firebase (Safe Check)
-        let app, auth, db;
-        let isFirebaseActive = false;
-        try {
-            if (firebaseConfig.apiKey !== "API_KEY_ANDA_DISINI") {
-                app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                isFirebaseActive = true;
-            } else {
-                console.warn("Firebase Config belum diisi. Menggunakan mode Offline/Demo.");
-            }
-        } catch (e) {
-            console.error("Firebase Error:", e);
-        }
-
-        // --- DATA CONSTANTS ---
-        const DEFAULT_LINKS = [
-            { id: 3, title: 'BarKom', url: 'https://s.id/hUxOT', category: 'AI Tools', description: 'Ubah Gambarmu Menjadi Komik Secara Instan.' },
-            { id: 4, title: 'Free Editor', url: 'https://s.id/2mlDG', category: 'AI Tools', description: 'Edit dan ubah foto kamu jadi lebih keren.' },
-            { id: 5, title: 'Instan Foto', url: 'https://s.id/ClF2y', category: 'AI Tools', description: 'Edit Foto Instan, Cocok Buat Kaum Rebahan.' },
-            { id: 6, title: 'PAS Foto Generator', url: 'https://s.id/H2Cpn', category: 'AI Tools', description: 'Ubah foto kamu jadi sebuah PAS Foto siap pakai.' },
-            { id: 7, title: 'Prompt Generator', url: 'https://s.id/sJUl8', category: 'AI Tools', description: 'Deskripsikan sebuah gambar menjadi prompt siap pakai.' },
-            { id: 8, title: 'Restorasi', url: 'https://s.id/d9K6w', category: 'AI Tools', description: 'Foto Restorasi, Bikin Foto Lama atau Rusak Jadi Bening.' },
-            { id: 9, title: 'UMKM Editor', url: 'https://s.id/umkmedit', category: 'AI Tools', description: 'Ubah foto produkmu jadi lebih keren.' },
-            { id: 10, title: 'Voice Generator', url: 'https://s.id/gRpsK', category: 'AI Tools', description: 'Ubah teks menjadi voice dengan banyak pilihan suara dan hasil yang sangat natural.' },
-        ];
-
-        const CONTACT_WA = "6287784183394";
-        const DANA_NUMBER = "085323073037";
-
-        const THEMES = {
-            techno: {
-                label: 'Techno',
-                bgClass: 'bg-slate-950',
-                textMain: 'text-white',
-                textSub: 'text-slate-400',
-                cardClass: 'bg-slate-800/60 backdrop-blur-sm border-slate-700/50 hover:bg-slate-800 hover:border-blue-500/30',
-                btnPrimary: 'bg-blue-600 hover:bg-blue-500 text-white',
-                headerIconBg: 'bg-slate-800/50 border-slate-700/50',
-                bottomNav: 'bg-slate-900/90 border-slate-700 text-slate-300',
-                accentColor: 'text-blue-400',
-                iconBg: 'bg-slate-900 border-slate-700 text-blue-400',
-                modalBg: 'bg-slate-900 border-slate-700 text-white'
-            },
-            modern: {
-                label: 'Modern',
-                bgClass: 'bg-gradient-to-br from-indigo-900 via-purple-900 to-fuchsia-900',
-                textMain: 'text-white',
-                textSub: 'text-purple-200',
-                cardClass: 'bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 hover:border-white/30',
-                btnPrimary: 'bg-fuchsia-600 hover:bg-fuchsia-500 text-white shadow-lg shadow-fuchsia-900/20',
-                headerIconBg: 'bg-white/10 border-white/10',
-                bottomNav: 'bg-black/40 backdrop-blur-xl border-white/10 text-white',
-                accentColor: 'text-fuchsia-300',
-                iconBg: 'bg-white/10 border-white/10 text-fuchsia-300',
-                modalBg: 'bg-slate-900/90 backdrop-blur-xl border-white/10 text-white'
-            },
-            simple: {
-                label: 'Simple',
-                bgClass: 'bg-gray-100',
-                textMain: 'text-slate-800',
-                textSub: 'text-slate-500',
-                cardClass: 'bg-white border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-0.5',
-                btnPrimary: 'bg-slate-800 hover:bg-slate-900 text-white',
-                headerIconBg: 'bg-white border-gray-200',
-                bottomNav: 'bg-white/90 border-gray-200 text-slate-600',
-                accentColor: 'text-slate-700',
-                iconBg: 'bg-gray-50 border-gray-200 text-slate-600',
-                modalBg: 'bg-white border-gray-200 text-slate-800'
-            },
-            minimalis: {
-                label: 'Minimalis',
-                bgClass: 'bg-white',
-                textMain: 'text-black',
-                textSub: 'text-gray-500',
-                cardClass: 'bg-white border-2 border-black hover:bg-black hover:text-white group-hover:text-white transition-colors',
-                btnPrimary: 'bg-black hover:bg-gray-800 text-white rounded-none',
-                headerIconBg: 'bg-white border-2 border-black',
-                bottomNav: 'bg-white border-t-2 border-black text-black',
-                accentColor: 'text-black',
-                iconBg: 'bg-white border-2 border-black text-black',
-                modalBg: 'bg-white border-2 border-black text-black rounded-none'
-            }
-        };
-
-        // --- STATE MANAGEMENT ---
-        // Kita menggunakan objek global "state" untuk meniru React State
-        const state = {
-            user: null,
-            links: [...DEFAULT_LINKS],
-            currentTheme: 'modern',
-            webTitle: 'Joi Ai Apps',
-            webDesc: '100% Gratis',
-            isAdmin: false,
-            showLogin: false,
-            showWarning: true,
-            showSuggestion: false,
-            showDonation: false,
-            linkToDelete: null,
-            editingLink: null,
+        <!-- Main Card -->
+        <main class="w-full max-w-md bg-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl p-5 sm:p-8 border border-white/60 relative z-10 glass-effect">
             
-            // Form Inputs
-            forms: {
-                username: '',
-                password: '',
-                newLinkTitle: '',
-                newLinkUrl: '',
-                newLinkDesc: '',
-                suggName: '',
-                suggContent: '',
-                donationAmount: ''
-            }
-        };
-
-        // --- HELPER FUNCTIONS ---
-        
-        // 1. Render App (Main Loop)
-        function render() {
-            const root = document.getElementById('root');
-            const theme = THEMES[state.currentTheme] || THEMES.techno;
-
-            // HTML Structure
-            root.innerHTML = `
-                <div class="min-h-screen font-sans ${theme.bgClass} relative flex flex-col items-center overflow-x-hidden transition-colors duration-500">
-                    
-                    <canvas id="networkCanvas" class="${state.currentTheme === 'techno' ? 'fixed inset-0 bg-slate-950 z-0' : 'hidden'}"></canvas>
-
-                    ${state.currentTheme === 'techno' ? 
-                        '<div class="fixed inset-0 bg-gradient-to-b from-slate-950/80 via-slate-900/60 to-slate-950 pointer-events-none z-0"></div>' 
-                        : ''}
-
-                    <div class="relative z-10 w-full max-w-lg px-6 pt-12 pb-8 flex flex-col items-center animate-fade-in">
-                        <button onclick="handlers.toggleAdmin()" 
-                            class="absolute top-4 right-4 p-2 rounded-full ${theme.textSub} hover:opacity-100 transition-all ${theme.headerIconBg}"
-                            title="${state.isAdmin ? 'Logout' : 'Login Admin'}">
-                            <i data-lucide="lock" width="16"></i>
-                        </button>
-
-                        <div class="relative w-24 h-24 mb-6 group">
-                            ${(state.currentTheme === 'techno' || state.currentTheme === 'modern') ? 
-                                '<div class="absolute inset-0 bg-blue-500 rounded-full blur opacity-20 group-hover:opacity-40 transition duration-500"></div>' : ''}
-                            <div class="relative w-full h-full rounded-full flex items-center justify-center shadow-2xl transition ${theme.headerIconBg}">
-                                <span class="font-black text-3xl ${state.currentTheme === 'minimalis' ? 'text-black' : 'text-transparent bg-clip-text bg-gradient-to-tr from-blue-400 to-cyan-300'}">JOI</span>
-                            </div>
-                        </div>
-                        
-                        <h1 class="text-3xl font-bold tracking-tight text-center ${theme.textMain}">${state.webTitle}</h1>
-                        <div class="flex items-center gap-2 mt-2 px-3 py-1 rounded-full ${theme.headerIconBg}">
-                            <i data-lucide="cpu" width="14" class="${theme.accentColor.replace('text-', 'stroke-')}"></i>
-                            <p class="text-xs font-mono tracking-wide uppercase ${theme.textSub}">${state.webDesc}</p>
-                        </div>
+            <!-- Header / Logo Area -->
+            <div class="text-center mb-8 pt-2">
+                <div class="relative w-24 h-24 mx-auto mb-4 group">
+                    <div class="absolute inset-0 bg-indigo-500 rounded-3xl rotate-6 opacity-20 group-hover:rotate-12 transition-transform duration-300"></div>
+                    <div class="relative w-full h-full bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center shadow-xl transform group-hover:scale-[1.02] transition-transform duration-300">
+                        <i class="fa-solid fa-wand-magic-sparkles text-4xl text-white"></i>
                     </div>
-
-                    <main class="relative z-10 w-full max-w-lg px-6 pb-40 flex flex-col gap-4">
-                        
-                        ${state.isAdmin ? renderAdminPanel(theme) : ''}
-
-                        ${state.links.length === 0 ? renderEmptyState(theme) : renderLinks(theme)}
-
-                        <div class="mt-8 flex justify-center gap-4 flex-wrap">
-                            ${renderSocialIcon('https://facebook.com/budijoiBBJ', 'facebook', 'FB', theme)}
-                            ${renderSocialIcon('https://instagram.com/budijoi_eco', 'instagram', 'IG', theme)}
-                            ${renderSocialIcon('https://www.threads.net/@budijoi_eco', 'at-sign', 'Threads', theme)}
-                            ${renderSocialIcon(`https://wa.me/${CONTACT_WA}`, 'smartphone', 'WA', theme)}
-                            ${renderSocialIcon('mailto:premipahe@gmail.com', 'mail', 'Email', theme)}
-                        </div>
-                    </main>
-
-                    <div class="fixed bottom-6 left-0 right-0 px-6 z-40">
-                        <div class="max-w-sm mx-auto p-2 rounded-2xl shadow-2xl flex gap-2 border ${theme.bottomNav}">
-                            <button onclick="handlers.setShowSuggestion(true)" class="flex-1 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition text-sm hover:opacity-80">
-                                <i data-lucide="message-circle" width="18"></i> Saran
-                            </button>
-                            <div class="w-px bg-gray-500/30 my-2"></div>
-                            <button onclick="handlers.setShowDonation(true)" class="flex-1 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition text-sm ${theme.btnPrimary}">
-                                <i data-lucide="coffee" width="18"></i> Donasi
-                            </button>
-                        </div>
-                    </div>
-
-                    ${state.showWarning ? renderModal('Pemberitahuan', true, 'handlers.setShowWarning(false)', theme, renderWarningContent(theme)) : ''}
-                    ${state.linkToDelete ? renderModal('Hapus Link?', true, 'handlers.setLinkToDelete(null)', theme, renderDeleteContent(theme)) : ''}
-                    ${state.showLogin ? renderModal('System Login', false, 'handlers.setShowLogin(false)', theme, renderLoginContent(theme)) : ''}
-                    ${state.showSuggestion ? renderModal('Kirim Saran', false, 'handlers.setShowSuggestion(false)', theme, renderSuggestionContent(theme)) : ''}
-                    ${state.showDonation ? renderModal('Support Donasi', false, 'handlers.setShowDonation(false)', theme, renderDonationContent(theme)) : ''}
                 </div>
-            `;
+                <h1 class="text-2xl font-bold tracking-tight text-slate-900">Joi Ai Apps</h1>
+                <p class="text-slate-500 mt-1 text-sm font-medium">Koleksi Tools AI</p>
+            </div>
 
-            // Initialize Icons
-            lucide.createIcons();
-            
-            // Re-bind Inputs Values (since innerHTML wipes them)
-            restoreInputValues();
-
-            // Handle Canvas Animation if Techno Theme
-            if (state.currentTheme === 'techno') {
-                initCanvas();
-            }
-        }
-
-        // --- SUB-RENDER FUNCTIONS ---
-
-        function renderAdminPanel(theme) {
-            return `
-            <div class="p-5 rounded-2xl shadow-lg border flex flex-col gap-4 mb-4 animate-scale-up backdrop-blur-md ${theme.modalBg} ${theme.label === 'Techno' ? 'border-blue-500/30' : 'border-gray-200/50'}">
+            <!-- Links List -->
+            <div class="space-y-3 mb-8">
                 
-                <div>
-                    <h3 class="text-xs font-bold uppercase tracking-wider flex items-center gap-2 mb-3 ${theme.accentColor}">
-                        <i data-lucide="palette" width="14"></i> Tema Global
-                    </h3>
-                    <div class="grid grid-cols-4 gap-2">
-                        ${Object.keys(THEMES).map(key => `
-                            <button onclick="handlers.changeTheme('${key}')"
-                                class="text-xs py-2 px-1 rounded-lg border transition-all ${state.currentTheme === key ? 
-                                `${theme.btnPrimary} border-transparent ring-2 ring-offset-2 ring-offset-transparent ring-blue-500` : 
-                                `bg-transparent ${theme.textSub} border-gray-500/30 hover:border-gray-500`}">
-                                ${THEMES[key].label}
-                            </button>
-                        `).join('')}
-                    </div>
-                </div>
-
-                <hr class="border-gray-500/20" />
-
-                <div class="mb-1">
-                    <h3 class="text-xs font-bold uppercase tracking-wider flex items-center gap-2 mb-2 ${theme.accentColor}">
-                        <i data-lucide="type" width="14"></i> Info Website
-                    </h3>
-                    <div class="flex flex-col gap-2">
-                        <input id="input-webTitle" oninput="handlers.handleInput('webTitle', this.value)" onblur="handlers.handleConfigBlur()"
-                            class="border p-2 rounded-lg text-xs outline-none transition bg-black/10 border-gray-500/30 focus:border-blue-500 ${theme.textMain} placeholder-gray-500"
-                            placeholder="Nama Website" value="${state.webTitle}" />
-                        <input id="input-webDesc" oninput="handlers.handleInput('webDesc', this.value)" onblur="handlers.handleConfigBlur()"
-                            class="border p-2 rounded-lg text-xs outline-none transition bg-black/10 border-gray-500/30 focus:border-blue-500 ${theme.textMain} placeholder-gray-500"
-                            placeholder="Deskripsi Singkat" value="${state.webDesc}" />
-                    </div>
-                </div>
-
-                <hr class="border-gray-500/20" />
-
-                <form onsubmit="handlers.handleSaveLink(event)" class="flex flex-col gap-3">
-                    <div class="flex justify-between items-center mb-1">
-                        <h3 class="text-xs font-bold uppercase tracking-wider flex items-center gap-2 ${state.editingLink ? 'text-yellow-500' : theme.accentColor}">
-                            ${state.editingLink ? '<i data-lucide="edit-2" width="14"></i> Edit Link' : '<i data-lucide="layout-grid" width="14"></i> Tambah Link'}
-                        </h3>
-                        ${state.editingLink ? `
-                            <button type="button" onclick="handlers.cancelEdit()" class="text-xs flex items-center gap-1 px-2 py-1 rounded-lg border ${theme.textSub} border-gray-500/50">
-                                <i data-lucide="rotate-ccw" width="12"></i> Batal
-                            </button>
-                        ` : ''}
-                    </div>
-                    
-                    <input id="input-newLinkTitle" oninput="handlers.handleFormInput('newLinkTitle', this.value)"
-                        class="border p-3 rounded-xl text-sm outline-none transition bg-black/10 border-gray-500/30 focus:border-blue-500 ${theme.textMain} placeholder-gray-500"
-                        placeholder="Judul Link" value="${state.forms.newLinkTitle}" />
-                    <input id="input-newLinkDesc" oninput="handlers.handleFormInput('newLinkDesc', this.value)"
-                        class="border p-3 rounded-xl text-sm outline-none transition bg-black/10 border-gray-500/30 focus:border-blue-500 ${theme.textMain} placeholder-gray-500"
-                        placeholder="Deskripsi Singkat" value="${state.forms.newLinkDesc}" />
-                    <input id="input-newLinkUrl" oninput="handlers.handleFormInput('newLinkUrl', this.value)"
-                        class="border p-3 rounded-xl text-sm outline-none transition bg-black/10 border-gray-500/30 focus:border-blue-500 ${theme.textMain} placeholder-gray-500"
-                        placeholder="URL (https://...)" value="${state.forms.newLinkUrl}" />
-                    
-                    <button class="py-3 rounded-xl font-bold text-sm transition shadow-lg ${state.editingLink ? 'bg-yellow-600 hover:bg-yellow-500 text-white' : theme.btnPrimary}">
-                        ${state.editingLink ? 'Update Link' : 'Simpan Link'}
-                    </button>
-                </form>
-            </div>`;
-        }
-
-        function renderLinks(theme) {
-            return state.links.map(link => `
-                <div class="group relative transition-all duration-300 ${state.editingLink?.id === link.id ? 'opacity-50 scale-95' : ''}">
-                    <a href="${link.url}" target="_blank" rel="noreferrer"
-                        onclick="${state.editingLink ? 'event.preventDefault()' : ''}"
-                        class="flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${theme.cardClass}">
-                        <div class="flex items-center gap-4 w-full">
-                            <div class="w-12 h-12 shrink-0 rounded-xl flex items-center justify-center transition-colors ${theme.iconBg} ${state.currentTheme === 'minimalis' ? '' : 'group-hover:bg-blue-600 group-hover:text-white'}">
-                                <i data-lucide="${link.category === 'Web' ? 'globe' : 'network'}" width="20"></i>
-                            </div>
-                            <div class="min-w-0 flex-1">
-                                <h3 class="font-bold text-base truncate ${theme.textMain} ${state.currentTheme === 'minimalis' ? 'group-hover:text-white' : ''}">${link.title}</h3>
-                                ${link.description ? 
-                                    `<p class="text-xs mt-0.5 line-clamp-2 leading-relaxed ${theme.textSub} ${state.currentTheme === 'minimalis' ? 'group-hover:text-gray-300' : ''}">${link.description}</p>` :
-                                    `<p class="text-[10px] uppercase font-mono mt-0.5 tracking-wide opacity-50">Secure Link</p>`
-                                }
-                            </div>
+                <!-- Helper: Link Item Component -->
+                <!-- BarKom -->
+                <a href="https://s.id/hUxOT" target="_blank" class="relative group block w-full bg-white border border-slate-100 shadow-sm p-4 rounded-2xl transition-all duration-200 active:scale-[0.98] active:bg-slate-50 hover:border-indigo-200 hover:shadow-md">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 flex-shrink-0 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300">
+                            <i class="fa-solid fa-book-open text-xl"></i>
                         </div>
-                        ${!state.isAdmin ? `
-                        <div class="transition ml-3 ${theme.textSub} ${state.currentTheme === 'minimalis' ? 'group-hover:text-white' : ''}">
-                            <i data-lucide="chevron-right" width="20"></i>
-                        </div>` : ''}
-                    </a>
-                    ${state.isAdmin ? `
-                    <div class="absolute right-3 top-1/2 -translate-y-1/2 z-30 flex gap-2" onclick="event.stopPropagation()">
-                        <button onclick="handlers.startEdit(${link.id})" class="bg-yellow-500/20 hover:bg-yellow-500 text-yellow-500 hover:text-white p-2.5 rounded-xl transition-all border border-yellow-500/20 hover:border-yellow-500 shadow-lg backdrop-blur-sm">
-                            <i data-lucide="edit-2" width="16"></i>
-                        </button>
-                        <button onclick="handlers.requestDelete(${link.id})" class="bg-red-500/20 hover:bg-red-600 text-red-400 hover:text-white p-2.5 rounded-xl transition-all border border-red-500/20 hover:border-red-500 shadow-lg backdrop-blur-sm">
-                            <i data-lucide="trash-2" width="16"></i>
-                        </button>
-                    </div>` : ''}
-                </div>
-            `).join('');
-        }
-
-        function renderEmptyState(theme) {
-            return `
-            <div class="text-center py-12 text-sm rounded-2xl border border-dashed ${theme.textSub} border-gray-500/30">
-                <i data-lucide="binary" width="24" class="mx-auto mb-2 opacity-50"></i>
-                Memuat Link...
-            </div>`;
-        }
-
-        function renderSocialIcon(href, iconName, label, theme) {
-            return `
-            <a href="${href}" target="_blank" rel="noreferrer"
-                class="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 ${theme.iconBg} hover:bg-blue-600 hover:text-white"
-                title="${label}">
-                ${iconName === 'at-sign' ? '<span class="font-bold text-lg">@</span>' : `<i data-lucide="${iconName}" width="20"></i>`}
-            </a>`;
-        }
-
-        function renderModal(title, danger, closeHandler, theme, contentHTML) {
-            return `
-            <div class="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-fade-in">
-                <div class="${theme.modalBg} w-full max-w-md shadow-2xl border overflow-hidden relative animate-scale-up ${theme.label === 'Minimalis' ? 'rounded-none' : 'rounded-2xl'}">
-                    <div class="flex justify-between items-center p-5 border-b ${theme.label === 'Techno' ? 'border-slate-800' : 'border-gray-200/20'}">
-                        <h3 class="text-xl font-bold tracking-tight flex items-center gap-2 ${danger ? 'text-red-500' : theme.accentColor}">
-                            <i data-lucide="${danger ? 'alert-triangle' : 'zap'}" width="18"></i> ${title}
-                        </h3>
-                        <button onclick="${closeHandler}" class="p-2 rounded-full hover:bg-black/10 transition opacity-70 hover:opacity-100">
-                            <i data-lucide="x" width="20"></i>
-                        </button>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-slate-900 truncate">BarKom</h3>
+                            <p class="text-xs text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">Ubah gambarmu menjadi komik</p>
+                        </div>
+                        <div class="text-slate-300 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all">
+                            <i class="fa-solid fa-chevron-right text-sm"></i>
+                        </div>
                     </div>
-                    <div class="p-6">
-                        ${contentHTML}
+                </a>
+
+                <!-- Free Foto Editor -->
+                <a href="https://s.id/2mlDG" target="_blank" class="relative group block w-full bg-white border border-slate-100 shadow-sm p-4 rounded-2xl transition-all duration-200 active:scale-[0.98] active:bg-slate-50 hover:border-indigo-200 hover:shadow-md">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 flex-shrink-0 bg-pink-50 rounded-xl flex items-center justify-center text-pink-600 group-hover:bg-pink-600 group-hover:text-white transition-colors duration-300">
+                            <i class="fa-solid fa-wand-magic text-xl"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-slate-900 truncate">Free Foto Editor</h3>
+                            <p class="text-xs text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">Edit foto gratis lebih keren</p>
+                        </div>
+                        <div class="text-slate-300 group-hover:text-pink-500 group-hover:translate-x-1 transition-all">
+                            <i class="fa-solid fa-chevron-right text-sm"></i>
+                        </div>
                     </div>
-                </div>
-            </div>`;
-        }
+                </a>
 
-        // Modal Contents
-        function renderWarningContent(theme) {
-            return `
-            <div class="text-center">
-                <div class="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5 border border-red-500/20">
-                    <i data-lucide="alert-triangle" width="32"></i>
-                </div>
-                <p class="mb-6 text-sm leading-relaxed ${theme.textSub}">
-                    Aplikasi ini <span class="${theme.textMain} font-bold">100% GRATIS</span>.
-                    <br/>Hati-hati terhadap penipuan yang meminta bayaran wajib.
-                </p>
-                <button onclick="handlers.setShowWarning(false)" class="w-full py-3 rounded-xl font-semibold transition-all active:scale-95 shadow-lg bg-red-600 hover:bg-red-500 text-white">
-                    Saya Mengerti
+                <!-- Instan Foto Editor -->
+                <a href="https://s.id/ClF2y" target="_blank" class="relative group block w-full bg-white border border-slate-100 shadow-sm p-4 rounded-2xl transition-all duration-200 active:scale-[0.98] active:bg-slate-50 hover:border-indigo-200 hover:shadow-md">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 flex-shrink-0 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+                            <i class="fa-solid fa-bolt text-xl"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-slate-900 truncate">Instan Foto Editor</h3>
+                            <p class="text-xs text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">Edit foto instan & cepat</p>
+                        </div>
+                        <div class="text-slate-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-all">
+                            <i class="fa-solid fa-chevron-right text-sm"></i>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- PAS Foto Editor -->
+                <a href="https://s.id/H2Cpn" target="_blank" class="relative group block w-full bg-white border border-slate-100 shadow-sm p-4 rounded-2xl transition-all duration-200 active:scale-[0.98] active:bg-slate-50 hover:border-indigo-200 hover:shadow-md">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 flex-shrink-0 bg-red-50 rounded-xl flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors duration-300">
+                            <i class="fa-solid fa-id-card text-xl"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-slate-900 truncate">PAS Foto Editor</h3>
+                            <p class="text-xs text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">Buat pas foto resmi keren</p>
+                        </div>
+                        <div class="text-slate-300 group-hover:text-red-500 group-hover:translate-x-1 transition-all">
+                            <i class="fa-solid fa-chevron-right text-sm"></i>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Prompt Generator -->
+                <a href="https://s.id/sJUl8" target="_blank" class="relative group block w-full bg-white border border-slate-100 shadow-sm p-4 rounded-2xl transition-all duration-200 active:scale-[0.98] active:bg-slate-50 hover:border-indigo-200 hover:shadow-md">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 flex-shrink-0 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300">
+                            <i class="fa-solid fa-keyboard text-xl"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-slate-900 truncate">Prompt Generator</h3>
+                            <p class="text-xs text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">Generator prompt siap pakai</p>
+                        </div>
+                        <div class="text-slate-300 group-hover:text-purple-500 group-hover:translate-x-1 transition-all">
+                            <i class="fa-solid fa-chevron-right text-sm"></i>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Restorasi Foto -->
+                <a href="https://s.id/d9K6w" target="_blank" class="relative group block w-full bg-white border border-slate-100 shadow-sm p-4 rounded-2xl transition-all duration-200 active:scale-[0.98] active:bg-slate-50 hover:border-indigo-200 hover:shadow-md">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 flex-shrink-0 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors duration-300">
+                            <i class="fa-solid fa-clock-rotate-left text-xl"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-slate-900 truncate">Restorasi Foto</h3>
+                            <p class="text-xs text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">Perbaiki foto lama jadi baru</p>
+                        </div>
+                        <div class="text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all">
+                            <i class="fa-solid fa-chevron-right text-sm"></i>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- UMKM Foto Editor -->
+                <a href="https://s.id/umkmedit" target="_blank" class="relative group block w-full bg-white border border-slate-100 shadow-sm p-4 rounded-2xl transition-all duration-200 active:scale-[0.98] active:bg-slate-50 hover:border-indigo-200 hover:shadow-md">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 flex-shrink-0 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
+                            <i class="fa-solid fa-store text-xl"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-slate-900 truncate">UMKM Foto Editor</h3>
+                            <p class="text-xs text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">Foto produk profesional</p>
+                        </div>
+                        <div class="text-slate-300 group-hover:text-orange-500 group-hover:translate-x-1 transition-all">
+                            <i class="fa-solid fa-chevron-right text-sm"></i>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Text To Voice Generator -->
+                <a href="https://s.id/gRpsK" target="_blank" class="relative group block w-full bg-white border border-slate-100 shadow-sm p-4 rounded-2xl transition-all duration-200 active:scale-[0.98] active:bg-slate-50 hover:border-indigo-200 hover:shadow-md">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 flex-shrink-0 bg-cyan-50 rounded-xl flex items-center justify-center text-cyan-600 group-hover:bg-cyan-600 group-hover:text-white transition-colors duration-300">
+                            <i class="fa-solid fa-microphone-lines text-xl"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-slate-900 truncate">Text To Voice</h3>
+                            <p class="text-xs text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">Ubah teks jadi suara natural</p>
+                        </div>
+                        <div class="text-slate-300 group-hover:text-cyan-500 group-hover:translate-x-1 transition-all">
+                            <i class="fa-solid fa-chevron-right text-sm"></i>
+                        </div>
+                    </div>
+                </a>
+
+            </div>
+
+            <!-- Social Icons (Compact) -->
+            <div class="flex justify-center gap-3 mb-8">
+                <a href="https://facebook.com/budijoiBBJ" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 text-slate-600 hover:bg-blue-600 hover:text-white transition-colors duration-300 active:scale-95">
+                    <i class="fa-brands fa-facebook-f text-lg"></i>
+                </a>
+                <a href="https://instagram.com/budijoi_eco" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 text-slate-600 hover:bg-pink-600 hover:text-white transition-colors duration-300 active:scale-95">
+                    <i class="fa-brands fa-instagram text-lg"></i>
+                </a>
+                <a href="https://www.threads.net/@budijoi_eco" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 text-slate-600 hover:bg-black hover:text-white transition-colors duration-300 active:scale-95">
+                    <i class="fa-brands fa-threads text-lg"></i>
+                </a>
+                <a href="https://wa.me/6287784183394" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 text-slate-600 hover:bg-green-600 hover:text-white transition-colors duration-300 active:scale-95">
+                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                </a>
+                <a href="mailto:premipahe@gmail.com" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 text-slate-600 hover:bg-orange-600 hover:text-white transition-colors duration-300 active:scale-95">
+                    <i class="fa-solid fa-envelope text-lg"></i>
+                </a>
+            </div>
+
+            <!-- Bottom Actions (Big Buttons) -->
+            <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
+                <button onclick="openModal('saranModal')" class="relative overflow-hidden group w-full p-4 rounded-2xl bg-indigo-50 border border-indigo-100 text-indigo-700 hover:bg-indigo-600 hover:text-white transition-all duration-300 active:scale-[0.97]">
+                    <div class="flex flex-col items-center gap-2">
+                        <i class="fa-regular fa-comment-dots text-2xl mb-1"></i>
+                        <span class="font-bold text-sm">Beri Saran</span>
+                    </div>
                 </button>
-            </div>`;
-        }
-
-        function renderDeleteContent(theme) {
-            return `
-            <div class="text-center">
-                <p class="mb-6 ${theme.textSub}">
-                    Link <span class="font-bold ${theme.textMain}">"${state.linkToDelete.title}"</span> akan dihapus permanen.
-                </p>
-                <div class="flex gap-3">
-                    <button onclick="handlers.setLinkToDelete(null)" class="flex-1 py-3 rounded-xl font-bold border ${theme.textSub} border-gray-500/30">Batal</button>
-                    <button onclick="handlers.confirmDelete()" class="flex-1 py-3 rounded-xl font-bold bg-red-600 text-white hover:bg-red-500 shadow-lg">Hapus</button>
-                </div>
-            </div>`;
-        }
-
-        function renderLoginContent(theme) {
-            return `
-            <form onsubmit="handlers.handleLogin(event)" class="flex flex-col gap-4">
-                <div>
-                    <label class="text-xs font-mono uppercase block mb-2 ${theme.textSub}">Admin ID</label>
-                    <input type="text" id="input-username" oninput="handlers.handleFormInput('username', this.value)" 
-                        class="w-full border p-3 rounded-xl outline-none focus:border-blue-500 transition bg-black/10 border-gray-500/30 ${theme.textMain}" value="${state.forms.username}" autoFocus />
-                </div>
-                <div>
-                    <label class="text-xs font-mono uppercase block mb-2 ${theme.textSub}">Passcode</label>
-                    <input type="password" id="input-password" oninput="handlers.handleFormInput('password', this.value)" 
-                        class="w-full border p-3 rounded-xl outline-none focus:border-blue-500 transition bg-black/10 border-gray-500/30 ${theme.textMain}" value="${state.forms.password}" />
-                </div>
-                <button class="w-full font-bold py-3 rounded-xl mt-2 ${theme.btnPrimary}">Access Dashboard</button>
-            </form>`;
-        }
-
-        function renderSuggestionContent(theme) {
-            return `
-            <p class="text-sm mb-4 ${theme.textSub}">Kirim data saran ke server WhatsApp.</p>
-            <form onsubmit="handlers.sendSuggestion(event)" class="flex flex-col gap-3">
-                <input placeholder="Nama Anda" id="input-suggName" oninput="handlers.handleFormInput('suggName', this.value)"
-                    class="border p-3 rounded-xl outline-none focus:border-green-500 bg-black/10 border-gray-500/30 ${theme.textMain}" value="${state.forms.suggName}" required />
-                <textarea placeholder="Pesan saran..." id="input-suggContent" oninput="handlers.handleFormInput('suggContent', this.value)"
-                    class="border p-3 rounded-xl h-24 resize-none outline-none focus:border-green-500 bg-black/10 border-gray-500/30 ${theme.textMain}" required>${state.forms.suggContent}</textarea>
-                <button class="bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-500 transition flex justify-center gap-2 items-center">
-                    <i data-lucide="send" width="18"></i> Kirim
+                <button onclick="openModal('donasiModal')" class="relative overflow-hidden group w-full p-4 rounded-2xl bg-amber-50 border border-amber-100 text-amber-700 hover:bg-amber-500 hover:text-white transition-all duration-300 active:scale-[0.97]">
+                    <div class="flex flex-col items-center gap-2">
+                        <i class="fa-solid fa-heart text-2xl mb-1"></i>
+                        <span class="font-bold text-sm">Donasi</span>
+                    </div>
                 </button>
-            </form>`;
-        }
+            </div>
+            
+            <div class="text-center mt-6">
+                 <p class="text-[10px] text-slate-400 font-medium">© 2026 by Budijoi.</p>
+            </div>
+        </main>
+    </div>
 
-        function renderDonationContent(theme) {
-            return `
-            <div class="text-center mb-6">
-                <p class="text-xs font-bold text-blue-400 bg-blue-500/10 inline-block px-3 py-1 rounded-full mb-3 border border-blue-500/20">DANA</p>
-                <div onclick="navigator.clipboard.writeText('${DANA_NUMBER}'); alert('ID Disalin!')" class="p-4 rounded-2xl border border-dashed cursor-pointer transition group border-gray-500/50 hover:border-blue-500">
-                    <h2 class="text-2xl font-mono font-bold ${theme.textMain}">${DANA_NUMBER}</h2>
-                    <p class="text-xs mt-1 ${theme.textSub}">Tap to Copy</p>
+    <!-- ================= MODALS ================= -->
+
+    <!-- 1. Saran Modal -->
+    <div id="saranModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 hidden opacity-0 transition-opacity duration-300" style="backdrop-filter: blur(4px);">
+        <!-- Backdrop click to close -->
+        <div class="absolute inset-0" onclick="closeModal('saranModal')"></div>
+        
+        <div class="bg-white rounded-t-[2rem] sm:rounded-3xl w-full max-w-sm p-6 shadow-2xl relative z-10 transform transition-transform duration-300 translate-y-full sm:translate-y-0">
+            <!-- Handle for mobile visual -->
+            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 sm:hidden"></div>
+
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900">Kotak Saran</h3>
+                    <p class="text-xs text-slate-500">Masukan Anda sangat berharga</p>
+                </div>
+                <button onclick="closeModal('saranModal')" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Nama Anda</label>
+                    <input type="text" id="saranName" placeholder="Tulis nama anda..." class="w-full px-4 py-3.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-slate-50 text-slate-800 placeholder:text-slate-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Isi Saran</label>
+                    <textarea id="saranText" rows="3" placeholder="Tulis masukan anda disini..." class="w-full px-4 py-3.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-slate-50 text-slate-800 placeholder:text-slate-400 resize-none"></textarea>
+                </div>
+                <button onclick="sendSaran()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg mt-2">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Kirim via WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Donasi Modal -->
+    <div id="donasiModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 hidden opacity-0 transition-opacity duration-300" style="backdrop-filter: blur(4px);">
+        <!-- Backdrop click to close -->
+        <div class="absolute inset-0" onclick="closeModal('donasiModal')"></div>
+
+        <div class="bg-white rounded-t-[2rem] sm:rounded-3xl w-full max-w-sm p-6 shadow-2xl relative z-10 transform transition-transform duration-300 translate-y-full sm:translate-y-0">
+             <!-- Handle for mobile visual -->
+             <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 sm:hidden"></div>
+
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900">Dukungan</h3>
+                    <p class="text-xs text-slate-500">Traktir kopi developer</p>
+                </div>
+                <button onclick="closeModal('donasiModal')" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="bg-blue-50 border border-blue-100 rounded-2xl p-5 mb-6 text-center">
+                <p class="text-xs text-blue-600 font-bold mb-1 uppercase tracking-wider">DANA</p>
+                <div class="flex items-center justify-center gap-3">
+                    <span class="text-2xl font-bold text-slate-800 tracking-wide">085323073037</span>
+                    <button onclick="copyToClipboard('085323073037')" class="w-10 h-10 flex items-center justify-center rounded-full bg-white text-blue-600 shadow-sm active:scale-95 transition-all" title="Salin">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
                 </div>
             </div>
-            <form onsubmit="handlers.sendDonation(event)">
-                <label class="text-xs font-mono uppercase block mb-2 ${theme.textSub}">Nominal</label>
-                <input type="number" placeholder="Rp 0" id="input-donationAmount" oninput="handlers.handleFormInput('donationAmount', this.value)"
-                    class="w-full border p-3 rounded-xl mb-4 outline-none focus:border-blue-500 font-bold bg-black/10 border-gray-500/30 ${theme.textMain}" value="${state.forms.donationAmount}" required />
-                <button class="w-full font-bold py-3 rounded-xl flex justify-center gap-2 items-center ${theme.btnPrimary}">
-                    <i data-lucide="heart" width="18" class="fill-current"></i> Konfirmasi
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Nominal Donasi (Rp)</label>
+                    <input type="number" id="donasiAmount" placeholder="Contoh: 10000" class="w-full px-4 py-3.5 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-slate-50 text-slate-800 placeholder:text-slate-400">
+                </div>
+                <button onclick="sendDonasi()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg mt-2">
+                    <i class="fa-regular fa-paper-plane text-lg"></i> Konfirmasi ke WA
                 </button>
-            </form>`;
+                <p class="text-[10px] text-center text-slate-400 leading-tight pt-2">
+                    Konfirmasi akan dikirim ke WhatsApp admin agar donasi Anda tercatat. Terima kasih!
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification (for copy) -->
+    <div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-full text-sm font-semibold shadow-lg translate-y-20 opacity-0 transition-all duration-300 pointer-events-none z-[60] flex items-center gap-2">
+        <i class="fa-solid fa-check-circle text-green-400"></i>
+        <span>Nomor DANA disalin!</span>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        const adminWA = "6287784183394"; 
+
+        // 1. Modal Functions with Animation
+        function openModal(modalId) {
+            const el = document.getElementById(modalId);
+            const content = el.querySelector('div.bg-white');
+            
+            el.classList.remove('hidden');
+            // Small delay to allow display:block to apply before opacity transition
+            setTimeout(() => {
+                el.classList.remove('opacity-0');
+                content.classList.remove('translate-y-full');
+            }, 10);
         }
 
-        // --- HANDLERS (Global Logic) ---
-        window.handlers = {
-            toggleAdmin: () => {
-                if (state.isAdmin) {
-                    state.isAdmin = false;
-                    render();
-                } else {
-                    state.showLogin = true;
-                    render();
-                }
-            },
-            setShowLogin: (val) => { state.showLogin = val; render(); },
-            setShowWarning: (val) => { state.showWarning = val; render(); },
-            setShowSuggestion: (val) => { state.showSuggestion = val; render(); },
-            setShowDonation: (val) => { state.showDonation = val; render(); },
+        function closeModal(modalId) {
+            const el = document.getElementById(modalId);
+            const content = el.querySelector('div.bg-white');
             
-            handleFormInput: (key, val) => { state.forms[key] = val; },
-            handleInput: (key, val) => { state[key] = val; },
+            el.classList.add('opacity-0');
+            content.classList.add('translate-y-full');
+            
+            setTimeout(() => {
+                el.classList.add('hidden');
+            }, 300); // Match transition duration
+        }
 
-            handleLogin: (e) => {
-                e.preventDefault();
-                if (state.forms.username === 'admin' && state.forms.password === '170884') {
-                    state.isAdmin = true;
-                    state.showLogin = false;
-                    state.forms.username = '';
-                    state.forms.password = '';
-                    render();
-                } else {
-                    alert("Username atau Password salah!");
-                }
-            },
+        // 2. Send Saran
+        function sendSaran() {
+            const name = document.getElementById('saranName').value.trim();
+            const text = document.getElementById('saranText').value.trim();
 
-            changeTheme: (themeKey) => {
-                state.currentTheme = themeKey;
-                render();
-                if (isFirebaseActive && state.user) {
-                    const configRef = doc(db, 'artifacts', appId, 'public', 'data', 'appSettings', 'config');
-                    setDoc(configRef, { currentTheme: themeKey }, { merge: true });
-                }
-            },
-
-            handleConfigBlur: () => {
-                if (isFirebaseActive && state.user) {
-                    const configRef = doc(db, 'artifacts', appId, 'public', 'data', 'appSettings', 'config');
-                    setDoc(configRef, { webTitle: state.webTitle, webDesc: state.webDesc }, { merge: true });
-                }
-            },
-
-            handleSaveLink: async (e) => {
-                e.preventDefault();
-                const { newLinkTitle, newLinkUrl, newLinkDesc } = state.forms;
-                if (!newLinkTitle || !newLinkUrl) return;
-
-                let finalUrl = newLinkUrl;
-                if (!/^https?:\/\//i.test(finalUrl)) finalUrl = 'https://' + finalUrl;
-
-                let updatedLinks;
-                if (state.editingLink) {
-                    updatedLinks = state.links.map(link => link.id === state.editingLink.id ? {
-                        ...link, title: newLinkTitle, url: finalUrl, description: newLinkDesc
-                    } : link);
-                    state.editingLink = null;
-                } else {
-                    const newLink = {
-                        id: Date.now(), title: newLinkTitle, url: finalUrl, description: newLinkDesc || '', category: 'Link'
-                    };
-                    updatedLinks = [...state.links, newLink];
-                }
-
-                state.links = updatedLinks;
-                // Reset Forms
-                state.forms.newLinkTitle = '';
-                state.forms.newLinkUrl = '';
-                state.forms.newLinkDesc = '';
-                
-                render();
-
-                // DB Sync
-                if (isFirebaseActive && state.user) {
-                    const linksRef = doc(db, 'artifacts', appId, 'public', 'data', 'appContent', 'links');
-                    await setDoc(linksRef, { items: updatedLinks }, { merge: true });
-                }
-            },
-
-            startEdit: (id) => {
-                const link = state.links.find(l => l.id === id);
-                if (link) {
-                    state.editingLink = link;
-                    state.forms.newLinkTitle = link.title;
-                    state.forms.newLinkUrl = link.url;
-                    state.forms.newLinkDesc = link.description || '';
-                    render();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-            },
-
-            cancelEdit: () => {
-                state.editingLink = null;
-                state.forms.newLinkTitle = '';
-                state.forms.newLinkUrl = '';
-                state.forms.newLinkDesc = '';
-                render();
-            },
-
-            requestDelete: (id) => {
-                state.linkToDelete = state.links.find(l => l.id === id);
-                render();
-            },
-
-            setLinkToDelete: (val) => { state.linkToDelete = val; render(); },
-
-            confirmDelete: async () => {
-                if (state.linkToDelete) {
-                    const updatedLinks = state.links.filter(l => l.id !== state.linkToDelete.id);
-                    state.links = updatedLinks;
-                    
-                    if (state.editingLink && state.editingLink.id === state.linkToDelete.id) {
-                        state.editingLink = null;
-                        state.forms.newLinkTitle = '';
-                        state.forms.newLinkUrl = '';
-                        state.forms.newLinkDesc = '';
-                    }
-                    
-                    state.linkToDelete = null;
-                    render();
-
-                    if (isFirebaseActive && state.user) {
-                        const linksRef = doc(db, 'artifacts', appId, 'public', 'data', 'appContent', 'links');
-                        await setDoc(linksRef, { items: updatedLinks }, { merge: true });
-                    }
-                }
-            },
-
-            sendSuggestion: (e) => {
-                e.preventDefault();
-                if (!state.forms.suggName || !state.forms.suggContent) return;
-                const msg = `Halo Admin, saya ${state.forms.suggName}.%0A%0AIsi Saran:%0A${state.forms.suggContent}`;
-                window.open(`https://wa.me/${CONTACT_WA}?text=${msg}`, '_blank');
-                state.showSuggestion = false;
-                render();
-            },
-
-            sendDonation: (e) => {
-                e.preventDefault();
-                if (!state.forms.donationAmount) return;
-                const msg = `Halo Admin, saya ingin konfirmasi donasi.%0A%0ANominal: Rp ${state.forms.donationAmount}%0A%0AMohon info selanjutnya.`;
-                window.open(`https://wa.me/${CONTACT_WA}?text=${msg}`, '_blank');
-                state.showDonation = false;
-                render();
+            if (!name || !text) {
+                alert("Mohon isi nama dan pesan saran Anda.");
+                return;
             }
-        };
 
-        // --- UTILITIES ---
-        function restoreInputValues() {
-            // Helper to keep focus or values when rerendering
-            const ids = ['input-username', 'input-password', 'input-webTitle', 'input-webDesc', 'input-newLinkTitle', 'input-newLinkDesc', 'input-newLinkUrl', 'input-suggName', 'input-suggContent', 'input-donationAmount'];
+            const message = `Halo Admin, nama saya *${name}*.\n\nSaya ingin menyampaikan saran untuk aplikasi Joi Ai Apps:\n"${text}"`;
+            const url = `https://wa.me/${adminWA}?text=${encodeURIComponent(message)}`;
             
-            // Check active element before render
-            // Note: In a full VDOM this is automatic, here we just set values. 
-            // The logic is handled by binding value={state...} in HTML strings directly.
-        }
-
-        // --- CANVAS ANIMATION ---
-        let animationFrameId;
-        function initCanvas() {
-            const canvas = document.getElementById('networkCanvas');
-            if (!canvas) return;
+            window.open(url, '_blank');
+            closeModal('saranModal');
             
-            // Avoid double init
-            if (canvas.dataset.initialized) return;
-            canvas.dataset.initialized = "true";
-
-            const ctx = canvas.getContext('2d');
-            let particles = [];
-
-            const resizeCanvas = () => {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            };
-
-            const createParticles = () => {
-                const particleCount = Math.min(window.innerWidth / 15, 80);
-                particles = [];
-                for (let i = 0; i < particleCount; i++) {
-                    particles.push({
-                        x: Math.random() * canvas.width,
-                        y: Math.random() * canvas.height,
-                        vx: (Math.random() - 0.5) * 0.5,
-                        vy: (Math.random() - 0.5) * 0.5,
-                        size: Math.random() * 2 + 1
-                    });
-                }
-            };
-
-            const draw = () => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = 'rgba(66, 153, 225, 0.5)';
-                ctx.strokeStyle = 'rgba(66, 153, 225, 0.15)';
-
-                particles.forEach((p, i) => {
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-                    if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-                    
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    for (let j = i + 1; j < particles.length; j++) {
-                        const p2 = particles[j];
-                        const dx = p.x - p2.x;
-                        const dy = p.y - p2.y;
-                        const distance = Math.sqrt(dx * dx + dy * dy);
-                        if (distance < 150) {
-                            ctx.beginPath();
-                            ctx.moveTo(p.x, p.y);
-                            ctx.lineTo(p2.x, p2.y);
-                            ctx.stroke();
-                        }
-                    }
-                });
-                animationFrameId = requestAnimationFrame(draw);
-            };
-
-            window.addEventListener('resize', () => { resizeCanvas(); createParticles(); });
-            resizeCanvas();
-            createParticles();
-            cancelAnimationFrame(animationFrameId); // Clear old loop
-            draw();
+            document.getElementById('saranName').value = '';
+            document.getElementById('saranText').value = '';
         }
 
-        // --- INIT APP ---
-        // 1. Render UI Awal
-        render();
+        // 3. Send Donasi Confirmation
+        function sendDonasi() {
+            const amount = document.getElementById('donasiAmount').value.trim();
+            
+            if (!amount) {
+                alert("Mohon isi nominal donasi.");
+                return;
+            }
 
-        // 2. Init Firebase Listener (If Configured)
-        if (isFirebaseActive) {
-            signInAnonymously(auth).then(() => {
-                // Auth Listener
-                onAuthStateChanged(auth, (u) => {
-                    state.user = u;
-                    if (!u) return;
+            const formattedAmount = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(amount);
 
-                    // Sync Config
-                    const configRef = doc(db, 'artifacts', appId, 'public', 'data', 'appSettings', 'config');
-                    onSnapshot(configRef, (docSnap) => {
-                        if (docSnap.exists()) {
-                            const data = docSnap.data();
-                            if (data.webTitle) state.webTitle = data.webTitle;
-                            if (data.webDesc) state.webDesc = data.webDesc;
-                            if (data.currentTheme && THEMES[data.currentTheme]) {
-                                state.currentTheme = data.currentTheme;
-                            }
-                            render();
-                        }
-                    });
+            const message = `Halo Admin, saya ingin melakukan konfirmasi donasi.\n\nNominal: *${formattedAmount}*\nMetode: Transfer DANA (085323073037)\n\nMohon dicek ya, Admin. Terima kasih!`;
+            const url = `https://wa.me/${adminWA}?text=${encodeURIComponent(message)}`;
 
-                    // Sync Links
-                    const linksRef = doc(db, 'artifacts', appId, 'public', 'data', 'appContent', 'links');
-                    onSnapshot(linksRef, (docSnap) => {
-                        if (docSnap.exists()) {
-                            const items = docSnap.data().items;
-                            state.links = Array.isArray(items) ? items : [];
-                        } else {
-                            state.links = DEFAULT_LINKS;
-                        }
-                        render();
-                    });
-                });
-            });
+            window.open(url, '_blank');
+            closeModal('donasiModal');
+            document.getElementById('donasiAmount').value = '';
         }
 
+        // 4. Copy to Clipboard Utility
+        function copyToClipboard(text) {
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            // Show Toast
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2000);
+        }
     </script>
 </body>
 </html>
