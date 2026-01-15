@@ -8,8 +8,8 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- FontAwesome for Icons (Updated to 6.6.0 for Threads icon support) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -34,15 +34,6 @@
             background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-        }
-
-        .modal-enter {
-            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        
-        @keyframes slideUp {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
         }
 
         /* Prevent iOS zoom on inputs */
@@ -80,7 +71,6 @@
             <!-- Links List -->
             <div class="space-y-3 mb-8">
                 
-                <!-- Helper: Link Item Component -->
                 <!-- BarKom -->
                 <a href="https://s.id/hUxOT" target="_blank" class="relative group block w-full bg-white border border-slate-100 shadow-sm p-4 rounded-2xl transition-all duration-200 active:scale-[0.98] active:bg-slate-50 hover:border-indigo-200 hover:shadow-md">
                     <div class="flex items-center gap-4">
@@ -193,22 +183,6 @@
                     </div>
                 </a>
 
-                <!-- UMKM Foto Editor -->
-                <a href="https://s.id/umkmedit" target="_blank" class="relative group block w-full bg-white border border-slate-100 shadow-sm p-4 rounded-2xl transition-all duration-200 active:scale-[0.98] active:bg-slate-50 hover:border-indigo-200 hover:shadow-md">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 flex-shrink-0 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
-                            <i class="fa-solid fa-store text-xl"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="font-bold text-slate-900 truncate">UMKM Foto Editor</h3>
-                            <p class="text-xs text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">Foto produk profesional</p>
-                        </div>
-                        <div class="text-slate-300 group-hover:text-orange-500 group-hover:translate-x-1 transition-all">
-                            <i class="fa-solid fa-chevron-right text-sm"></i>
-                        </div>
-                    </div>
-                </a>
-
                 <!-- Text To Voice Generator -->
                 <a href="https://s.id/gRpsK" target="_blank" class="relative group block w-full bg-white border border-slate-100 shadow-sm p-4 rounded-2xl transition-all duration-200 active:scale-[0.98] active:bg-slate-50 hover:border-indigo-200 hover:shadow-md">
                     <div class="flex items-center gap-4">
@@ -220,6 +194,22 @@
                             <p class="text-xs text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">Ubah teks jadi suara natural</p>
                         </div>
                         <div class="text-slate-300 group-hover:text-cyan-500 group-hover:translate-x-1 transition-all">
+                            <i class="fa-solid fa-chevron-right text-sm"></i>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- UMKM Foto Editor -->
+                <a href="https://s.id/umkmedit" target="_blank" class="relative group block w-full bg-white border border-slate-100 shadow-sm p-4 rounded-2xl transition-all duration-200 active:scale-[0.98] active:bg-slate-50 hover:border-indigo-200 hover:shadow-md">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 flex-shrink-0 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
+                            <i class="fa-solid fa-store text-xl"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-slate-900 truncate">UMKM Foto Editor</h3>
+                            <p class="text-xs text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">Foto produk profesional</p>
+                        </div>
+                        <div class="text-slate-300 group-hover:text-orange-500 group-hover:translate-x-1 transition-all">
                             <i class="fa-solid fa-chevron-right text-sm"></i>
                         </div>
                     </div>
@@ -269,6 +259,36 @@
     </div>
 
     <!-- ================= MODALS ================= -->
+
+    <!-- 0. Welcome Modal (New) -->
+    <div id="welcomeModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 hidden opacity-0 transition-opacity duration-300" style="backdrop-filter: blur(4px);">
+        <!-- Backdrop click to close -->
+        <div class="absolute inset-0" onclick="closeModal('welcomeModal')"></div>
+        
+        <div class="bg-white rounded-t-[2rem] sm:rounded-3xl w-full max-w-sm p-6 shadow-2xl relative z-10 transform transition-transform duration-300 translate-y-full sm:translate-y-0">
+             <!-- Handle for mobile visual -->
+             <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 sm:hidden"></div>
+
+            <div class="text-center">
+                <div class="mx-auto w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-4 animate-bounce">
+                    <i class="fa-solid fa-hands-clapping text-indigo-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 mb-2">Selamat Datang!</h3>
+                <div class="text-sm text-slate-600 space-y-3 mb-6 leading-relaxed">
+                    <p>Terima kasih telah berkunjung.</p>
+                    <p>Silahkan digunakan, dan jika bermanfaat jangan lupa di-share ya!</p>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <p class="text-xs italic text-slate-500">
+                            "Kalo ada dana lebih, boleh donasi buat ngopi atau rokok admin sambil cari ide lain ☕🚬"
+                        </p>
+                    </div>
+                </div>
+                <button onclick="closeModal('welcomeModal')" class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-colors shadow-lg active:scale-[0.98]">
+                    Siap, Lanjutkan!
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- 1. Saran Modal -->
     <div id="saranModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 hidden opacity-0 transition-opacity duration-300" style="backdrop-filter: blur(4px);">
@@ -358,6 +378,13 @@
     <!-- JAVASCRIPT LOGIC -->
     <script>
         const adminWA = "6287784183394"; 
+        
+        // 0. Initial Welcome Modal
+        window.onload = function() {
+            setTimeout(() => {
+                openModal('welcomeModal');
+            }, 600); // Slight delay for better UX
+        };
 
         // 1. Modal Functions with Animation
         function openModal(modalId) {
