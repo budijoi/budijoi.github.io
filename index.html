@@ -120,7 +120,7 @@
                 </a>
 
                 <!-- Mesin Waktu -->
-                <a href="https://s.id/67Sjg" target="_blank" class="relative group block w-full bg-white border border-slate-100 shadow-sm p-4 rounded-2xl transition-all duration-200 active:scale-[0.98] active:bg-slate-50 hover:border-indigo-200 hover:shadow-md">
+                <a href="https://s.id/RvB5s" target="_blank" class="relative group block w-full bg-white border border-slate-100 shadow-sm p-4 rounded-2xl transition-all duration-200 active:scale-[0.98] active:bg-slate-50 hover:border-indigo-200 hover:shadow-md">
                     <div class="flex items-center gap-4">
                         <div class="w-12 h-12 flex-shrink-0 bg-teal-50 rounded-xl flex items-center justify-center text-teal-600 group-hover:bg-teal-600 group-hover:text-white transition-colors duration-300">
                             <i class="fa-solid fa-hourglass-half text-xl"></i>
@@ -215,6 +215,26 @@
                     </div>
                 </a>
 
+            </div>
+
+            <!-- REVIEW SLIDER SECTION -->
+            <div class="mb-8">
+                <h3 class="text-center text-[10px] font-bold text-slate-400 mb-3 uppercase tracking-widest">Apa Kata Mereka?</h3>
+                <div class="relative w-full overflow-hidden bg-white border border-slate-100 rounded-2xl p-4 shadow-sm h-32 flex items-center justify-center">
+                    
+                    <div id="review-content" class="text-center transition-opacity duration-500 opacity-100">
+                        <div class="flex justify-center gap-1 text-amber-400 text-xs mb-2">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <p id="review-text" class="text-xs text-slate-600 italic leading-relaxed px-2 mb-2">"Hasil BarKom nya keren banget, berasa jadi tokoh anime beneran!"</p>
+                        <p id="review-name" class="text-[10px] font-bold text-slate-900">- Andi, Jakarta</p>
+                    </div>
+
+                </div>
             </div>
 
             <!-- Social Icons (Compact) -->
@@ -379,6 +399,46 @@
     <script>
         const adminWA = "6287784183394"; 
         
+        // --- REVIEW SLIDER LOGIC START ---
+        const reviews = [
+            { name: "Andi, Jakarta", text: "Hasil BarKom nya keren banget, berasa jadi tokoh anime beneran!", stars: 5 },
+            { name: "Siti, Bandung", text: "Pas Foto editor-nya sangat membantu, gak perlu ke studio lagi.", stars: 5 },
+            { name: "Rudi, Surabaya", text: "Prompt Generator-nya ngebantu banget buat bikin gambar AI yang detail.", stars: 4 },
+            { name: "Dina, Medan", text: "Fitur Text to Voice suaranya natural, cocok buat konten TikTok aku.", stars: 5 },
+            { name: "Bayu, Yogyakarta", text: "Restorasi foto lama jadi jernih lagi, kenangan ortu terselamatkan.", stars: 5 },
+            { name: "Eko, Pasuruan", text: "Terima kasih... Tools nya sangat bagus.", stars: 5 }
+        ];
+        // --- REVIEW SLIDER LOGIC END ---
+        let currentReviewIndex = 0;
+
+        function rotateReview() {
+            const contentEl = document.getElementById('review-content');
+            
+            // 1. Fade out
+            contentEl.classList.remove('opacity-100');
+            contentEl.classList.add('opacity-0');
+
+            setTimeout(() => {
+                // 2. Change content after fade out
+                currentReviewIndex = (currentReviewIndex + 1) % reviews.length;
+                const review = reviews[currentReviewIndex];
+                
+                document.getElementById('review-text').textContent = `"${review.text}"`;
+                document.getElementById('review-name').textContent = `- ${review.name}`;
+                
+                // Optional: Dynamic stars (simplified for now as all are high rated)
+                
+                // 3. Fade in
+                contentEl.classList.remove('opacity-0');
+                contentEl.classList.add('opacity-100');
+            }, 500); // Matches transition duration
+        }
+
+        // Start Auto Slider
+        setInterval(rotateReview, 5000);
+        // ---------------------------
+
+
         // 0. Initial Welcome Modal
         window.onload = function() {
             setTimeout(() => {
