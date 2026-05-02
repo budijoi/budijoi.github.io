@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCS - Budijoi Cloud Service</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9', // Blue Modern
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            background-image: radial-gradient(at 0% 0%, hsla(199,100%,93%,1) 0, transparent 50%), 
+                              radial-gradient(at 100% 100%, hsla(187,100%,93%,1) 0, transparent 50%);
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="text-slate-900 font-sans antialiased min-h-screen">
+
+    <!-- Modal Login Info -->
+    <div id="loginModal" class="fixed inset-0 z-[100] hidden bg-slate-900/20 backdrop-blur-md flex items-center justify-center opacity-0 transition-all duration-500">
+        <div class="glass rounded-3xl shadow-2xl max-w-md w-full mx-4 overflow-hidden transform scale-90 transition-all duration-500" id="modalContent">
+            <div class="p-8">
+                <div class="flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-500/10 text-brand-600 mb-6 mx-auto">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                </div>
+                <h3 class="text-2xl font-bold text-center mb-2" id="modalTitle">Kredensial Akses</h3>
+                <p class="text-center text-slate-500 mb-8">Silakan gunakan data berikut untuk masuk ke dashboard.</p>
+                
+                <div class="bg-white/50 rounded-2xl p-5 mb-8 space-y-4 border border-white">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-semibold text-slate-400 uppercase tracking-wider">Username</span>
+                        <span class="font-mono px-3 py-1 bg-white rounded-lg shadow-sm text-brand-600 font-bold">casaos</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-semibold text-slate-400 uppercase tracking-wider">Password</span>
+                        <span class="font-mono px-3 py-1 bg-white rounded-lg shadow-sm text-brand-600 font-bold">casaos</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="closeModal()" class="px-6 py-3 rounded-2xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-all">Tutup</button>
+                    <a id="modalLink" href="#" target="_blank" onclick="closeModal()" class="px-6 py-3 rounded-2xl bg-brand-600 text-white font-bold hover:bg-brand-700 shadow-lg shadow-brand-200 transition-all text-center">Buka Link</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full top-0 left-0 z-50 p-6 flex justify-center">
+        <div class="glass px-8 py-3 rounded-full shadow-lg flex items-center gap-8">
+            <span class="font-black text-2xl tracking-tighter text-brand-600">BCS.</span>
+            <div class="hidden md:flex gap-6 text-sm font-bold text-slate-600 uppercase tracking-widest">
+                <a href="#features" class="hover:text-brand-600 transition">Fitur</a>
+                <a href="#pricing" class="hover:text-brand-600 transition">Harga</a>
+                <a href="mailto:admin@budijoi.my.id" class="hover:text-brand-600 transition">Kontak</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative pt-40 pb-20 px-4 text-center overflow-hidden">
+        <div class="max-w-4xl mx-auto relative z-10">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-white text-brand-600 text-xs font-black uppercase tracking-widest mb-8">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
+                </span>
+                The Future of Cloud Storage
+            </div>
+            <h1 class="text-6xl md:text-8xl font-black text-slate-900 tracking-tight mb-8 leading-none">
+                Budijoi <span class="bg-clip-text text-transparent bg-gradient-to-r from-brand-600 to-cyan-500">Cloud Service</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-slate-500 font-medium mb-12 max-w-2xl mx-auto leading-relaxed">
+                A Self-Hosted Cloud Service. Simpan data Anda dengan aman tanpa biaya bulanan selamanya.
+            </p>
+            
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row justify-center gap-5 mb-20">
+                <button onclick="openModal('Server Dashboard', 'https://server.budijoi.my.id')" class="px-10 py-5 bg-slate-900 text-white font-bold rounded-2xl shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3">
+                    Server Dashboard
+                    <svg class="w-5 h-5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                </button>
+                <button onclick="openModal('Files Management', 'https://files.budijoi.my.id')" class="px-10 py-5 glass text-slate-900 border-white border-2 font-bold rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3">
+                    Files Management
+                </button>
+            </div>
+        </div>
+
+        <!-- Floating Card (Pesan 1) -->
+        <div class="max-w-4xl mx-auto">
+            <div class="glass p-10 rounded-[3rem] shadow-2xl border border-white relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-10 opacity-5 group-hover:scale-110 transition-transform duration-700">
+                    <svg class="w-40 h-40" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"></path></svg>
+                </div>
+                <p class="text-2xl md:text-3xl text-slate-800 leading-snug font-extrabold relative z-10">
+                    Pusing sama biaya langganan cloud tiap bulan? <span class="text-brand-600">Storage penuh</span> dan harus bayar lagi buat nambah kapasitas? 
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section id="features" class="py-24 px-4 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <!-- Pesan 2 -->
+            <div class="group p-10 rounded-[2.5rem] hover:bg-brand-600 transition-all duration-500 hover:shadow-2xl hover:shadow-brand-200">
+                <div class="w-16 h-16 rounded-2xl bg-brand-100 group-hover:bg-brand-500 text-brand-600 group-hover:text-white flex items-center justify-center mb-8 transition-colors">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                </div>
+                <h3 class="text-2xl font-black mb-4 group-hover:text-white">Tanpa Abonemen</h3>
+                <p class="text-slate-500 group-hover:text-brand-100 leading-relaxed font-medium">Bebas menentukan kapasitas penyimpanan dan layanan cloud sendiri tanpa biaya tambahan per bulan selamanya.</p>
+            </div>
+
+            <!-- Pesan 3 -->
+            <div class="group p-10 rounded-[2.5rem] hover:bg-brand-600 transition-all duration-500 hover:shadow-2xl hover:shadow-brand-200">
+                <div class="w-16 h-16 rounded-2xl bg-brand-100 group-hover:bg-brand-500 text-brand-600 group-hover:text-white flex items-center justify-center mb-8 transition-colors">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+                </div>
+                <h3 class="text-2xl font-black mb-4 group-hover:text-white">Akses Global</h3>
+                <p class="text-slate-500 group-hover:text-brand-100 leading-relaxed font-medium">Gunakan secara lokal di rumah atau akses dari mana saja melalui koneksi online. Fleksibilitas total dalam genggaman Anda.</p>
+            </div>
+
+            <!-- Pesan 4 -->
+            <div class="group p-10 rounded-[2.5rem] hover:bg-brand-600 transition-all duration-500 hover:shadow-2xl hover:shadow-brand-200">
+                <div class="w-16 h-16 rounded-2xl bg-brand-100 group-hover:bg-brand-500 text-brand-600 group-hover:text-white flex items-center justify-center mb-8 transition-colors">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                </div>
+                <h3 class="text-2xl font-black mb-4 group-hover:text-white">Self-Hosted</h3>
+                <p class="text-slate-500 group-hover:text-brand-100 leading-relaxed font-medium">Server pribadi yang berfungsi selayaknya Google Drive atau Dropbox, namun kendali sepenuhnya ada di tangan Anda.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-32 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-20">
+                <h2 class="text-5xl font-black mb-6 tracking-tighter">Mulai Cloud Anda Sekarang</h2>
+                <p class="text-slate-500 text-xl font-medium">Pilih paket hardware yang paling sesuai dengan kebutuhan Anda.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-end">
+                <!-- Card 1 -->
+                <div class="glass p-10 rounded-[3rem] border border-white shadow-sm hover:shadow-2xl transition-all duration-500 group">
+                    <h3 class="text-xl font-black text-slate-400 mb-4 uppercase tracking-widest">B860H Series</h3>
+                    <div class="text-4xl font-black mb-8 text-slate-900">Rp 200.000</div>
+                    <ul class="space-y-4 mb-10">
+                        <li class="flex items-center gap-3 font-bold text-slate-600"><span class="w-2 h-2 rounded-full bg-brand-500"></span> STB B860H v1 (RAM 1GB)</li>
+                        <li class="flex items-center gap-3 font-bold text-slate-600"><span class="w-2 h-2 rounded-full bg-brand-500"></span> MMC 32 GB</li>
+                        <li class="flex items-center gap-3 font-bold text-slate-600"><span class="w-2 h-2 rounded-full bg-brand-500"></span> Domain .my.id (1 thn)</li>
+                    </ul>
+                    <a href="https://wa.me/6285323073037?text=Nama:%0AJenis Paket: Paket B860H" target="_blank" class="block w-full py-5 bg-slate-100 text-slate-900 font-black text-center rounded-2xl group-hover:bg-slate-900 group-hover:text-white transition-all">Pilih Paket</a>
+                </div>
+
+                <!-- Card 2 (Highlight) -->
+                <div class="bg-brand-600 p-12 rounded-[3.5rem] shadow-2xl shadow-brand-200 transform md:scale-110 relative z-10 text-white">
+                    <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-white text-brand-600 text-xs font-black px-6 py-2 rounded-full uppercase tracking-widest shadow-xl">
+                        🔥 Best Sale
+                    </div>
+                    <h3 class="text-xl font-black text-brand-200 mb-4 uppercase tracking-widest">HG680P Series</h3>
+                    <div class="text-5xl font-black mb-8">Rp 300.000</div>
+                    <ul class="space-y-4 mb-10">
+                        <li class="flex items-center gap-3 font-bold"><span class="w-2 h-2 rounded-full bg-white"></span> STB HG680P (RAM 2GB)</li>
+                        <li class="flex items-center gap-3 font-bold"><span class="w-2 h-2 rounded-full bg-white"></span> MMC 32 GB</li>
+                        <li class="flex items-center gap-3 font-bold"><span class="w-2 h-2 rounded-full bg-white"></span> Domain .my.id (1 thn)</li>
+                    </ul>
+                    <a href="https://wa.me/6285323073037?text=Nama:%0AJenis Paket: Paket HG680P" target="_blank" class="block w-full py-5 bg-white text-brand-600 font-black text-center rounded-2xl hover:scale-105 transition-all shadow-xl">Pesan Sekarang</a>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="glass p-10 rounded-[3rem] border border-white shadow-sm hover:shadow-2xl transition-all duration-500 group">
+                    <h3 class="text-xl font-black text-slate-400 mb-4 uppercase tracking-widest">X96MINI Series</h3>
+                    <div class="text-4xl font-black mb-8 text-slate-900">Rp 350.000</div>
+                    <ul class="space-y-4 mb-10">
+                        <li class="flex items-center gap-3 font-bold text-slate-600"><span class="w-2 h-2 rounded-full bg-brand-500"></span> STB X96 Mini (RAM 2GB)</li>
+                        <li class="flex items-center gap-3 font-bold text-slate-600"><span class="w-2 h-2 rounded-full bg-brand-500"></span> MMC 32 GB</li>
+                        <li class="flex items-center gap-3 font-bold text-slate-600"><span class="w-2 h-2 rounded-full bg-brand-500"></span> Domain .my.id (1 thn)</li>
+                    </ul>
+                    <a href="https://wa.me/6285323073037?text=Nama:%0AJenis Paket: Paket X96MINI" target="_blank" class="block w-full py-5 bg-slate-100 text-slate-900 font-black text-center rounded-2xl group-hover:bg-slate-900 group-hover:text-white transition-all">Pilih Paket</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="pt-32 pb-16 px-4 bg-slate-900 text-white rounded-t-[4rem] md:rounded-t-[6rem]">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-12 mb-20">
+                <div class="text-center md:text-left">
+                    <h2 class="text-3xl font-black mb-4">Budijoi Cloud Service</h2>
+                    <p class="text-slate-400 max-w-sm">Solusi server rumahan terbaik untuk kebutuhan penyimpanan data pribadi yang aman dan hemat biaya.</p>
+                </div>
+                
+                <div class="flex gap-6">
+                    <a href="https://instagram.com/budijoi_eco" class="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center hover:bg-brand-600 transition-all border border-white/10 group">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                    </a>
+                    <a href="https://wa.me/6285323073037" class="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center hover:bg-green-600 transition-all border border-white/10">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                    </a>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between items-center pt-10 border-t border-white/10 gap-6">
+                <div class="flex gap-8 text-sm font-bold text-slate-500 uppercase tracking-widest">
+                    <span>CasaOS</span>
+                    <span>OpHub</span>
+                    <span>GitHub</span>
+                </div>
+                <div class="text-slate-500 font-bold">budijoi &copy; 2026</div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        const modal = document.getElementById('loginModal');
+        const modalContent = document.getElementById('modalContent');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalLink = document.getElementById('modalLink');
+
+        function openModal(title, url) {
+            modalTitle.textContent = 'Akses ' + title;
+            modalLink.href = url;
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.add('opacity-100');
+                modalContent.classList.add('scale-100', 'translate-y-0');
+                modalContent.classList.remove('scale-90');
+            }, 10);
+        }
+
+        function closeModal() {
+            modal.classList.remove('opacity-100');
+            modalContent.classList.add('scale-90');
+            modalContent.classList.remove('scale-100');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 500);
+        }
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+    </script>
+</body>
+</html>
