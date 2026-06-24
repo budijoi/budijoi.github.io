@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TubeKidz - Video Aman untuk Anak</title>
+  <title>DilDulTube - Video Aman untuk Anak</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -11,54 +13,45 @@
 <body>
   <header class="header">
     <div class="container">
-      <div class="logo">
-        <span class="logo-icon">&#9733;</span>
-        <h1>TubeKidz</h1>
+      <div class="header-row">
+        <div class="logo" id="logoLink">&#9733; DilDulTube</div>
+        <div class="search-bar">
+          <input type="text" id="searchInput" placeholder="Cari video anak-anak..." autocomplete="off">
+          <button id="searchBtn">Cari</button>
+        </div>
       </div>
-      <p class="tagline">Video paling aman & seru untuk anak Indonesia</p>
+      <nav class="nav-bar" id="mainNav">
+        <span class="nav-link active" data-view="home">Beranda</span>
+        <span class="nav-link" data-view="categories">Kategori</span>
+      </nav>
     </div>
   </header>
 
+  <div class="container">
+    <div id="protocolBanner" class="protocol-banner" style="display:none;"></div>
+  </div>
   <main class="container">
-    <section class="hero">
-      <div class="search-box">
-        <span class="search-icon">&#128269;</span>
-        <input type="text" id="searchInput" placeholder="Cari video anak-anak..." autocomplete="off">
-        <button id="searchBtn" class="btn-search">Cari</button>
-      </div>
-      <div class="categories" id="categories">
-        <button class="cat-btn active" data-cat="all">Semua</button>
-        <button class="cat-btn" data-cat="edukasi">Edukasi</button>
-        <button class="cat-btn" data-cat="lagu">Lagu Anak</button>
-        <button class="cat-btn" data-cat="kartun">Kartun</button>
-        <button class="cat-btn" data-cat="petualangan">Petualangan</button>
-        <button class="cat-btn" data-cat="seni">Seni & Kreatif</button>
-      </div>
-    </section>
-
-    <section class="videos-grid" id="videoGrid">
-      <div class="loading">Memuat video...</div>
-    </section>
+    <div id="viewContent"></div>
   </main>
 
-  <div class="modal-overlay" id="modalOverlay">
-    <div class="modal-content">
-      <button class="modal-close" id="modalClose">&times;</button>
-      <h2 id="modalTitle" class="modal-title"></h2>
-      <div class="video-wrapper">
-        <iframe id="videoPlayer" src="" frameborder="0" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+  <div class="fullscreen-player" id="fullscreenPlayer">
+    <div class="fp-header">
+      <button class="fp-close" id="fpClose">&larr; Kembali</button>
+      <div class="fp-info">
+        <span class="fp-title" id="fpTitle"></span>
+        <span class="fp-channel" id="fpChannel"></span>
       </div>
-      <div id="fallbackMsg" class="fallback-msg" style="display:none;">
-        <p>Video tidak dapat diputar di sini. Klik tombol di bawah untuk menonton di YouTube.</p>
-        <a id="ytLinkBtn" href="#" target="_blank" rel="noopener" class="btn-yt">&#9654; Tonton di YouTube</a>
-      </div>
+    </div>
+    <div class="fp-video-wrap" id="videoWrapper"></div>
+    <div id="fallbackMsg" class="fallback-msg" style="display:none;">
+      <p>Video tidak dapat diputar di sini.</p>
+      <a id="ytLink" href="#" target="_blank" rel="noopener" class="btn-yt">&#9654; Tonton di YouTube</a>
     </div>
   </div>
 
   <footer class="footer">
     <div class="container">
-      <p>TubeKidz &mdash; Tayangan aman untuk buah hati tercinta</p>
-      <p class="footer-small">Semua video bersumber dari YouTube Kids & channel pendidikan anak</p>
+      <p>DilDulTube &mdash; Tayangan aman untuk buah hati tercinta</p>
     </div>
   </footer>
 
