@@ -16,41 +16,68 @@
       display: flex;
       flex-direction: column;
     }
-    .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 24px; flex: 1; }
+    .container { max-width: 880px; margin: 0 auto; padding: 32px 24px 24px; flex: 1; }
 
-    nav {
+    .topbar {
       display: flex;
-      gap: 24px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
       border-bottom: 1px solid #30363d;
-      padding-bottom: 12px;
-      margin-bottom: 32px;
+      margin-bottom: 28px;
     }
-    nav a {
+    .topbar .brand { font-size: 18px; font-weight: 700; color: #e6edf3; text-decoration: none; }
+    .topbar .brand:hover { color: #58a6ff; }
+    .topbar nav { display: flex; gap: 6px; }
+    .topbar nav a {
+      padding: 8px 16px;
+      border-radius: 8px;
       color: #8b949e;
       text-decoration: none;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 500;
-      padding-bottom: 12px;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -13px;
-      transition: color .2s;
+      transition: all .2s;
     }
-    nav a:hover { color: #e6edf3; }
-    nav a.active { color: #f78166; border-bottom-color: #f78166; }
+    .topbar nav a:hover { background: #21262d; color: #e6edf3; }
+    .topbar nav a.active { background: #1f6feb; color: #fff; }
 
-    header { margin-bottom: 8px; }
-    header h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.5px; }
-    header h1 a { color: #e6edf3; text-decoration: none; }
-    header h1 a:hover { color: #58a6ff; }
-    .stats { display: flex; gap: 24px; margin-top: 8px; font-size: 14px; color: #8b949e; }
-
-    .repo-list { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-    .repo-card {
+    .profile-summary {
+      display: flex;
+      align-items: center;
+      gap: 20px;
       background: #151b23;
       border: 1px solid #30363d;
-      border-radius: 8px;
-      padding: 18px 22px;
-      transition: border-color .2s;
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 28px;
+    }
+    .profile-summary .avatar {
+      width: 72px; height: 72px; border-radius: 50%;
+      border: 2px solid #30363d; flex-shrink: 0;
+    }
+    .profile-summary .info { flex: 1; min-width: 0; }
+    .profile-summary .info h2 { font-size: 20px; font-weight: 600; }
+    .profile-summary .info h2 a { color: #e6edf3; text-decoration: none; }
+    .profile-summary .info h2 a:hover { color: #58a6ff; }
+    .profile-summary .info .bio { color: #8b949e; font-size: 14px; margin-top: 2px; }
+    .profile-summary .info .detail { color: #8b949e; font-size: 13px; margin-top: 6px; display: flex; flex-wrap: wrap; gap: 14px; }
+    .profile-summary .info .detail span { display: flex; align-items: center; gap: 4px; }
+    .profile-summary .btn-profil {
+      background: #21262d; border: 1px solid #30363d; color: #e6edf3;
+      padding: 8px 20px; border-radius: 8px; text-decoration: none;
+      font-size: 14px; font-family: inherit; font-weight: 500;
+      transition: border-color .2s; white-space: nowrap;
+    }
+    .profile-summary .btn-profil:hover { border-color: #58a6ff; }
+
+    .repo-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .repo-header h3 { font-size: 17px; font-weight: 600; }
+    .repo-header .count { color: #8b949e; font-size: 14px; }
+
+    .repo-list { display: flex; flex-direction: column; gap: 10px; }
+    .repo-card {
+      background: #151b23; border: 1px solid #30363d; border-radius: 8px;
+      padding: 18px 22px; transition: border-color .2s;
     }
     .repo-card:hover { border-color: #58a6ff; }
     .repo-card a { text-decoration: none; }
@@ -68,33 +95,27 @@
     }
 
     .pagination {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      margin-top: 28px; flex-wrap: wrap;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      margin-top: 24px;
     }
     .pagination button {
       background: #21262d; border: 1px solid #30363d; color: #e6edf3;
-      padding: 6px 14px; border-radius: 6px; cursor: pointer;
+      padding: 8px 20px; border-radius: 8px; cursor: pointer;
       font-size: 14px; font-family: inherit; transition: border-color .2s;
+      display: inline-flex; align-items: center; gap: 6px;
     }
     .pagination button:hover:not(:disabled) { border-color: #58a6ff; }
     .pagination button:disabled { opacity: .4; cursor: default; }
-    .pagination .page-info { color: #8b949e; font-size: 14px; padding: 0 8px; }
-    .pagination .page-num {
-      background: transparent; border: 1px solid #30363d; color: #8b949e;
-      min-width: 34px; height: 34px; border-radius: 6px; cursor: pointer;
-      font-size: 14px; font-family: inherit; transition: all .2s;
-    }
-    .pagination .page-num:hover { border-color: #58a6ff; color: #e6edf3; }
-    .pagination .page-num.active { background: #1f6feb; border-color: #1f6feb; color: #fff; }
+    .pagination .page-info { color: #8b949e; font-size: 14px; }
 
-    .loading { text-align: center; color: #8b949e; padding: 60px 0; }
+    .loading { text-align: center; color: #8b949e; padding: 50px 0; }
     .loading .spinner {
-      width: 30px; height: 30px; border: 3px solid #30363d;
+      width: 28px; height: 28px; border: 3px solid #30363d;
       border-top-color: #58a6ff; border-radius: 50%;
       animation: spin .8s linear infinite; margin: 0 auto 10px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .error { color: #f85149; text-align: center; padding: 60px 0; }
+    .error { color: #f85149; text-align: center; padding: 50px 0; }
 
     footer { text-align: center; padding: 24px; color: #484f58; font-size: 13px; }
     footer a { color: #58a6ff; text-decoration: none; }
@@ -102,16 +123,25 @@
 </head>
 <body>
   <div class="container">
-    <nav>
-      <a href="index.html" class="active">Repositori</a>
-      <a href="profile.html">Profil</a>
-    </nav>
-    <header>
-      <h1><a href="https://github.com/budijoi">budijoi</a></h1>
-      <div class="stats">
-        <span id="repo-count">--</span>
+    <div class="topbar">
+      <a href="index.html" class="brand">budijoi</a>
+      <nav>
+        <a href="index.html" class="active">Repositori</a>
+        <a href="profile.html">Profil</a>
+      </nav>
+    </div>
+
+    <div id="profile-summary" class="profile-summary">
+      <div class="loading" style="width:100%;padding:20px 0;">
+        <div class="spinner"></div>
+        Memuat profil...
       </div>
-    </header>
+    </div>
+
+    <div class="repo-header">
+      <h3>Repositori</h3>
+      <span class="count" id="repo-count">--</span>
+    </div>
     <div id="repo-list" class="repo-list">
       <div class="loading">
         <div class="spinner"></div>
@@ -125,10 +155,11 @@
   </footer>
 
   <script>
-    const PER_PAGE = 10;
-    let allRepos = [];
     let currentPage = 1;
+    let totalCount = 0;
+    const PER_PAGE = 10;
 
+    const profileEl = document.getElementById('profile-summary');
     const container = document.getElementById('repo-list');
     const countEl = document.getElementById('repo-count');
     const paginationEl = document.getElementById('pagination');
@@ -144,77 +175,89 @@
 
     (async () => {
       try {
-        const res = await fetch('https://api.github.com/users/budijoi/repos?sort=updated&per_page=100&type=owner');
-        if (!res.ok) throw new Error('Gagal memuat repositori');
-        allRepos = await res.json();
+        const userRes = await fetch('https://api.github.com/users/budijoi');
+        if (!userRes.ok) throw new Error('Gagal memuat profil');
+        const user = await userRes.json();
 
-        countEl.textContent = allRepos.length + ' repositori';
-        if (allRepos.length === 0) {
-          container.innerHTML = '<p style="text-align:center;color:#8b949e;padding:60px 0;">Belum ada repositori.</p>';
-          return;
-        }
-        render();
+        profileEl.innerHTML = `
+          <img class="avatar" src="${user.avatar_url}" alt="${user.login}" loading="lazy">
+          <div class="info">
+            <h2><a href="https://github.com/${user.login}">${escHtml(user.name || user.login)}</a></h2>
+            ${user.bio ? `<div class="bio">${escHtml(user.bio)}</div>` : ''}
+            <div class="detail">
+              ${user.location ? `<span>📍 ${escHtml(user.location)}</span>` : ''}
+              ${user.company ? `<span>🏢 ${escHtml(user.company)}</span>` : ''}
+              <span>📦 ${user.public_repos} repositori</span>
+              <span>👥 ${user.followers} pengikut</span>
+            </div>
+          </div>
+          <a href="profile.html" class="btn-profil">Profil Lengkap →</a>
+        `;
+
+        totalCount = user.public_repos;
+        countEl.textContent = totalCount + ' repositori';
+        loadRepos();
       } catch (e) {
-        container.innerHTML = '<div class="error">Gagal memuat repositori. Coba lagi nanti.</div>';
+        profileEl.innerHTML = '<div class="error">Gagal memuat profil.</div>';
+        container.innerHTML = '<div class="error">Gagal memuat repositori.</div>';
         console.error(e);
       }
     })();
 
-    function render() {
-      const totalPages = Math.ceil(allRepos.length / PER_PAGE);
-      if (currentPage > totalPages) currentPage = totalPages;
-      if (currentPage < 1) currentPage = 1;
+    async function loadRepos() {
+      container.innerHTML = '<div class="loading"><div class="spinner"></div>Memuat repositori...</div>';
+      paginationEl.innerHTML = '';
 
-      const start = (currentPage - 1) * PER_PAGE;
-      const pageRepos = allRepos.slice(start, start + PER_PAGE);
+      try {
+        const res = await fetch(`https://api.github.com/users/budijoi/repos?sort=updated&per_page=${PER_PAGE}&page=${currentPage}&type=owner`);
+        if (!res.ok) throw new Error('Gagal memuat repositori');
 
-      container.innerHTML = pageRepos.map(repo => {
-        const desc = repo.description || '';
-        const lang = repo.language || '';
-        const color = langColors[lang] || '#8b949e';
-        return `
-          <div class="repo-card">
-            <a href="${repo.html_url}"><span class="repo-name">${escHtml(repo.name)}</span></a>
-            ${desc ? `<div class="repo-desc">${escHtml(desc)}</div>` : ''}
-            <div class="repo-meta">
-              ${lang ? `<span><span class="lang-dot" style="background:${color}"></span>${lang}</span>` : ''}
-              ${repo.stargazers_count > 0 ? `<span>${repo.stargazers_count} ★</span>` : ''}
-              ${repo.forks_count > 0 ? `<span>${repo.forks_count} 🍴</span>` : ''}
-              ${repo.fork ? '<span class="fork-label">Fork</span>' : ''}
-              <span>Diperbarui ${timeAgo(repo.pushed_at)}</span>
+        const linkHeader = res.headers.get('Link') || '';
+        const repos = await res.json();
+
+        const lastMatch = linkHeader.match(/page=(\d+)>; rel="last"/);
+        const totalPages = lastMatch ? parseInt(lastMatch[1]) : (repos.length < PER_PAGE ? currentPage : currentPage + 1);
+
+        if (repos.length === 0) {
+          container.innerHTML = '<p style="text-align:center;color:#8b949e;padding:50px 0;">Tidak ada repositori.</p>';
+          return;
+        }
+
+        container.innerHTML = repos.map(repo => {
+          const desc = repo.description || '';
+          const lang = repo.language || '';
+          const color = langColors[lang] || '#8b949e';
+          return `
+            <div class="repo-card">
+              <a href="${repo.html_url}"><span class="repo-name">${escHtml(repo.name)}</span></a>
+              ${desc ? `<div class="repo-desc">${escHtml(desc)}</div>` : ''}
+              <div class="repo-meta">
+                ${lang ? `<span><span class="lang-dot" style="background:${color}"></span>${lang}</span>` : ''}
+                ${repo.stargazers_count > 0 ? `<span>${repo.stargazers_count} ★</span>` : ''}
+                ${repo.forks_count > 0 ? `<span>${repo.forks_count} 🍴</span>` : ''}
+                ${repo.fork ? '<span class="fork-label">Fork</span>' : ''}
+                <span>Diperbarui ${timeAgo(repo.pushed_at)}</span>
+              </div>
             </div>
-          </div>
+          `;
+        }).join('');
+
+        paginationEl.innerHTML = `
+          <button id="prev-btn" ${currentPage <= 1 ? 'disabled' : ''}>← Sebelumnya</button>
+          <span class="page-info">Halaman ${currentPage}${totalPages > 1 ? ' dari ' + totalPages : ''}</span>
+          <button id="next-btn" ${repos.length < PER_PAGE ? 'disabled' : ''}>Selanjutnya →</button>
         `;
-      }).join('');
 
-      renderPagination(totalPages);
-    }
-
-    function renderPagination(totalPages) {
-      if (totalPages <= 1) { paginationEl.innerHTML = ''; return; }
-
-      let html = '';
-      html += `<button class="page-num" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
-
-      let startPage = Math.max(1, currentPage - 2);
-      let endPage = Math.min(totalPages, startPage + 4);
-      if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
-
-      for (let i = startPage; i <= endPage; i++) {
-        html += `<button class="page-num${i === currentPage ? ' active' : ''}" data-page="${i}">${i}</button>`;
-      }
-
-      html += `<button class="page-num" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''}>›</button>`;
-      html += `<span class="page-info">${currentPage}/${totalPages}</span>`;
-
-      paginationEl.innerHTML = html;
-
-      paginationEl.querySelectorAll('.page-num:not(:disabled)').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const page = parseInt(btn.dataset.page);
-          if (page !== currentPage) { currentPage = page; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        document.getElementById('prev-btn').addEventListener('click', () => {
+          if (currentPage > 1) { currentPage--; loadRepos(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
         });
-      });
+        document.getElementById('next-btn').addEventListener('click', () => {
+          if (repos.length >= PER_PAGE) { currentPage++; loadRepos(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        });
+      } catch (e) {
+        container.innerHTML = '<div class="error">Gagal memuat repositori. Coba lagi nanti.</div>';
+        console.error(e);
+      }
     }
 
     function escHtml(s) {
