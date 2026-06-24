@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>budijoi · GitHub Repositori</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .container { max-width: 880px; margin: 0 auto; padding: 48px 24px; flex: 1; }
+    header { margin-bottom: 40px; }
+    header h1 { font-size: 28px; font-weight: 600; letter-spacing: -0.5px; }
+    header h1 a { color: #e6edf3; text-decoration: none; }
+    header h1 a:hover { color: #58a6ff; }
+    header p { color: #8b949e; margin-top: 6px; font-size: 15px; }
+    .stats { display: flex; gap: 24px; margin-top: 16px; font-size: 14px; color: #8b949e; }
+    .stats span { display: flex; align-items: center; gap: 6px; }
+    .repo-list { display: flex; flex-direction: column; gap: 12px; }
+    .repo-card {
+      background: #151b23;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 20px 24px;
+      transition: border-color .2s;
+    }
+    .repo-card:hover { border-color: #58a6ff; }
+    .repo-card a { text-decoration: none; }
+    .repo-name {
+      font-size: 17px;
+      font-weight: 600;
+      color: #58a6ff;
+    }
+    .repo-name:hover { text-decoration: underline; }
+    .repo-desc {
+      color: #8b949e;
+      font-size: 14px;
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+    .repo-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 12px;
+      font-size: 13px;
+      color: #8b949e;
+      align-items: center;
+    }
+    .repo-meta .lang-dot {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+    .repo-meta .fork-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #21262d;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      color: #8b949e;
+    }
+    .loading {
+      text-align: center;
+      color: #8b949e;
+      padding: 60px 0;
+    }
+    .loading .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid #30363d;
+      border-top-color: #58a6ff;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error { color: #f85149; text-align: center; padding: 60px 0; }
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: #484f58;
+      font-size: 13px;
+    }
+    footer a { color: #58a6ff; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1><a href="https://github.com/budijoi">budijoi</a></h1>
+      <p>Repositori publik</p>
+      <div class="stats">
+        <span id="repo-count">--</span>
+      </div>
+    </header>
+    <div id="repo-list" class="repo-list">
+      <div class="loading">
+        <div class="spinner"></div>
+        Memuat repositori...
+      </div>
+    </div>
+  </div>
+  <footer>
+    <a href="https://github.com/budijoi">github.com/budijoi</a>
+  </footer>
+
+  <script>
+    (async () => {
+      const container = document.getElementById('repo-list');
+      const countEl = document.getElementById('repo-count');
+
+      try {
+        const res = await fetch('https://api.github.com/users/budijoi/repos?sort=updated&per_page=100&type=owner');
+        if (!res.ok) throw new Error('Gagal memuat repositori');
+        const repos = await res.json();
+
+        countEl.textContent = repos.length + ' repositori';
+
+        if (repos.length === 0) {
+          container.innerHTML = '<p style="text-align:center;color:#8b949e;padding:60px 0;">Belum ada repositori.</p>';
+          return;
+        }
+
+        const langColors = {
+          'JavaScript': '#f1e05a', 'Python': '#3572A5', 'HTML': '#e34c26',
+          'Shell': '#89e051', 'CSS': '#563d7c', 'TypeScript': '#3178c6',
+          'PHP': '#4F5D95', 'Ruby': '#701516', 'Go': '#00ADD8',
+          'Rust': '#dea584', 'Java': '#b07219', 'C': '#555555',
+          'C++': '#f34b7d', 'C#': '#178600', 'Kotlin': '#A97BFF',
+          'Dart': '#00B4AB', 'Swift': '#F05138', 'Scala': '#c22d40',
+        };
+
+        container.innerHTML = repos.map(repo => {
+          const isFork = repo.fork;
+          const desc = repo.description || '';
+          const lang = repo.language || '';
+          const color = langColors[lang] || '#8b949e';
+
+          return `
+            <div class="repo-card">
+              <a href="${repo.html_url}"><span class="repo-name">${repo.name}</span></a>
+              ${desc ? `<div class="repo-desc">${escHtml(desc)}</div>` : ''}
+              <div class="repo-meta">
+                ${lang ? `<span><span class="lang-dot" style="background:${color}"></span>${lang}</span>` : ''}
+                ${repo.stargazers_count > 0 ? `<span>${repo.stargazers_count} ★</span>` : ''}
+                ${repo.forks_count > 0 ? `<span>${repo.forks_count} 🍴</span>` : ''}
+                ${isFork ? '<span class="fork-label">Fork</span>' : ''}
+                <span>Diperbarui ${timeAgo(repo.pushed_at)}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        container.innerHTML = '<div class="error">Gagal memuat repositori. Coba lagi nanti.</div>';
+        console.error(e);
+      }
+    })();
+
+    function escHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    function timeAgo(dateStr) {
+      const now = Date.now();
+      const then = new Date(dateStr).getTime();
+      const diff = Math.floor((now - then) / 1000);
+      if (diff < 60) return 'baru saja';
+      if (diff < 3600) return Math.floor(diff / 60) + ' menit lalu';
+      if (diff < 86400) return Math.floor(diff / 3600) + ' jam lalu';
+      if (diff < 2592000) return Math.floor(diff / 86400) + ' hari lalu';
+      if (diff < 31536000) return Math.floor(diff / 2592000) + ' bulan lalu';
+      return Math.floor(diff / 31536000) + ' tahun lalu';
+    }
+  </script>
+</body>
+</html>
