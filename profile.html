@@ -157,22 +157,44 @@
   </footer>
 
   <script>
+    const CACHE_EXPIRY = 5 * 60 * 1000;
+
+    function cacheGet(key) {
+      try {
+        const raw = sessionStorage.getItem('gh_' + key);
+        if (!raw) return null;
+        const { data, ts } = JSON.parse(raw);
+        if (Date.now() - ts > CACHE_EXPIRY) { sessionStorage.removeItem('gh_' + key); return null; }
+        return data;
+      } catch { return null; }
+    }
+    function cacheSet(key, data) {
+      try { sessionStorage.setItem('gh_' + key, JSON.stringify({ data, ts: Date.now() })); } catch {}
+    }
+
+    async function ghFetch(url) {
+      const cached = cacheGet(url);
+      if (cached) return cached;
+      const res = await fetch(url);
+      if (res.status === 403) throw new Error('Rate limit GitHub API. Coba lagi nanti.');
+      if (!res.ok) throw new Error('Gagal memuat data');
+      const data = await res.json();
+      cacheSet(url, data);
+      return data;
+    }
+
     (async () => {
       const el = document.getElementById('profile-content');
 
       try {
-        const [userRes, socialRes] = await Promise.all([
-          fetch('https://api.github.com/users/budijoi'),
-          fetch('https://api.github.com/users/budijoi/social_accounts')
+        const [user, socialAccounts] = await Promise.all([
+          ghFetch('https://api.github.com/users/budijoi'),
+          ghFetch('https://api.github.com/users/budijoi/social_accounts').catch(() => [])
         ]);
-        if (!userRes.ok) throw new Error('Gagal memuat profil');
-        const user = await userRes.json();
-        let socialAccounts = [];
-        if (socialRes.ok) socialAccounts = await socialRes.json();
 
-        el.innerHTML = buildProfile(user, socialAccounts);
+        el.innerHTML = buildProfile(user, socialAccounts || []);
       } catch (e) {
-        el.innerHTML = '<div class="error">Gagal memuat profil. Coba lagi nanti.</div>';
+        el.innerHTML = '<div class="error">' + escHtml(e.message) + '</div>';
         console.error(e);
       }
     })();

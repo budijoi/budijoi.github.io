@@ -164,6 +164,32 @@
     const countEl = document.getElementById('repo-count');
     const paginationEl = document.getElementById('pagination');
 
+    const CACHE_EXPIRY = 5 * 60 * 1000;
+
+    function cacheGet(key) {
+      try {
+        const raw = sessionStorage.getItem('gh_' + key);
+        if (!raw) return null;
+        const { data, ts } = JSON.parse(raw);
+        if (Date.now() - ts > CACHE_EXPIRY) { sessionStorage.removeItem('gh_' + key); return null; }
+        return data;
+      } catch { return null; }
+    }
+    function cacheSet(key, data) {
+      try { sessionStorage.setItem('gh_' + key, JSON.stringify({ data, ts: Date.now() })); } catch {}
+    }
+
+    async function ghFetch(url) {
+      const cached = cacheGet(url);
+      if (cached) return { data: cached, link: '' };
+      const res = await fetch(url);
+      if (res.status === 403) throw new Error('Rate limit GitHub API. Coba lagi nanti.');
+      if (!res.ok) throw new Error('Gagal memuat data');
+      const data = await res.json();
+      cacheSet(url, data);
+      return { data, link: res.headers.get('Link') || '' };
+    }
+
     const langColors = {
       JavaScript: '#f1e05a', Python: '#3572A5', HTML: '#e34c26',
       Shell: '#89e051', CSS: '#563d7c', TypeScript: '#3178c6',
@@ -175,9 +201,7 @@
 
     (async () => {
       try {
-        const userRes = await fetch('https://api.github.com/users/budijoi');
-        if (!userRes.ok) throw new Error('Gagal memuat profil');
-        const user = await userRes.json();
+        const { data: user } = await ghFetch('https://api.github.com/users/budijoi');
 
         profileEl.innerHTML = `
           <img class="avatar" src="${user.avatar_url}" alt="${user.login}" loading="lazy">
@@ -216,11 +240,7 @@
       paginationEl.innerHTML = '';
 
       try {
-        const res = await fetch(`https://api.github.com/users/budijoi/repos?sort=updated&per_page=${PER_PAGE}&page=${currentPage}&type=owner`);
-        if (!res.ok) throw new Error('Gagal memuat repositori');
-
-        const linkHeader = res.headers.get('Link') || '';
-        const repos = await res.json();
+        const { data: repos, link: linkHeader } = await ghFetch(`https://api.github.com/users/budijoi/repos?sort=updated&per_page=${PER_PAGE}&page=${currentPage}&type=owner`);
 
         const hasNext = linkHeader.includes('rel="next"');
         const lastMatch = linkHeader.match(/page=(\d+)>; rel="last"/);
