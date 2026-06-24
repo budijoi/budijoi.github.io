@@ -1,0 +1,423 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: linear-gradient(135deg, #fce4ec 0%, #e8f5e9 50%, #fff9c4 100%);
+  min-height: 100vh;
+  color: #333;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.header {
+  background: linear-gradient(135deg, #ff6b6b, #ffa94d, #ffd43b);
+  padding: 24px 0 20px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  font-size: 2.5rem;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  animation: spin 4s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.logo h1 {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 3px 3px 0 rgba(0,0,0,0.15);
+  letter-spacing: -1px;
+}
+
+.tagline {
+  color: #fff;
+  font-size: 1rem;
+  margin-top: 4px;
+  opacity: 0.9;
+  font-weight: 600;
+}
+
+.hero {
+  text-align: center;
+  padding: 32px 0 20px;
+}
+
+.search-box {
+  display: flex;
+  max-width: 500px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 50px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  overflow: hidden;
+  border: 3px solid transparent;
+  transition: border-color 0.3s;
+}
+
+.search-box:focus-within {
+  border-color: #ffa94d;
+}
+
+.search-icon {
+  display: flex;
+  align-items: center;
+  padding-left: 18px;
+  font-size: 1.2rem;
+}
+
+#searchInput {
+  flex: 1;
+  padding: 14px 12px;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 600;
+}
+
+.btn-search {
+  background: linear-gradient(135deg, #ff6b6b, #ffa94d);
+  color: #fff;
+  border: none;
+  padding: 14px 28px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  transition: opacity 0.3s;
+}
+
+.btn-search:hover {
+  opacity: 0.8;
+}
+
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.cat-btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 30px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: #fff;
+  color: #555;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  transition: all 0.3s;
+}
+
+.cat-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+}
+
+.cat-btn.active {
+  color: #fff;
+}
+
+.cat-btn[data-cat="all"].active { background: linear-gradient(135deg, #6c5ce7, #a29bfe); }
+.cat-btn[data-cat="edukasi"].active { background: linear-gradient(135deg, #00b894, #55efc4); }
+.cat-btn[data-cat="lagu"].active { background: linear-gradient(135deg, #e17055, #fab1a0); }
+.cat-btn[data-cat="kartun"].active { background: linear-gradient(135deg, #0984e3, #74b9ff); }
+.cat-btn[data-cat="petualangan"].active { background: linear-gradient(135deg, #6c5ce7, #a29bfe); }
+.cat-btn[data-cat="seni"].active { background: linear-gradient(135deg, #e84393, #fd79a8); }
+
+.videos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  padding: 20px 0 40px;
+}
+
+.video-card {
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.video-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+}
+
+.thumbnail-wrap {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.thumbnail-wrap img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.play-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 107, 107, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  color: #fff;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+}
+
+.video-card:hover .play-badge {
+  background: #ff6b6b;
+  width: 70px;
+  height: 70px;
+  font-size: 2.2rem;
+}
+
+.video-info {
+  padding: 16px;
+}
+
+.video-info h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.video-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #888;
+  font-weight: 600;
+}
+
+.video-cat-tag {
+  padding: 3px 12px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.cat-edukasi .video-cat-tag { background: #00b894; }
+.cat-lagu .video-cat-tag { background: #e17055; }
+.cat-kartun .video-cat-tag { background: #0984e3; }
+.cat-petualangan .video-cat-tag { background: #6c5ce7; }
+.cat-seni .video-cat-tag { background: #e84393; }
+
+.loading {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #888;
+}
+
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #aaa;
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.show {
+  display: flex;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 24px;
+  padding: 24px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 2.2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #888;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s;
+  z-index: 10;
+}
+
+.modal-close:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.modal-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  padding-right: 40px;
+  color: #333;
+}
+
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #000;
+}
+
+.video-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.fallback-msg {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.fallback-msg p {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+.btn-yt {
+  display: inline-block;
+  padding: 12px 32px;
+  background: #ff0000;
+  color: #fff;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 1rem;
+  transition: all 0.3s;
+  font-family: 'Nunito', sans-serif;
+}
+
+.btn-yt:hover {
+  background: #cc0000;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255,0,0,0.3);
+}
+
+.footer {
+  background: linear-gradient(135deg, #ff6b6b, #ffa94d, #ffd43b);
+  text-align: center;
+  padding: 24px 0;
+  margin-top: 20px;
+}
+
+.footer p {
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.footer-small {
+  font-size: 0.8rem !important;
+  opacity: 0.8;
+  margin-top: 4px;
+}
+
+@media (max-width: 600px) {
+  .logo h1 { font-size: 2rem; }
+  .videos-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 14px;
+  }
+  .video-info h3 { font-size: 0.85rem; }
+  .search-box { flex-direction: column; border-radius: 20px; }
+  .btn-search { border-radius: 0; padding: 12px; }
+  .categories { gap: 8px; }
+  .cat-btn { padding: 8px 16px; font-size: 0.85rem; }
+  .modal-content { padding: 16px; width: 95%; }
+}
