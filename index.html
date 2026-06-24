@@ -222,8 +222,9 @@
         const linkHeader = res.headers.get('Link') || '';
         const repos = await res.json();
 
+        const hasNext = linkHeader.includes('rel="next"');
         const lastMatch = linkHeader.match(/page=(\d+)>; rel="last"/);
-        const totalPages = lastMatch ? parseInt(lastMatch[1]) : (repos.length < PER_PAGE ? currentPage : currentPage + 1);
+        const totalPages = lastMatch ? parseInt(lastMatch[1]) : currentPage;
 
         if (repos.length === 0) {
           container.innerHTML = '<p style="text-align:center;color:#8b949e;padding:50px 0;">Tidak ada repositori.</p>';
@@ -252,14 +253,14 @@
         paginationEl.innerHTML = `
           <button id="prev-btn" ${currentPage <= 1 ? 'disabled' : ''}>← Sebelumnya</button>
           <span class="page-info">Halaman ${currentPage}${totalPages > 1 ? ' dari ' + totalPages : ''}</span>
-          <button id="next-btn" ${repos.length < PER_PAGE ? 'disabled' : ''}>Selanjutnya →</button>
+          <button id="next-btn" ${!hasNext ? 'disabled' : ''}>Selanjutnya →</button>
         `;
 
         document.getElementById('prev-btn').addEventListener('click', () => {
           if (currentPage > 1) { currentPage--; loadRepos(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
         });
         document.getElementById('next-btn').addEventListener('click', () => {
-          if (repos.length >= PER_PAGE) { currentPage++; loadRepos(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+          if (hasNext) { currentPage++; loadRepos(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
         });
       } catch (e) {
         container.innerHTML = '<div class="error">Gagal memuat repositori. Coba lagi nanti.</div>';
