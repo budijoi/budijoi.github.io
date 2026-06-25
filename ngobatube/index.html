@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NGOBATUBE</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0f0f0f;
+            color: #fff;
+            min-height: 100vh;
+        }
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            border-bottom: 1px solid #272727;
+            position: sticky;
+            top: 0;
+            background: #0f0f0f;
+            z-index: 10;
+        }
+        .logo { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+        .logo span { color: #ff0033; }
+        .sub-count { color: #aaa; font-size: 14px; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .toolbar label { color: #aaa; font-size: 14px; }
+        .toolbar select {
+            background: #272727;
+            color: #fff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+        }
+        .toolbar select:focus { outline: 1px solid #ff0033; }
+        .toolbar .count-info { color: #888; font-size: 13px; }
+        .videos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+        .card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .card:hover { transform: translateY(-4px); }
+        .card .thumb-wrap { position: relative; }
+        .card .thumb-wrap img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+        .card .thumb-wrap .badge {
+            position: absolute; bottom: 6px; right: 6px;
+            background: rgba(0,0,0,0.85);
+            color: #fff; font-size: 12px; font-weight: 500;
+            padding: 2px 6px; border-radius: 4px;
+        }
+        .card-body { padding: 12px 16px 16px; }
+        .card-body h3 {
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .card-body .meta { color: #aaa; font-size: 13px; margin-top: 6px; }
+        .loading {
+            text-align: center;
+            padding: 80px 24px;
+            color: #888;
+        }
+        .loading .spinner {
+            width: 40px; height: 40px;
+            border: 4px solid #333;
+            border-top-color: #ff0033;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .error {
+            text-align: center;
+            padding: 80px 24px;
+            color: #ff6b6b;
+        }
+        .error p { margin-top: 8px; color: #aaa; font-size: 14px; }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 40px;
+            padding-bottom: 40px;
+        }
+        .pagination button {
+            background: #272727;
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .pagination button:hover:not(:disabled) { background: #3f3f3f; }
+        .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .pagination .page-info { display: flex; align-items: center; color: #aaa; font-size: 14px; }
+        .overlay {
+            position: fixed; inset: 0; z-index: 100;
+            background: #000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .overlay.active { display: flex; }
+        .overlay .close {
+            position: absolute; top: 16px; right: 20px;
+            background: none; border: none; color: #fff;
+            font-size: 32px; cursor: pointer; z-index: 10;
+            opacity: 0.7; transition: opacity 0.2s;
+        }
+        .overlay .close:hover { opacity: 1; }
+        .overlay #player { width: 100vw; height: 100vh; }
+        .footer { text-align: center; color: #555; font-size: 13px; padding: 24px; }
+        @media (max-width: 640px) {
+            header { padding: 12px 16px; }
+            .container { padding: 16px; }
+            .videos { gap: 16px; grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Budi Dalton - NGOBAT</div>
+        <div class="sub-count" id="subCount"></div>
+    </header>
+
+    <div class="container">
+        <div class="toolbar" id="toolbar" style="display:none">
+            <div>
+                <label for="sortSelect">Urutkan: </label>
+                <select id="sortSelect">
+                    <option value="terbaru">Terbaru</option>
+                    <option value="terlama">Terlama</option>
+                    <option value="viewerTerbanyak">Viewer terbanyak</option>
+                    <option value="viewerTersedikit">Viewer tersedikit</option>
+                    <option value="durasiTerpanjang">Durasi terpanjang</option>
+                    <option value="durasiTerpendek">Durasi terpendek</option>
+                    <option value="judulAZ">Judul A-Z</option>
+                    <option value="judulZA">Judul Z-A</option>
+                </select>
+            </div>
+            <span class="count-info" id="countInfo"></span>
+        </div>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Memuat video...</p>
+        </div>
+        <div class="error" id="error" style="display:none">
+            <h2>Gagal memuat video</h2>
+            <p id="errorMsg">Terjadi kesalahan. Coba lagi nanti.</p>
+        </div>
+        <div class="videos" id="videos" style="display:none"></div>
+        <div class="pagination" id="pagination" style="display:none">
+            <button id="prevBtn" disabled>Sebelumnya</button>
+            <span class="page-info" id="pageInfo"></span>
+            <button id="nextBtn">Berikutnya</button>
+        </div>
+    </div>
+
+    <div class="footer">Data dari YouTube API</div>
+
+    <div class="overlay" id="overlay">
+        <button class="close" id="closeBtn">&times;</button>
+        <div id="player"></div>
+    </div>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        const API_KEY = 'AIzaSyDpRLPGTQ9zyDUBXUE8bkKnG9gfa-Gq0IY';
+        const HANDLE = '@ngobat.official';
+
+        const videosEl = document.getElementById('videos');
+        const loadingEl = document.getElementById('loading');
+        const errorEl = document.getElementById('error');
+        const errorMsg = document.getElementById('errorMsg');
+        const subCount = document.getElementById('subCount');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pageInfo = document.getElementById('pageInfo');
+        const paginationEl = document.getElementById('pagination');
+        const toolbarEl = document.getElementById('toolbar');
+        const sortSelect = document.getElementById('sortSelect');
+        const countInfo = document.getElementById('countInfo');
+
+        let allVideos = [];
+        let pageTokens = [];
+        let currentPage = 0;
+        let playlistId = null;
+        let channelTitle = '';
+        let sortBy = 'terbaru';
+        let isLoading = false;
+
+        function showError(msg) {
+            loadingEl.style.display = 'none';
+            errorEl.style.display = 'block';
+            errorMsg.textContent = msg || 'Terjadi kesalahan. Coba lagi nanti.';
+        }
+
+        async function fetchJSON(url) {
+            const res = await fetch(url);
+            if (!res.ok) {
+                const body = await res.text();
+                throw new Error(`HTTP ${res.status}: ${body}`);
+            }
+            return res.json();
+        }
+
+        function formatCount(n) {
+            if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'jt';
+            if (n >= 1_000) return (n / 1_000).toFixed(1) + 'rb';
+            return n.toString();
+        }
+
+        function timeAgo(published) {
+            const seconds = Math.floor((Date.now() - new Date(published).getTime()) / 1000);
+            if (seconds < 60) return 'baru saja';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return minutes + ' menit lalu';
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return hours + ' jam lalu';
+            const days = Math.floor(hours / 24);
+            if (days < 30) return days + ' hari lalu';
+            const months = Math.floor(days / 30);
+            if (months < 12) return months + ' bulan lalu';
+            return Math.floor(months / 12) + ' tahun lalu';
+        }
+
+        function parseDuration(iso) {
+            const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+            if (!m) return 0;
+            return (parseInt(m[1]||0) * 3600) + (parseInt(m[2]||0) * 60) + parseInt(m[3]||0);
+        }
+
+        function formatDuration(iso) {
+            const total = parseDuration(iso);
+            const h = Math.floor(total / 3600);
+            const min = Math.floor((total % 3600) / 60);
+            const s = total % 60;
+            if (h > 0) return `${h}:${String(min).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            return `${min}:${String(s).padStart(2,'0')}`;
+        }
+
+        async function getChannelInfo() {
+            const url = `https://www.googleapis.com/youtube/v3/channels?part=snippet,contentDetails,statistics&forHandle=${HANDLE}&key=${API_KEY}`;
+            const data = await fetchJSON(url);
+            if (!data.items || data.items.length === 0) throw new Error('Channel tidak ditemukan');
+            const channel = data.items[0];
+            channelTitle = channel.snippet.title;
+            playlistId = channel.contentDetails.relatedPlaylists.uploads;
+            const stats = channel.statistics;
+            document.title = 'Budi Dalton - NGOBAT';
+            subCount.textContent = formatCount(parseInt(stats.subscriberCount)) + ' subscribers';
+        }
+
+        async function getVideos(pageToken) {
+            const tokenParam = pageToken ? `&pageToken=${pageToken}` : '';
+            const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=24${tokenParam}&key=${API_KEY}`;
+            const data = await fetchJSON(url);
+
+            const items = data.items.filter(i => i.snippet.title !== 'Private video' && i.snippet.title !== 'Deleted video');
+            if (items.length === 0) return { ...data, items: [] };
+
+            const ids = items.map(i => i.snippet.resourceId.videoId).join(',');
+            const detailUrl = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails,statistics&id=${ids}&key=${API_KEY}`;
+            const detailData = await fetchJSON(detailUrl);
+            const detailMap = {};
+            for (const v of detailData.items) {
+                detailMap[v.id] = v;
+            }
+
+            const enriched = [];
+            for (const item of items) {
+                const vid = item.snippet.resourceId.videoId;
+                const detail = detailMap[vid];
+                if (!detail) continue;
+                const dur = parseDuration(detail.contentDetails.duration);
+                if (dur < 3600) continue;
+                enriched.push({
+                    videoId: vid,
+                    title: item.snippet.title,
+                    publishedAt: item.snippet.publishedAt,
+                    thumb: (item.snippet.thumbnails.medium || item.snippet.thumbnails.default).url,
+                    duration: dur,
+                    durationLabel: formatDuration(detail.contentDetails.duration),
+                    views: parseInt(detail.statistics?.viewCount || 0)
+                });
+            }
+
+            return { ...data, items: enriched };
+        }
+
+        function sortVideos(videos) {
+            const sorted = [...videos];
+            switch (sortBy) {
+                case 'terbaru': sorted.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt)); break;
+                case 'terlama': sorted.sort((a, b) => new Date(a.publishedAt) - new Date(b.publishedAt)); break;
+                case 'viewerTerbanyak': sorted.sort((a, b) => b.views - a.views); break;
+                case 'viewerTersedikit': sorted.sort((a, b) => a.views - b.views); break;
+                case 'durasiTerpanjang': sorted.sort((a, b) => b.duration - a.duration); break;
+                case 'durasiTerpendek': sorted.sort((a, b) => a.duration - b.duration); break;
+                case 'judulAZ': sorted.sort((a, b) => a.title.localeCompare(b.title)); break;
+                case 'judulZA': sorted.sort((a, b) => b.title.localeCompare(a.title)); break;
+            }
+            return sorted;
+        }
+
+        function renderVideos() {
+            if (allVideos.length === 0) {
+                videosEl.innerHTML = '<div class="loading"><p>Tidak ada video durasi panjang.</p></div>';
+                return;
+            }
+
+            const sorted = sortVideos(allVideos);
+
+            let html = '';
+            for (const v of sorted) {
+                html += `
+                    <div class="card" onclick="playVideo('${v.videoId}')">
+                        <div class="thumb-wrap">
+                            <img src="${v.thumb}" alt="${v.title}" loading="lazy">
+                            <span class="badge">${v.durationLabel}</span>
+                        </div>
+                        <div class="card-body">
+                            <h3>${v.title}</h3>
+                            <div class="meta">${formatCount(v.views)} x ditonton · ${timeAgo(v.publishedAt)}</div>
+                        </div>
+                    </div>
+                `;
+            }
+            videosEl.innerHTML = html;
+            videosEl.style.display = 'grid';
+            toolbarEl.style.display = 'flex';
+            countInfo.textContent = `${sorted.length} video`;
+        }
+
+        async function loadPage(pageToken) {
+            if (isLoading) return;
+            isLoading = true;
+            loadingEl.style.display = 'block';
+            errorEl.style.display = 'none';
+            videosEl.style.display = 'none';
+            toolbarEl.style.display = 'none';
+
+            try {
+                const data = await getVideos(pageToken);
+                allVideos = data.items;
+                renderVideos();
+
+                if (data.nextPageToken && !pageTokens[currentPage + 1]) {
+                    pageTokens[currentPage + 1] = data.nextPageToken;
+                }
+                if (data.prevPageToken && !pageTokens[currentPage - 1]) {
+                    pageTokens[currentPage - 1] = data.prevPageToken;
+                }
+                paginationEl.style.display = data.nextPageToken || data.prevPageToken ? 'flex' : 'none';
+                prevBtn.disabled = !data.prevPageToken || currentPage === 0;
+                nextBtn.disabled = !data.nextPageToken;
+                pageInfo.textContent = `Halaman ${currentPage + 1}`;
+            } catch (err) {
+                showError(err.message);
+            } finally {
+                loadingEl.style.display = 'none';
+                isLoading = false;
+            }
+        }
+
+        async function init() {
+            try {
+                await getChannelInfo();
+                pageTokens[0] = null;
+                await loadPage(null);
+            } catch (err) {
+                showError(err.message);
+                loadingEl.style.display = 'none';
+            }
+        }
+
+        sortSelect.addEventListener('change', () => {
+            sortBy = sortSelect.value;
+            renderVideos();
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 0) { currentPage--; loadPage(pageTokens[currentPage]); }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentPage++; loadPage(pageTokens[currentPage]);
+        });
+
+        const overlay = document.getElementById('overlay');
+        const closeBtn = document.getElementById('closeBtn');
+        let ytPlayer = null;
+
+        function onYouTubeIframeAPIReady() {}
+
+        function playVideo(videoId) {
+            if (ytPlayer) {
+                ytPlayer.loadVideoById(videoId);
+            } else {
+                ytPlayer = new YT.Player('player', {
+                    videoId: videoId,
+                    playerVars: { autoplay: 1, rel: 0, modestbranding: 1, controls: 1 },
+                    events: { onReady: (e) => e.target.playVideo() }
+                });
+            }
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePlayer() {
+            if (ytPlayer && ytPlayer.stopVideo) ytPlayer.stopVideo();
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        closeBtn.addEventListener('click', closePlayer);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) closePlayer(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePlayer(); });
+
+        init();
+    </script>
+</body>
+</html>
