@@ -61,11 +61,23 @@ var VIDEOS = [
   { id: "azog8Z2jJ3I", title: "Berkreasi bersama Blippi!", channel: "Blippi Indonesia", cat: "edukasi" },
   { id: "udauRXpT7NM", title: "Sebuah Suguhan yang Lezat", channel: "Blippi Indonesia", cat: "edukasi" },
   { id: "N5WwLsYuKl0", title: "Membuat Gelembung", channel: "Blippi Indonesia", cat: "edukasi" },
-  { id: "akKxZyA0qmk", title: "Memanggang Makaroni yang Lezat", channel: "Blippi Indonesia", cat: "edukasi" }
+  { id: "akKxZyA0qmk", title: "Memanggang Makaroni yang Lezat", channel: "Blippi Indonesia", cat: "edukasi" },
   { id: "e4J03H0vepk", title: "Mud Test JCB & Traktor", channel: "Pramod`s Life", cat: "petualangan" },
   { id: "DZk2S-Y4rOI", title: "JCB & TATA Tipper Heavy Load", channel: "Pramod`s Life", cat: "petualangan" },
   { id: "0JVB3MZq9bg", title: "JCB Excavator Buat Sumur", channel: "Pramod`s Life", cat: "petualangan" },
-  { id: "jGH2flI1Xqg", title: "JCB Excavator Bikin Kolam Ikan", channel: "Pramod`s Life", cat: "petualangan" }
+  { id: "jGH2flI1Xqg", title: "JCB Excavator Bikin Kolam Ikan", channel: "Pramod`s Life", cat: "petualangan" },
+  { id: "oKyViklTKHM", title: "Sonic Bukan Monster", channel: "Anglikosik Indonesia", cat: "petualangan" },
+  { id: "7enRlkNAJ1k", title: "Bombardino Crocodilo", channel: "Anglikosik Indonesia", cat: "petualangan" },
+  { id: "l9YenYrISiM", title: "Stitch di Dunia Nyata", channel: "Anglikosik Indonesia", cat: "petualangan" },
+  { id: "vE6c0YG6iXI", title: "Monster Italian Brainrot", channel: "Anglikosik Indonesia", cat: "petualangan" },
+  { id: "VDevBKiZ3u4", title: "Burung Cendet Penjagal Kejam", channel: "Animal Scripts", cat: "edukasi" },
+  { id: "RPaf1oWv4Rw", title: "Hutan Mangrove", channel: "Animal Scripts", cat: "edukasi" },
+  { id: "JwEn2Q3hgfs", title: "Honey Badger Preman Sabana", channel: "Animal Scripts", cat: "edukasi" },
+  { id: "kd8iGvkMSFg", title: "Burung Kedasih Perampok", channel: "Animal Scripts", cat: "edukasi" },
+  { id: "ZU6qShtfguA", title: "Bangun Penjara Dari Miskin ke Kaya", channel: "Dunia Budi Roblox", cat: "gaming" },
+  { id: "C5igwlK3drE", title: "Jaga Rumah Sakit Hewan Jam 3 Pagi", channel: "Dunia Budi Roblox", cat: "gaming" },
+  { id: "6PqVWxdbFas", title: "Liburan Naik Pesawat Jatuh Meledak", channel: "Dunia Budi Roblox", cat: "gaming" },
+  { id: "aLCI15vaNRo", title: "Sembunyi dari Pocong Ketuk Pintu", channel: "Dunia Budi Roblox", cat: "gaming" }
 ];
 
 var CATEGORIES = { semua: "all", edukasi: "edukasi", lagu: "lagu", kartun: "kartun", petualangan: "petualangan", gaming: "gaming" };
@@ -86,12 +98,15 @@ var CHANNEL_FEEDS = {
   "BaLiTa - Baba Lili Tata": { id: "UC5Tg_aUYKBtpnGipTVqDDuQ", cat: "edukasi" },
   "Kok Bisa?": { id: "UCu0yQD7NFMyLu_-TmKa4Hqg", cat: "edukasi" },
   "NussaOfficial": { id: "UCV2jNjJEtO0Hr3b1Es3xPJg", cat: "kartun" },
-  "Blippi Indonesia": { id: "UCIOO268dRFA8Gae-ksXrpvw", cat: "edukasi" }
-  "Pramod`s Life": { id: "UC1V1PQT_ZVRjzuzioG05rrQ", cat: "petualangan" }
+  "Blippi Indonesia": { id: "UCIOO268dRFA8Gae-ksXrpvw", cat: "edukasi" },
+  "Pramod`s Life": { id: "UC1V1PQT_ZVRjzuzioG05rrQ", cat: "petualangan" },
+  "Anglikosik Indonesia": { id: "UCiK7L708JFZylemhApNkRcA", cat: "petualangan" },
+  "Animal Scripts": { id: "UC5wFTgdXgbecQOm97_S6yfA", cat: "edukasi" },
+  "Dunia Budi Roblox": { id: "UCJ9v-fDARn2Vyl1TX9PfVyA", cat: "gaming" }
 };
 
 var RSS_URL = "https://api.rss2json.com/v1/api.json?rss_url=";
-var MAX_RSS = 5;
+var MAX_RSS = 15;
 var dynamicVideos = [];
 var dynamicLoaded = false;
 
@@ -203,8 +218,6 @@ function isDup(id) {
 }
 
 function loadDynamicVideos() {
-  if (dynamicLoaded) return;
-  dynamicLoaded = true;
   var names = Object.keys(CHANNEL_FEEDS);
   var pending = names.length;
 
@@ -224,15 +237,21 @@ function loadDynamicVideos() {
       }
     }).catch(function() {}).then(function() {
       pending--;
-      if (pending === 0) { render(); }
+      if (pending === 0) { if (dynamicLoaded) render(); else { dynamicLoaded = true; render(); } }
     });
   });
+}
+
+function refreshDynamicVideos() {
+  dynamicVideos = [];
+  dynamicLoaded = false;
+  loadDynamicVideos();
 }
 
 // ================= RENDER =================
 
 function render() {
-  if (!IS_FILE) loadDynamicVideos();
+  if (!IS_FILE && !dynamicLoaded) { loadDynamicVideos(); }
   if (state.view === "home") renderHome();
   else if (state.view === "categories") renderCategories();
   else if (state.view === "channel") renderChannel(state.channelName);
@@ -474,3 +493,4 @@ if (IS_FILE) {
   }
 }
 goHome();
+setInterval(refreshDynamicVideos, 1800000);
