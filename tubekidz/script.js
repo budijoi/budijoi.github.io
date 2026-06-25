@@ -77,7 +77,18 @@ var VIDEOS = [
   { id: "C_fg98XhF4k", title: "Masha dan Beruang Do-Do-Domba", channel: "Masha dan Beruang", cat: "kartun" },
   { id: "QeCJilRorZk", title: "Masha Bilang Cheese", channel: "Masha dan Beruang", cat: "kartun" },
   { id: "41RNH5od7XQ", title: "Masha Episode Baru", channel: "Masha dan Beruang", cat: "kartun" },
-  { id: "2SQUdqjhYro", title: "10 Hal yang Harus Dilakukan", channel: "Masha dan Beruang", cat: "kartun" }
+  { id: "2SQUdqjhYro", title: "10 Hal yang Harus Dilakukan", channel: "Masha dan Beruang", cat: "kartun" },
+
+  // Top 10 most-viewed videos across all channels
+  { id: "e_04ZrNroTo", title: "Wheels on the Bus", channel: "CoComelon", cat: "lagu" },
+  { id: "WRVsOCh907o", title: "Bath Song", channel: "CoComelon", cat: "lagu" },
+  { id: "wV3N-wCRL2k", title: "Baa Baa Black Sheep", channel: "CoComelon", cat: "lagu" },
+  { id: "tPIbNo9BsFk", title: "Yes Yes Vegetables Song", channel: "CoComelon", cat: "lagu" },
+  { id: "jNJvBBSQw-U", title: "The Sick Song", channel: "CoComelon", cat: "lagu" },
+  { id: "7MeWlZgPlqk", title: "Bayi Panda & Jus Segarnya", channel: "BabyBus - Cerita & Lagu Anak-anak", cat: "edukasi" },
+  { id: "4_zdirgU3EU", title: "Belajar Tata Krama Makan Yuk!", channel: "Little Angel Bahasa Indonesia", cat: "lagu" },
+  { id: "gN4pNQO78_w", title: "Mary Had a Little Lamb", channel: "CoComelon", cat: "lagu" },
+  { id: "o-_8C1InZbE", title: "Are We There Yet?", channel: "CoComelon", cat: "lagu" }
 ];
 
 var CATEGORIES = { semua: "all", edukasi: "edukasi", lagu: "lagu", kartun: "kartun", petualangan: "petualangan", gaming: "gaming" };
