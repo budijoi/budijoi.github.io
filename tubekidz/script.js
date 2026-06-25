@@ -77,7 +77,7 @@ var VIDEOS = [
   { id: "ZU6qShtfguA", title: "Bangun Penjara Dari Miskin ke Kaya", channel: "Dunia Budi Roblox", cat: "gaming" },
   { id: "C5igwlK3drE", title: "Jaga Rumah Sakit Hewan Jam 3 Pagi", channel: "Dunia Budi Roblox", cat: "gaming" },
   { id: "6PqVWxdbFas", title: "Liburan Naik Pesawat Jatuh Meledak", channel: "Dunia Budi Roblox", cat: "gaming" },
-  { id: "aLCI15vaNRo", title: "Sembunyi dari Pocong Ketuk Pintu", channel: "Dunia Budi Roblox", cat: "gaming" }
+  { id: "aLCI15vaNRo", title: "Sembunyi dari Pocong Ketuk Pintu", channel: "Dunia Budi Roblox", cat: "gaming" },
   { id: "C_fg98XhF4k", title: "Masha dan Beruang Do-Do-Domba", channel: "Masha dan Beruang", cat: "kartun" },
   { id: "QeCJilRorZk", title: "Masha Bilang Cheese", channel: "Masha dan Beruang", cat: "kartun" },
   { id: "41RNH5od7XQ", title: "Masha Episode Baru", channel: "Masha dan Beruang", cat: "kartun" },
@@ -106,7 +106,7 @@ var CHANNEL_FEEDS = {
   "Pramod`s Life": { id: "UC1V1PQT_ZVRjzuzioG05rrQ", cat: "petualangan" },
   "Anglikosik Indonesia": { id: "UCiK7L708JFZylemhApNkRcA", cat: "petualangan" },
   "Animal Scripts": { id: "UC5wFTgdXgbecQOm97_S6yfA", cat: "edukasi" },
-  "Dunia Budi Roblox": { id: "UCJ9v-fDARn2Vyl1TX9PfVyA", cat: "gaming" }
+  "Dunia Budi Roblox": { id: "UCJ9v-fDARn2Vyl1TX9PfVyA", cat: "gaming" },
   "Masha dan Beruang": { id: "UCNHOXLWFpOzW4_eqDWo7GjA", cat: "kartun" }
 };
 
