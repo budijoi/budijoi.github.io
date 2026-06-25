@@ -136,6 +136,48 @@
         }
         .overlay .close:hover { opacity: 1; }
         .overlay #player { width: 100vw; height: 100vh; }
+        #setupScreen {
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100vh; padding: 24px;
+        }
+        .setup-box {
+            background: #1a1a1a; border-radius: 16px;
+            padding: 40px 32px; max-width: 480px; width: 100%;
+            text-align: center;
+        }
+        .setup-logo { font-size: 24px; font-weight: 700; margin-bottom: 12px; }
+        .setup-desc { color: #aaa; font-size: 14px; margin-bottom: 24px; line-height: 1.5; }
+        .setup-input-wrap { display: flex; gap: 8px; }
+        .setup-input-wrap input {
+            flex: 1; background: #0f0f0f; border: 1px solid #333; border-radius: 8px;
+            padding: 12px 14px; color: #fff; font-size: 14px; outline: none;
+        }
+        .setup-input-wrap input:focus { border-color: #ff0033; }
+        .setup-input-wrap button {
+            background: #ff0033; color: #fff; border: none; border-radius: 8px;
+            padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer;
+        }
+        .setup-input-wrap button:hover { background: #e0002e; }
+        .setup-error { color: #ff6b6b; font-size: 13px; margin-top: 8px; min-height: 20px; }
+        .setup-tutorial-btn {
+            background: none; border: none; color: #888; font-size: 13px;
+            cursor: pointer; margin-top: 16px; text-decoration: underline;
+        }
+        .setup-tutorial-btn:hover { color: #fff; }
+        .tutorial {
+            display: none; text-align: left; margin-top: 20px;
+            background: #0f0f0f; border-radius: 10px; padding: 20px;
+            font-size: 14px; line-height: 1.8; color: #ccc;
+        }
+        .tutorial.active { display: block; }
+        .tutorial h3 { color: #fff; margin-bottom: 10px; font-size: 15px; }
+        .tutorial ol { padding-left: 20px; }
+        .tutorial a { color: #ff0033; }
+        .btn-link {
+            background: none; border: none; color: #888; font-size: 13px;
+            cursor: pointer; text-decoration: underline; padding: 0;
+        }
+        .btn-link:hover { color: #fff; }
         .footer { text-align: center; color: #555; font-size: 13px; padding: 24px; }
         @media (max-width: 640px) {
             header { padding: 12px 16px; }
@@ -150,7 +192,32 @@
         <div class="sub-count" id="subCount"></div>
     </header>
 
-    <div class="container">
+    <div id="setupScreen">
+        <div class="setup-box">
+            <div class="setup-logo">Budi Dalton - NGOBAT</div>
+            <p class="setup-desc">Masukkan YouTube API Key untuk menampilkan video channel Budi Dalton.</p>
+            <div class="setup-input-wrap">
+                <input type="text" id="apiKeyInput" placeholder="Masukkan API Key..." spellcheck="false">
+                <button id="saveKeyBtn">Simpan</button>
+            </div>
+            <p id="setupError" class="setup-error"></p>
+            <button class="setup-tutorial-btn" id="tutorialBtn">Cara mendapatkan API Key</button>
+            <div class="tutorial" id="tutorial">
+                <h3>Cara mendapatkan YouTube API Key:</h3>
+                <ol>
+                    <li>Buka <a href="https://console.cloud.google.com" target="_blank">Google Cloud Console</a></li>
+                    <li>Buat project baru atau pilih project yang ada</li>
+                    <li>Pergi ke menu <strong>APIs & Services</strong> &gt; <strong>Library</strong></li>
+                    <li>Cari <strong>YouTube Data API v3</strong> lalu klik <strong>Enable</strong></li>
+                    <li>Pergi ke <strong>Credentials</strong> &gt; <strong>Create Credentials</strong> &gt; <strong>API Key</strong></li>
+                    <li>Salin API Key yang muncul dan tempel di input di atas</li>
+                </ol>
+                <p style="margin-top:12px;font-size:13px;color:#888;">Key disimpan di localStorage browser kamu.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="mainApp" style="display:none">
         <div class="toolbar" id="toolbar" style="display:none">
             <div>
                 <label for="sortSelect">Urutkan: </label>
@@ -164,6 +231,9 @@
                     <option value="judulAZ">Judul A-Z</option>
                     <option value="judulZA">Judul Z-A</option>
                 </select>
+            </div>
+            <div>
+                <button id="changeKeyBtn" class="btn-link">Ganti API Key</button>
             </div>
             <span class="count-info" id="countInfo"></span>
         </div>
@@ -192,7 +262,6 @@
 
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
-        const API_KEY = 'AIzaSyDpRLPGTQ9zyDUBXUE8bkKnG9gfa-Gq0IY';
         const HANDLE = '@ngobat.official';
 
         const videosEl = document.getElementById('videos');
@@ -207,7 +276,16 @@
         const toolbarEl = document.getElementById('toolbar');
         const sortSelect = document.getElementById('sortSelect');
         const countInfo = document.getElementById('countInfo');
+        const setupScreen = document.getElementById('setupScreen');
+        const mainApp = document.getElementById('mainApp');
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const saveKeyBtn = document.getElementById('saveKeyBtn');
+        const setupError = document.getElementById('setupError');
+        const tutorialBtn = document.getElementById('tutorialBtn');
+        const tutorial = document.getElementById('tutorial');
+        const changeKeyBtn = document.getElementById('changeKeyBtn');
 
+        let API_KEY = '';
         let allVideos = [];
         let pageTokens = [];
         let currentPage = 0;
@@ -215,6 +293,50 @@
         let channelTitle = '';
         let sortBy = 'terbaru';
         let isLoading = false;
+
+        tutorialBtn.addEventListener('click', () => tutorial.classList.toggle('active'));
+
+        function showSetup() {
+            setupScreen.style.display = 'flex';
+            mainApp.style.display = 'none';
+        }
+
+        function showApp() {
+            setupScreen.style.display = 'none';
+            mainApp.style.display = 'block';
+        }
+
+        function saveKey(key) {
+            API_KEY = key.trim();
+            localStorage.setItem('ngobat_api_key', API_KEY);
+            setupError.textContent = '';
+            showApp();
+            init();
+        }
+
+        saveKeyBtn.addEventListener('click', () => {
+            const key = apiKeyInput.value.trim();
+            if (!key) { setupError.textContent = 'API Key tidak boleh kosong.'; return; }
+            saveKey(key);
+        });
+
+        apiKeyInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') saveKeyBtn.click();
+        });
+
+        changeKeyBtn.addEventListener('click', () => {
+            showSetup();
+            apiKeyInput.value = API_KEY;
+        });
+
+        const savedKey = localStorage.getItem('ngobat_api_key');
+        if (savedKey) {
+            API_KEY = savedKey;
+            showApp();
+            init();
+        } else {
+            showSetup();
+        }
 
         function showError(msg) {
             loadingEl.style.display = 'none';
@@ -443,8 +565,6 @@
         closeBtn.addEventListener('click', closePlayer);
         overlay.addEventListener('click', (e) => { if (e.target === overlay) closePlayer(); });
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePlayer(); });
-
-        init();
     </script>
 </body>
 </html>
