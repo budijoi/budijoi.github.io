@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harian Nusantara - Edisi Cetak Klasik</title>
+    <!-- Tailwind CSS untuk tata letak responsif -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts untuk tipografi koran klasik -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Special+Elite&family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Gaya Khusus Koran Klasik */
+        .paper-classic {
+            background-color: #faf6ee;
+            color: #1a1a1a;
+            background-image: radial-gradient(#eadabe 0.5px, transparent 0.5px), radial-gradient(#eadabe 0.5px, #faf6ee 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+
+        .paper-sepia {
+            background-color: #f1e4c3;
+            color: #2b1f0d;
+            background-image: radial-gradient(#d3be93 0.5px, transparent 0.5px), radial-gradient(#d3be93 0.5px, #f1e4c3 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+
+        .paper-aged {
+            background-color: #dfd2ad;
+            color: #1c1505;
+            background-image: radial-gradient(#c2b186 0.5px, transparent 0.5px), radial-gradient(#c2b186 0.5px, #dfd2ad 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+
+        /* Tipografi Koran */
+        .font-header {
+            font-family: 'Cinzel', serif;
+        }
+        
+        .font-headline {
+            font-family: 'Playfair Display', serif;
+            letter-spacing: -0.02em;
+        }
+
+        .font-body {
+            font-family: 'PT Serif', serif;
+            line-height: 1.45;
+        }
+
+        .font-ads {
+            font-family: 'Special Elite', monospace;
+        }
+
+        /* Garis Pembatas Koran Tradisional */
+        .border-double-thick {
+            border-style: double;
+            border-width: 6px 0;
+            border-color: currentColor;
+        }
+
+        .border-thin-thick {
+            border-top: 1px solid currentColor;
+            border-bottom: 3px solid currentColor;
+            padding: 3px 0;
+        }
+
+        /* Kolom Koran */
+        .newspaper-cols-3 {
+            column-count: 3;
+            column-gap: 2rem;
+            column-rule: 1px solid rgba(0, 0, 0, 0.15);
+        }
+
+        .newspaper-cols-2 {
+            column-count: 2;
+            column-gap: 1.5rem;
+            column-rule: 1px solid rgba(0, 0, 0, 0.15);
+        }
+
+        @media (max-width: 768px) {
+            .newspaper-cols-3, .newspaper-cols-2 {
+                column-count: 1;
+                column-gap: 0;
+                column-rule: none;
+            }
+        }
+
+        /* Efek Huruf Pertama Besar (Drop Cap) */
+        .drop-cap::first-letter {
+            font-family: 'Playfair Display', serif;
+            font-size: 4.5rem;
+            float: left;
+            margin-right: 8px;
+            line-height: 0.85;
+            font-weight: bold;
+            border: 1px solid currentColor;
+            padding: 4px 8px;
+            margin-top: 4px;
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+
+        /* Simulasi tinta luntur halus */
+        .ink-bleed {
+            filter: contrast(1.05) brightness(0.98);
+        }
+
+        /* Gaya Khusus Cetak */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            .paper-container {
+                box-shadow: none !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-stone-800 py-6 px-4 md:px-12 font-body transition-colors duration-300">
+
+    <!-- Panel Kontrol Pengguna (Interaktif - Tidak Ikut Dicetak) -->
+    <div class="max-w-5xl mx-auto mb-6 bg-stone-900 text-stone-300 p-4 rounded-lg shadow-xl border border-stone-700 flex flex-wrap gap-4 items-center justify-between no-print text-sm">
+        <div class="flex items-center gap-2">
+            <span class="font-bold text-amber-400">⚙️ PANEL KONTROL KORAN:</span>
+        </div>
+        
+        <!-- Pilihan Warna Kertas -->
+        <div class="flex items-center gap-2">
+            <span class="text-xs">Jenis Kertas:</span>
+            <button onclick="setPaper('classic')" class="px-3 py-1 bg-amber-50 text-stone-900 rounded border border-amber-200 text-xs font-semibold hover:bg-amber-100 transition">Krem Klasik</button>
+            <button onclick="setPaper('sepia')" class="px-3 py-1 bg-yellow-100 text-amber-950 rounded border border-yellow-300 text-xs font-semibold hover:bg-yellow-200 transition">Sepia</button>
+            <button onclick="setPaper('aged')" class="px-3 py-1 bg-yellow-200 text-yellow-950 rounded border border-yellow-400 text-xs font-semibold hover:bg-yellow-300 transition">Usang (Aged)</button>
+        </div>
+
+        <!-- Ukuran Teks -->
+        <div class="flex items-center gap-2">
+            <span class="text-xs">Ukuran Huruf:</span>
+            <button onclick="adjustFont(-1)" class="px-3 py-1 bg-stone-700 hover:bg-stone-600 rounded text-xs">-</button>
+            <span id="font-size-label" class="text-xs font-bold w-12 text-center">Sedang</span>
+            <button onclick="adjustFont(1)" class="px-3 py-1 bg-stone-700 hover:bg-stone-600 rounded text-xs">+</button>
+        </div>
+
+        <!-- Tombol Aksi -->
+        <div class="flex gap-2">
+            <button onclick="window.print()" class="px-4 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded font-semibold text-xs flex items-center gap-1.5 transition">
+                🖨️ Cetak Koran
+            </button>
+            <button onclick="tampilkanKutipan()" class="px-4 py-1.5 bg-stone-700 hover:bg-stone-600 text-white rounded font-semibold text-xs transition">
+                📜 Kutipan Hari Ini
+            </button>
+        </div>
+    </div>
+
+    <!-- Lembaran Utama Koran -->
+    <div id="koran-wrapper" class="paper-classic max-w-5xl mx-auto p-6 md:p-10 shadow-2xl border-4 border-double border-stone-400/60 transition-all duration-300 ink-bleed">
+        
+        <!-- HEADER KORAN ATAS (Informasi Edisi) -->
+        <div class="flex justify-between items-center text-xs md:text-sm font-bold uppercase tracking-wider pb-1">
+            <span>No. Registrasi: 1945/VIII/MDK</span>
+            <span class="hidden md:inline">Terbit di Batavia (Jakarta)</span>
+            <span>Edisi Digital #01</span>
+        </div>
+
+        <!-- NAMA UTAMA KORAN (NAMEPLATE) -->
+        <div class="text-center my-4">
+            <h1 class="font-header text-5xl md:text-8xl font-black tracking-tight leading-none uppercase">
+                HARIAN NUSANTARA
+            </h1>
+            <p class="font-headline italic text-lg md:text-2xl mt-2 tracking-wide font-medium">
+                "Suara Rakyat dari Sabang sampai Merauke, Kebenaran yang Menembus Zaman"
+            </p>
+        </div>
+
+        <!-- INFORMASI HARGA & TANGGAL -->
+        <div class="border-double-thick py-1 text-center font-bold text-xs md:text-sm tracking-widest uppercase flex flex-col md:flex-row justify-between px-2 gap-1">
+            <span>Hari ini: <span id="current-date">Kamis, 25 Juni 2026</span></span>
+            <span class="font-black text-sm md:text-base border-y md:border-y-0 py-1 md:py-0">HARGA ECERAN: RP 1.500,- (LUAR JAWA RP 2.000,-)</span>
+            <span>Telp. Redaksi: Batavia-4545</span>
+        </div>
+
+        <!-- DAFTAR ISI MINI / BERITA SINGKAT -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-3 border-b border-stone-400 text-xs italic">
+            <div class="border-r border-stone-300 pr-2">
+                <strong>Internasional:</strong> Terjadi kesepakatan damai baru di belahan bumi timur. <a href="#" class="underline">Hal. 4</a>
+            </div>
+            <div class="border-r border-stone-300 pr-2 hidden md:block">
+                <strong>Ekonomi:</strong> Rupiah menunjukkan stabilitas di pasar komoditas pangan. <a href="#" class="underline">Hal. 6</a>
+            </div>
+            <div class="border-r border-stone-300 pr-2 hidden md:block">
+                <strong>Budaya:</strong> Pentas ketoprak kolosal kembali digelar di alun-alun kota. <a href="#" class="underline">Hal. 9</a>
+            </div>
+            <div>
+                <strong>Cuaca Batavia:</strong> Cerah berawan sepanjang hari dengan angin sepoi-sepoi hangat.
+            </div>
+        </div>
+
+        <!-- BERITA UTAMA / HEADLINE DAHSYAT -->
+        <div class="my-6">
+            <div class="text-center max-w-3xl mx-auto">
+                <p class="text-amber-800 font-bold tracking-widest text-xs md:text-sm uppercase mb-1">📢 LAPORAN EKSKLUSIF UTAMA</p>
+                <h2 class="font-headline text-3xl md:text-5xl font-extrabold leading-tight tracking-tight mb-4">
+                    PRASASTI PURBA KALA DIJUMPAI DI KAKI GUNUNG MERBABI: USAHA MENYINGKAP SEJARAH NUSANTARA!
+                </h2>
+                <p class="font-headline italic text-base md:text-lg text-stone-600 mb-6">
+                    "Para arkeolog meyakini lempengan batu bertulis aksara kuno ini berasal dari abad ke-8 masehi, menceritakan masa kemakmuran luhur."
+                </p>
+            </div>
+
+            <!-- TATA LETAK KOLOM BERITA UTAMA -->
+            <div class="newspaper-cols-3 font-body text-justify text-sm md:text-base leading-relaxed">
+                <p class="drop-cap">
+                    <strong>BATAVIA</strong> — Sebuah penemuan arkeologis luar biasa kembali mengguncang tanah air. Tim gabungan peneliti sejarah dari berbagai lembaga kebudayaan berhasil mengidentifikasi sebuah prasasti batu utuh di lereng barat Gunung Merbabi. Prasasti yang kini dinamai "Prasasti Merbabi Mandala" ini ditengarai memuat maklumat penting tentang sistem irigasi kuno serta hukum perdamaian antarwilayah pada masanya.
+                </p>
+
+                <p class="mt-3">
+                    Menurut Profesor Danuwijaya, kepala ekskavasi, tulisan dalam batu andesit setinggi 1,5 meter tersebut menggunakan aksara Pallawa yang dipahat dengan tingkat presisi mengagumkan. "Kondisi batu sangat terawat karena tertimbun abu vulkanis tebal yang justru mengawetkannya dari erosi cuaca selama berabad-abad," ujarnya penuh antusias saat ditemui oleh koresponden kami di lokasi temuan kemarin malam.
+                </p>
+
+                <p class="mt-3">
+                    Penemuan ini segera menarik minat khalayak ramai. Ratusan penduduk setempat sempat mendatangi area garis pembatas karena penasaran ingin melihat langsung simbol-simbol kuno yang terpahat indah pada permukaan batu purba tersebut. Pihak keamanan setempat telah memasang barikade guna menjaga keaslian situs.
+                </p>
+
+                <p class="mt-3">
+                    Analisis awal menunjukkan bahwa teks tersebut memuat rincian tentang pesta panen raya dan titah sang raja untuk membebaskan pajak wilayah perkebunan sekitar lereng gunung. "Ini adalah bukti konkret bahwa masyarakat purba kita telah mempraktikkan konsep keadilan sosial dan manajemen agraria yang sangat maju," tambah Danuwijaya seraya menunjukkan salinan transkrip aksara tersebut.
+                </p>
+
+                <div class="bg-stone-200/50 p-3 my-3 border border-stone-400 font-headline italic text-xs leading-snug">
+                    "Kemakmuran sejati dicapai tatkala air mengalir merata ke sawah jelata tanpa ada monopoli dari kaum penguasa istana." <br>
+                    <span class="block text-right font-bold not-italic mt-1">— Terjemahan Baris ke-12 Prasasti</span>
+                </div>
+
+                <p class="mt-3">
+                    Rencana jangka panjang dari kementerian kebudayaan adalah memindahkan prasasti ini ke museum pusat guna penelitian epigrafis lebih mendalam. Namun, tetua adat setempat mengusulkan agar replikanya saja yang dibawa, sementara batu asli tetap diletakkan di tanah asalnya guna menjaga nilai spiritual wilayah tersebut. Diskusi musyawarah mufakat hingga kini masih terus berlangsung hangat di balai desa.
+                </p>
+            </div>
+        </div>
+
+        <!-- SKETSA / GAMBAR UTAMA DENGAN CAPTION TRADISIONAL -->
+        <div class="my-8 border-y-2 border-stone-400 py-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+            
+            <!-- Area Gambar Sketsa (Menggunakan SVG buatan sendiri agar bergaya koran cetak manual) -->
+            <div class="md:col-span-7 bg-stone-100 p-4 border border-stone-400 shadow-md">
+                <div class="relative w-full aspect-[4/3] bg-stone-300 border-2 border-dashed border-stone-500 flex items-center justify-center overflow-hidden">
+                    <!-- SVG Ilustrasi Gunung & Prasasti Bergaya Klasik Monokrom -->
+                    <svg class="absolute inset-0 w-full h-full p-4" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Latar Belakang Garis Matahari/Langit -->
+                        <path d="M 0,150 L 400,150 M 200,300 L 200,0 M 0,0 L 400,300 M 0,300 L 400,0" stroke="#8a7e66" stroke-width="0.5" stroke-dasharray="2,4"/>
+                        
+                        <!-- Pegunungan (Siluet Garis Sketsa) -->
+                        <path d="M 20,240 L 120,100 L 220,240" stroke="#222" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="M 120,100 L 140,130" stroke="#222" stroke-width="2"/>
+                        <path d="M 160,240 L 270,80 L 380,240" stroke="#222" stroke-width="2.5" stroke-linejoin="round"/>
+                        
+                        <!-- Jalur Arsir Pegunungan -->
+                        <path d="M 100,128 L 80,160 M 110,114 L 90,146 M 120,140 L 105,165" stroke="#444" stroke-width="1"/>
+                        <path d="M 250,110 L 230,140 M 260,95 L 240,125 M 270,120 L 255,145" stroke="#444" stroke-width="1"/>
+
+                        <!-- Matahari Terbenam Gaya Jepang/Klasik -->
+                        <circle cx="200" cy="120" r="35" stroke="#222" stroke-width="1.5" stroke-dasharray="4,2"/>
+                        
+                        <!-- Prasasti Purba di bagian depan -->
+                        <path d="M 160,260 L 170,170 C 170,150 230,150 230,170 L 240,260 Z" fill="#ebdcb9" stroke="#222" stroke-width="3"/>
+                        <!-- Garis Arsiran Tekstur Batu -->
+                        <path d="M 175,180 L 225,180 M 173,200 L 227,200 M 174,220 L 230,220 M 176,240 L 234,240" stroke="#555" stroke-width="1.5" stroke-dasharray="2,3"/>
+                        <path d="M 190,190 H 210 M 185,210 H 215 M 195,230 H 220" stroke="#333" stroke-width="2"/>
+                        
+                        <!-- Semak / Rumput Depan -->
+                        <path d="M 10,260 C 50,230 100,280 150,260 C 200,240 250,280 300,260 C 350,240 390,270 400,260" stroke="#222" stroke-width="2"/>
+                        <path d="M 130,260 L 135,240 M 145,263 L 142,238 M 255,260 L 250,235 M 265,262 L 270,245" stroke="#222" stroke-width="1.5"/>
+
+                        <!-- Teks Cap Sketsa Vintage -->
+                        <rect x="290" y="20" width="90" height="30" fill="#faf6ee" stroke="#222" stroke-width="1"/>
+                        <text x="335" y="40" font-family="'Special Elite', monospace" font-size="10" fill="#222" text-anchor="middle">ARSIP 1926</text>
+                    </svg>
+                </div>
+                <!-- Keterangan Gambar (Caption) -->
+                <p class="font-headline italic text-xs text-stone-700 mt-2 text-center border-t border-stone-300 pt-1">
+                    [Gambar Sketsa Lapangan: Rekonstruksi visual peletakan batu Prasasti Mandala purba di lereng gunung, dibuat oleh ilustrator khusus harian kami.]
+                </p>
+            </div>
+
+            <!-- Opini Sampingan / Editorial -->
+            <div class="md:col-span-5 h-full flex flex-col justify-between">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-widest text-red-800 bg-red-100 px-2 py-0.5 rounded">POKOK PIKIRAN</span>
+                    <h3 class="font-headline text-2xl font-bold mt-2 mb-3 leading-tight">
+                        Mengapa Kita Kerap Melupakan Pesan Luhur Masa Lampau?
+                    </h3>
+                    <p class="text-sm text-justify leading-relaxed">
+                        Penemuan prasasti ini adalah tamparan keras bagi kedangkalan zaman modern. Ketika kita sibuk bertikai soal hal-hal praktis jangka pendek, nenek moyang kita telah menuliskan hukum keadilan sosial di atas batu andesit abadi agar dibaca oleh generasi penerus seribu tahun kemudian. Hukum air harus adil adalah pesan mendasar ekologis.
+                    </p>
+                </div>
+                <div class="border-t border-stone-400 pt-3 mt-4">
+                    <p class="text-xs font-bold uppercase italic">— Redaktur Senior, Ki Hadipranoto</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- BAGIAN TENGAH KORAN (KOLOM GANDA & IKLAN JADUL) -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 my-6">
+            
+            <!-- Kolom Berita Samping (Kiri) -->
+            <div class="md:col-span-8 border-r-0 md:border-r border-stone-300 pr-0 md:pr-6">
+                <h3 class="font-headline text-xl font-bold uppercase border-b-2 border-stone-800 pb-1 mb-3">
+                    KABAR NUSANTARA & DAERAH
+                </h3>
+                
+                <div class="newspaper-cols-2 text-justify text-sm leading-relaxed">
+                    <h4 class="font-headline font-bold text-base mb-1">
+                        Panen Jagung Melimpah di Sektor Timur
+                    </h4>
+                    <p class="mb-3">
+                        Petani di wilayah dataran rendah bagian timur merayakan hasil bumi melimpah tahun ini. Kebijakan pupuk organik lokal terbukti menggandakan kuantitas hasil panen tanpa merusak kualitas hara tanah setempat. Kepala kooperasi optimis pasokan pangan aman terkendali hingga musim dingin tahun depan.
+                    </p>
+
+                    <h4 class="font-headline font-bold text-base mb-1">
+                        Pembangunan Jembatan Gantung Baru Dimulai
+                    </h4>
+                    <p class="mb-3">
+                        Guna menyambungkan jalur perdagangan terisolir antar-lembah, kerja bakti massal pembangunan jembatan kayu berdesain suspensi besi resmi dimulai pagi ini. Seluruh warga bergotong royong membawa kayu jati pilihan terbaik hasil sumbangan sukarela.
+                    </p>
+
+                    <h4 class="font-headline font-bold text-base mb-1">
+                        Lomba Tulis Sastra Rakyat Dibuka
+                    </h4>
+                    <p>
+                        Klub Literasi Batavia mengumumkan sayembara penulisan prosa bertema dongeng nusantara. Hadiah utama berupa mesin ketik portabel mutakhir merek "Royal" dan paket kertas bersegel resmi. Pendaftaran terbuka bagi seluruh rakyat jelata hingga akhir bulan depan tanpa dipungut biaya sepeser pun.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Kolom Iklan Vintage / Reklame Jadul (Kanan) -->
+            <div class="md:col-span-4 flex flex-col gap-4 justify-start">
+                <h3 class="font-headline text-center text-xs font-bold tracking-widest text-stone-500 uppercase border-b border-stone-300 pb-1 mb-1">
+                    ☕ REKLAME POEDJOK ☕
+                </h3>
+
+                <!-- Iklan 1 -->
+                <div class="border-2 border-stone-800 p-3 text-center bg-stone-100/80 font-ads">
+                    <h4 class="font-bold text-lg tracking-wider">KOPI TJOBODAS</h4>
+                    <p class="text-xs italic my-1">"Rasanja Mantap, Bikin Pikiran Terang Banderang!"</p>
+                    <p class="text-[10px] mt-2 border-t border-dashed border-stone-400 pt-1">
+                        Dapatkan di Toko Kelontong Tionghoa terdekat. Kemasan kaleng tahan kelembaban udara.
+                    </p>
+                </div>
+
+                <!-- Iklan 2 -->
+                <div class="border border-stone-500 p-3 bg-stone-200/40 text-center">
+                    <span class="text-[9px] block uppercase tracking-widest font-bold text-stone-600">Alat Tulis Berkwalitas</span>
+                    <h4 class="font-header text-sm font-bold my-1">PENA EMAS "MERDEKA"</h4>
+                    <p class="text-xs italic">Menulis halus tanpa macet, pilihan para priyayi dan jurnalis ulung tanah air.</p>
+                    <span class="text-xs font-bold block mt-2 text-amber-950">Harga: F 1.25 saja!</span>
+                </div>
+
+                <!-- Pojok Humor / Teka Teki Silang Kuno -->
+                <div class="border-2 border-double border-stone-600 p-3">
+                    <h4 class="font-headline text-xs font-bold uppercase mb-1">💬 POJOK JENAKA</h4>
+                    <p class="text-xs italic leading-relaxed text-stone-700">
+                        <strong>Tanja:</strong> "Kenapa kapal laut jalannja di air?"<br>
+                        <strong>Djawab:</strong> "Sebab kalau jalannja di darat namanya kereta api, bung!"
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER KORAN (Keterangan Penerbitan) -->
+        <div class="border-t-4 border-double border-stone-800 pt-4 mt-6 text-xs text-center text-stone-600">
+            <p class="font-bold uppercase tracking-wider">
+                Diterbitkan oleh PT. Pustaka Raya Nusantara — Anggota Serikat Penerbit Surat Kabar Klasik.
+            </p>
+            <p class="mt-1">
+                Dicetak menggunakan mesin silinder uap kuno di Bengkel Grafika Batavia. Hak cipta dilindungi oleh undang-undang moral kemanusiaan.
+            </p>
+        </div>
+    </div>
+
+    <!-- Kotak Dialog Modal Kutipan Interaktif (Tidak Ikut Dicetak) -->
+    <div id="kutipan-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden no-print p-4">
+        <div class="bg-amber-50 max-w-md w-full p-6 rounded-lg border-4 border-double border-stone-800 shadow-2xl relative">
+            <button onclick="tutupKutipan()" class="absolute top-2 right-2 text-xl font-bold text-stone-700 hover:text-stone-900">×</button>
+            <div class="text-center">
+                <span class="text-xs font-bold text-amber-800 tracking-widest uppercase">📜 KUTIPAN HARI INI</span>
+                <p id="kutipan-text" class="font-headline italic text-lg text-stone-900 my-4 leading-relaxed">
+                    "Tinta emas sejarah tidak ditulis oleh para penonton, melainkan oleh para pelaku yang rela berpeluh keringat demi kebaikan bersama."
+                </p>
+                <p id="kutipan-author" class="font-bold text-sm text-stone-700 uppercase">— Sutan Alisjahbana (1928)</p>
+                <button onclick="tutupKutipan()" class="mt-6 px-4 py-2 bg-stone-900 text-white rounded text-xs hover:bg-stone-800 transition">
+                    Tutup Lembaran
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Kontrol Interaktif -->
+    <script>
+        // Update tanggal otomatis dengan format bahasa Indonesia klasik
+        document.addEventListener("DOMContentLoaded", () => {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const today = new Date();
+            // Format manual sedikit jadul
+            const hari = today.toLocaleDateString('id-ID', { weekday: 'long' });
+            const tanggal = today.getDate();
+            const bulan = today.toLocaleDateString('id-ID', { month: 'long' });
+            const tahun = today.getFullYear();
+            
+            document.getElementById('current-date').innerText = `${hari}, ${tanggal} ${bulan} ${tahun}`;
+        });
+
+        // Kontrol Tema Warna Kertas
+        function setPaper(theme) {
+            const koran = document.getElementById('koran-wrapper');
+            koran.classList.remove('paper-classic', 'paper-sepia', 'paper-aged');
+            
+            if (theme === 'classic') {
+                koran.classList.add('paper-classic');
+            } else if (theme === 'sepia') {
+                koran.classList.add('paper-sepia');
+            } else if (theme === 'aged') {
+                koran.classList.add('paper-aged');
+            }
+        }
+
+        // Kontrol Ukuran Font Dinamis
+        let currentSizeIndex = 1; // 0: Kecil, 1: Sedang, 2: Besar, 3: Sangat Besar
+        const fontClasses = ['text-xs', 'text-sm', 'text-base', 'text-lg'];
+        const fontLabels = ['Kecil', 'Sedang', 'Besar', 'Sangat Besar'];
+        
+        function adjustFont(direction) {
+            const koran = document.getElementById('koran-wrapper');
+            const label = document.getElementById('font-size-label');
+            
+            // Simpan indeks lama
+            let newIndex = currentSizeIndex + direction;
+            if (newIndex >= 0 && newIndex < fontClasses.length) {
+                currentSizeIndex = newIndex;
+                label.innerText = fontLabels[currentSizeIndex];
+                
+                // Ubah kelas pada elemen pembungkus koran
+                // Menghapus kelas font-size yang lama terlebih dahulu
+                koran.style.fontSize = currentSizeIndex === 0 ? '0.875rem' : 
+                                       currentSizeIndex === 1 ? '1rem' : 
+                                       currentSizeIndex === 2 ? '1.125rem' : '1.25rem';
+            }
+        }
+
+        // Daftar Kutipan Acak Klasik
+        const listKutipan = [
+            {
+                text: "Tinta emas sejarah tidak ditulis oleh para penonton, melainkan oleh para pelaku yang rela berpeluh keringat demi kebaikan bersama.",
+                author: "Sutan Alisjahbana (1928)"
+            },
+            {
+                text: "Gantungkan cita-citamu setinggi langit! Bermimpilah setinggi langit. Jika engkau jatuh, engkau akan jatuh di antara bintang-bintang.",
+                author: "Bung Karno"
+            },
+            {
+                text: "Lawan-lawanmu bukanlah manusia yang berbeda tanah air, melainkan kebodohan dan ketidakpedulian yang bersarang di dada kita sendiri.",
+                author: "Ki Hajar Dewantara"
+            },
+            {
+                text: "Perjuanganku lebih mudah karena mengusir penjajah, perjuanganmu akan lebih sulit karena melawan bangsamu sendiri.",
+                author: "Bung Karno"
+            },
+            {
+                text: "Hanya ada satu hal yang membuat mimpi tidak mungkin dicapai: ketakutan akan kegagalan dalam melangkah.",
+                author: "Pramoedya Ananta Toer"
+            }
+        ];
+
+        // Tampilkan Kutipan Acak dalam Modal
+        function tampilkanKutipan() {
+            const randomIdx = Math.floor(Math.random() * listKutipan.length);
+            const kutipan = listKutipan[randomIdx];
+            
+            document.getElementById('kutipan-text').innerText = `"${kutipan.text}"`;
+            document.getElementById('kutipan-author').innerText = `— ${kutipan.author}`;
+            
+            document.getElementById('kutipan-modal').classList.remove('hidden');
+        }
+
+        function tutupKutipan() {
+            document.getElementById('kutipan-modal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
