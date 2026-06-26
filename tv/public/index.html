@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Live TV</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <button id="menu-btn" aria-label="Menu">&#9776;</button>
+    <h1>Live TV</h1>
+  </header>
+  <div id="backdrop"></div>
+  <main>
+    <aside id="channel-list"></aside>
+    <section id="player">
+      <div id="status-overlay" class="hidden">
+        <div class="status-spinner"></div>
+        <div id="status-msg"></div>
+      </div>
+      <div id="video-player">
+        <video-player>
+          <video-minimal-skin>
+            <video id="video-element" slot="media" autoplay muted playsinline preload="auto"></video>
+          </video-minimal-skin>
+        </video-player>
+      </div>
+      <div id="youtube-player"></div>
+      <div id="placeholder">
+        <div id="no-channel">Pilih channel untuk mulai menonton</div>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@videojs/html/cdn/video-minimal.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
