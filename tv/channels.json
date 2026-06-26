@@ -1,0 +1,74 @@
+[
+  {
+    "id": "rtv",
+    "name": "RTV",
+    "logo": "",
+    "streamUrl": "https://rtvstream.rtv.co.id:4555/hls/rtv.m3u8"
+  },
+  {
+    "id": "rcti",
+    "name": "RCTI",
+    "logo": "",
+    "streamUrl": "https://rcti-linier.rctiplus.id/rcti-sdi.m3u8?hdnts=exp=1782448083~hmac=3b841da38169e1c5ad506956ea197f1e0685fba684f24dc0253014e6d15ad3fd"
+  },
+  {
+    "id": "mqtv",
+    "name": "MQTV",
+    "logo": "",
+    "streamUrl": "https://5bf7b725107e5.streamlock.net/mqtv/mqtv/playlist.m3u8"
+  },
+  {
+    "id": "nusantara-tv",
+    "name": "Nusantara TV",
+    "logo": "",
+    "streamUrl": "https://nusantaratv.siar.us/nusantaratv/live/playlist.m3u8"
+  },
+  {
+    "id": "jogja-tv",
+    "name": "Jogja TV",
+    "logo": "",
+    "streamUrl": "https://stream.jogjatv.co.id/jtvlive/stream/index.m3u8"
+  },
+  {
+    "id": "mnc",
+    "name": "MNC",
+    "logo": "",
+    "streamUrl": "https://edge.medcom.id/live-edge/smil:mgnch.smil/playlist.m3u8"
+  },
+  {
+    "id": "trans-tv",
+    "name": "Trans TV",
+    "logo": "",
+    "streamUrl": "https://video.detik.com/transtv/smil:transtv.smil/chunklist_w2114898498_b744100_sleng.m3u8"
+  },
+  {
+    "id": "cnn-indonesia",
+    "name": "CNN Indonesia",
+    "logo": "",
+    "streamUrl": "https://live.cnnindonesia.com/livecnn/smil:cnntv.smil/chunklist_w80388450_b384000_sleng.m3u8"
+  },
+  {
+    "id": "cnbc-indonesia",
+    "name": "CNBC Indonesia",
+    "logo": "",
+    "streamUrl": "https://live.cnbcindonesia.com/livecnbc/smil:cnbctv.smil/chunklist_w481242722_b384000_sleng.m3u8"
+  },
+  {
+    "id": "daai-tv",
+    "name": "DAAI TV",
+    "logo": "",
+    "streamUrl": "https://pull.daaiplus.com/live-DAAIPLUS/live-DAAIPLUS_HD.m3u8"
+  },
+  {
+    "id": "garuda-tv",
+    "name": "Garuda TV",
+    "logo": "",
+    "streamUrl": "https://hgmtv.com:19360/garudatvlivestreaming/garudatvlivestreaming.m3u8"
+  },
+  {
+    "id": "kompas-tv",
+    "name": "Kompas TV",
+    "logo": "",
+    "streamUrl": "https://video.kompas.com/live/3cb30f586f77e9c6a6a197b12a54e1f5/kompas-tv-live-streaming-24-jam"
+  }
+]
