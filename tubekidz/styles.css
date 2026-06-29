@@ -112,6 +112,50 @@ body {
 
 .nav-link:hover:not(.active) { background: rgba(255,255,255,0.35); }
 
+.nav-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.refresh-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 1.15rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  user-select: none;
+  line-height: 1;
+}
+.refresh-link:hover {
+  background: rgba(255,255,255,0.95);
+  color: #ff6b6b;
+  transform: rotate(90deg);
+}
+
+.countdown {
+  color: rgba(255,255,255,0.8);
+  font-weight: 700;
+  font-size: 0.82rem;
+  font-family: 'Nunito', sans-serif;
+  white-space: nowrap;
+}
+
+.countdown.loading { opacity: 0.5; }
+
+.video-meta .video-time {
+  font-size: 0.72rem;
+  color: #bbb;
+  font-weight: 600;
+}
+
 /* Loading & Error */
 .loading, .error-msg {
   text-align: center;

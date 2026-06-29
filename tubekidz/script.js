@@ -54,6 +54,10 @@ var VIDEOS = [
   { id: "BqaVPgmOd8c", title: "Chef Rarra Lagi Masak Apa Ya?", channel: "NussaOfficial", cat: "kartun" },
   { id: "XqZsoesa55w", title: "Baby Shark Dance", channel: "Pinkfong", cat: "lagu" },
   { id: "tbbWnLx-BPo", title: "Baby Shark Cocomelon", channel: "CoComelon", cat: "lagu" },
+  { id: "yCjJyiqpAuU", title: "Baby Shark Super Simple Songs", channel: "Super Simple Songs", cat: "lagu" },
+  { id: "N5YSbaUl9Y4", title: "5 Little Ducks Lalafun", channel: "Lalafun", cat: "lagu" },
+  { id: "H1P7Qk2fwHk", title: "LooLoo Kids Johny Johny", channel: "LooLoo Kids", cat: "lagu" },
+  { id: "jTQO_aETdEE", title: "Peppa Pig Indonesia Naik Sepeda", channel: "Peppa Pig", cat: "kartun" },
   { id: "azog8Z2jJ3I", title: "Berkreasi bersama Blippi!", channel: "Blippi Indonesia", cat: "edukasi" },
   { id: "udauRXpT7NM", title: "Sebuah Suguhan yang Lezat", channel: "Blippi Indonesia", cat: "edukasi" },
   { id: "N5WwLsYuKl0", title: "Membuat Gelembung", channel: "Blippi Indonesia", cat: "edukasi" },
@@ -73,22 +77,7 @@ var VIDEOS = [
   { id: "ZU6qShtfguA", title: "Bangun Penjara Dari Miskin ke Kaya", channel: "Dunia Budi Roblox", cat: "gaming" },
   { id: "C5igwlK3drE", title: "Jaga Rumah Sakit Hewan Jam 3 Pagi", channel: "Dunia Budi Roblox", cat: "gaming" },
   { id: "6PqVWxdbFas", title: "Liburan Naik Pesawat Jatuh Meledak", channel: "Dunia Budi Roblox", cat: "gaming" },
-  { id: "aLCI15vaNRo", title: "Sembunyi dari Pocong Ketuk Pintu", channel: "Dunia Budi Roblox", cat: "gaming" },
-  { id: "C_fg98XhF4k", title: "Masha dan Beruang Do-Do-Domba", channel: "Masha dan Beruang", cat: "kartun" },
-  { id: "QeCJilRorZk", title: "Masha Bilang Cheese", channel: "Masha dan Beruang", cat: "kartun" },
-  { id: "41RNH5od7XQ", title: "Masha Episode Baru", channel: "Masha dan Beruang", cat: "kartun" },
-  { id: "2SQUdqjhYro", title: "10 Hal yang Harus Dilakukan", channel: "Masha dan Beruang", cat: "kartun" },
-
-  // Top 10 most-viewed videos across all channels
-  { id: "e_04ZrNroTo", title: "Wheels on the Bus", channel: "CoComelon", cat: "lagu" },
-  { id: "WRVsOCh907o", title: "Bath Song", channel: "CoComelon", cat: "lagu" },
-  { id: "wV3N-wCRL2k", title: "Baa Baa Black Sheep", channel: "CoComelon", cat: "lagu" },
-  { id: "tPIbNo9BsFk", title: "Yes Yes Vegetables Song", channel: "CoComelon", cat: "lagu" },
-  { id: "jNJvBBSQw-U", title: "The Sick Song", channel: "CoComelon", cat: "lagu" },
-  { id: "7MeWlZgPlqk", title: "Bayi Panda & Jus Segarnya", channel: "BabyBus - Cerita & Lagu Anak-anak", cat: "edukasi" },
-  { id: "4_zdirgU3EU", title: "Belajar Tata Krama Makan Yuk!", channel: "Little Angel Bahasa Indonesia", cat: "lagu" },
-  { id: "gN4pNQO78_w", title: "Mary Had a Little Lamb", channel: "CoComelon", cat: "lagu" },
-  { id: "o-_8C1InZbE", title: "Are We There Yet?", channel: "CoComelon", cat: "lagu" }
+  { id: "aLCI15vaNRo", title: "Sembunyi dari Pocong Ketuk Pintu", channel: "Dunia Budi Roblox", cat: "gaming" }
 ];
 
 var CATEGORIES = { semua: "all", edukasi: "edukasi", lagu: "lagu", kartun: "kartun", petualangan: "petualangan", gaming: "gaming" };
@@ -96,7 +85,11 @@ var CATEGORIES = { semua: "all", edukasi: "edukasi", lagu: "lagu", kartun: "kart
 var CHANNEL_FEEDS = {
   "Pinkfong": { id: "UCcdwLMPsaU2ezNSJU1nFoBQ", cat: "lagu" },
   "CoComelon": { id: "UCbCmjCuTUZos6Inko4u57UQ", cat: "lagu" },
+  "Super Simple Songs": { id: "UCLsooMJoIpl_7ux2jvdPB-Q", cat: "lagu" },
+  "LooLoo Kids": { id: "UC4NALVCmcmL5ntpV0thoH6w", cat: "lagu" },
   "Blippi": { id: "UC5PYHgAzJ1wLEidB58SK6Xw", cat: "petualangan" },
+  "Peppa Pig": { id: "UCAOtE1V7Ots4DjM8JLlrYgg", cat: "kartun" },
+  "Lalafun": { id: "UC5mNk1y0O1awxC8DucC8r0w", cat: "lagu" },
   "Dunia Farash ROBLOX": { id: "UChu9w8GFik0spCfQGF_i9WQ", cat: "gaming" },
   "Popo Mimi ROBLOX": { id: "UCnzbx11s43-5ncWWwejPVHg", cat: "gaming" },
   "FranzRX1": { id: "UCUMKbZT3R4myY41_bReI3Cg", cat: "gaming" },
@@ -109,14 +102,15 @@ var CHANNEL_FEEDS = {
   "Pramod`s Life": { id: "UC1V1PQT_ZVRjzuzioG05rrQ", cat: "petualangan" },
   "Anglikosik Indonesia": { id: "UCiK7L708JFZylemhApNkRcA", cat: "petualangan" },
   "Animal Scripts": { id: "UC5wFTgdXgbecQOm97_S6yfA", cat: "edukasi" },
-  "Dunia Budi Roblox": { id: "UCJ9v-fDARn2Vyl1TX9PfVyA", cat: "gaming" },
-  "Masha dan Beruang": { id: "UCNHOXLWFpOzW4_eqDWo7GjA", cat: "kartun" }
+  "Dunia Budi Roblox": { id: "UCJ9v-fDARn2Vyl1TX9PfVyA", cat: "gaming" }
 };
 
 var RSS_URL = "https://api.rss2json.com/v1/api.json?rss_url=";
 var MAX_RSS = 15;
 var dynamicVideos = [];
 var dynamicLoaded = false;
+var REFRESH_INTERVAL = 3600000;
+var lastRefreshTime = Date.now();
 
 var IS_FILE = window.location.protocol === "file:";
 
@@ -232,14 +226,14 @@ function loadDynamicVideos() {
   names.forEach(function(chName) {
     var info = CHANNEL_FEEDS[chName];
     var rss = "https://www.youtube.com/feeds/videos.xml?channel_id=" + info.id;
-    var url = RSS_URL + encodeURIComponent(rss);
+    var url = RSS_URL + encodeURIComponent(rss) + "&_=" + Date.now();
 
     fetch(url).then(function(r) { return r.json(); }).then(function(data) {
       if (data && data.items) {
         data.items.forEach(function(item) {
           var m = item.link.match(/v=([a-zA-Z0-9_-]{11})/);
           if (m && !isDup(m[1])) {
-            dynamicVideos.push({ id: m[1], title: item.title.substring(0, 60), channel: chName, cat: info.cat });
+            dynamicVideos.push({ id: m[1], title: item.title.substring(0, 60), channel: chName, cat: info.cat, pubDate: item.pubDate });
           }
         });
       }
@@ -253,6 +247,8 @@ function loadDynamicVideos() {
 function refreshDynamicVideos() {
   dynamicVideos = [];
   dynamicLoaded = false;
+  lastRefreshTime = Date.now();
+  document.getElementById("countdownDisplay").classList.remove("loading");
   loadDynamicVideos();
 }
 
@@ -273,6 +269,12 @@ function renderHome() {
   for (var c = 0; c < cats.length; c++) {
     var items = getSafeVideos(cats[c], "");
     if (items.length === 0) continue;
+    items.sort(function(a, b) {
+      if (a.pubDate && b.pubDate) return new Date(b.pubDate) - new Date(a.pubDate);
+      if (a.pubDate) return -1;
+      if (b.pubDate) return 1;
+      return 0;
+    });
     html += '<div class="section">';
     html += '<h2 class="section-title"><span class="sec-cat-tag ' + catClass(cats[c]) + '">' + catLabel(cats[c]) + '</span></h2>';
     html += '<div class="video-grid">';
@@ -354,7 +356,21 @@ function renderSearch(query) {
   el.view.innerHTML = html;
 }
 
+function timeAgo(dateStr) {
+  if (!dateStr) return "";
+  var diff = Date.now() - new Date(dateStr).getTime();
+  var mins = Math.floor(diff / 60000);
+  if (mins < 1) return "baru";
+  if (mins < 60) return mins + "m lalu";
+  var hrs = Math.floor(mins / 60);
+  if (hrs < 24) return hrs + "j lalu";
+  var days = Math.floor(hrs / 24);
+  if (days < 30) return days + "h lalu";
+  return Math.floor(days / 30) + "bl lalu";
+}
+
 function cardHtml(v) {
+  var timeHtml = v.pubDate ? '<span class="video-time">' + timeAgo(v.pubDate) + '</span>' : '';
   return '<div class="video-card" data-id="' + v.id + '" data-title="' + esc(v.title) + '" data-channel="' + esc(v.channel) + '" data-cat="' + v.cat + '">' +
     '<div class="thumb-wrap">' +
     '<img src="' + thumb(v.id) + '" alt="' + esc(v.title) + '" loading="lazy">' +
@@ -363,6 +379,7 @@ function cardHtml(v) {
     '<h3>' + esc(v.title) + '</h3>' +
     '<div class="video-meta">' +
     '<span class="channel-link">' + esc(v.channel) + '</span>' +
+    timeHtml +
     '</div></div></div>';
 }
 
@@ -488,6 +505,11 @@ el.logo.addEventListener("click", goHome);
 el.close.addEventListener("click", closePlayer);
 document.addEventListener("keydown", function(e) { if (e.key === "Escape") closePlayer(); });
 
+document.getElementById("refreshBtn").addEventListener("click", function() {
+  document.getElementById("countdownDisplay").classList.add("loading");
+  refreshDynamicVideos();
+});
+
 // ================= INIT =================
 if ("serviceWorker" in navigator) { navigator.serviceWorker.register("sw.js"); }
 
@@ -501,4 +523,14 @@ if (IS_FILE) {
   }
 }
 goHome();
-setInterval(refreshDynamicVideos, 1800000);
+
+setInterval(refreshDynamicVideos, REFRESH_INTERVAL);
+
+setInterval(function() {
+  var display = document.getElementById("countdownDisplay");
+  if (!display) return;
+  var rem = Math.max(0, REFRESH_INTERVAL - (Date.now() - lastRefreshTime));
+  var m = Math.floor(rem / 60000);
+  var s = Math.floor((rem % 60000) / 1000);
+  display.textContent = "⏱ " + m + ":" + (s < 10 ? "0" : "") + s;
+}, 1000);
