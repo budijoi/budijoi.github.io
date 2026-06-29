@@ -85,11 +85,7 @@ var CATEGORIES = { semua: "all", edukasi: "edukasi", lagu: "lagu", kartun: "kart
 var CHANNEL_FEEDS = {
   "Pinkfong": { id: "UCcdwLMPsaU2ezNSJU1nFoBQ", cat: "lagu" },
   "CoComelon": { id: "UCbCmjCuTUZos6Inko4u57UQ", cat: "lagu" },
-  "Super Simple Songs": { id: "UCLsooMJoIpl_7ux2jvdPB-Q", cat: "lagu" },
-  "LooLoo Kids": { id: "UC4NALVCmcmL5ntpV0thoH6w", cat: "lagu" },
   "Blippi": { id: "UC5PYHgAzJ1wLEidB58SK6Xw", cat: "petualangan" },
-  "Peppa Pig": { id: "UCAOtE1V7Ots4DjM8JLlrYgg", cat: "kartun" },
-  "Lalafun": { id: "UC5mNk1y0O1awxC8DucC8r0w", cat: "lagu" },
   "Dunia Farash ROBLOX": { id: "UChu9w8GFik0spCfQGF_i9WQ", cat: "gaming" },
   "Popo Mimi ROBLOX": { id: "UCnzbx11s43-5ncWWwejPVHg", cat: "gaming" },
   "FranzRX1": { id: "UCUMKbZT3R4myY41_bReI3Cg", cat: "gaming" },
@@ -106,7 +102,7 @@ var CHANNEL_FEEDS = {
 };
 
 var RSS_URL = "https://api.rss2json.com/v1/api.json?rss_url=";
-var MAX_RSS = 15;
+var MAX_RSS = 20;
 var dynamicVideos = [];
 var dynamicLoaded = false;
 var REFRESH_INTERVAL = 3600000;
