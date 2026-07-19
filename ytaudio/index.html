@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Audio Player</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f0f0f;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 520px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+        .subtitle {
+            color: #aaa;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .input-group {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        .input-group input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background: #1a1a1a;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+        }
+        .input-group input:focus { border-color: #ff4444; }
+        .input-group input::placeholder { color: #666; }
+        .input-group button {
+            padding: 10px 16px;
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .input-group button:hover { background: #444; }
+        .input-group button.primary { background: #ff4444; }
+        .input-group button.primary:hover { background: #cc0000; }
+        .input-actions {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+        .input-actions button {
+            padding: 8px 14px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background: #1a1a1a;
+            color: #aaa;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .input-actions button:hover {
+            background: #333;
+            color: #fff;
+        }
+        .player-card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
+            display: none;
+        }
+        .player-card.active { display: block; }
+        .info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        .thumbnail {
+            width: 56px;
+            height: 56px;
+            border-radius: 8px;
+            background: #333;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+        .details { flex: 1; min-width: 0; }
+        .details .title {
+            font-size: 15px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px;
+        }
+        .details .channel { font-size: 12px; color: #aaa; }
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 14px;
+        }
+        .controls button {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .controls button:hover { background: #333; }
+        .controls .play-btn {
+            width: 48px;
+            height: 48px;
+            background: #ff4444;
+        }
+        .controls .play-btn:hover { background: #cc0000; }
+        .progress-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: #aaa;
+        }
+        .progress-area input[type="range"] {
+            flex: 1;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            border-radius: 2px;
+            background: #333;
+            outline: none;
+        }
+        .progress-area input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: #ff4444;
+            cursor: pointer;
+        }
+        .volume-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .volume-area input[type="range"] {
+            flex: 1;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            border-radius: 2px;
+            background: #333;
+            outline: none;
+            max-width: 100px;
+        }
+        .volume-area input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+        }
+        .volume-icon { cursor: pointer; font-size: 16px; user-select: none; width: 24px; text-align: center; }
+        .pl-section {
+            margin-top: 16px;
+        }
+        .pl-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .pl-header span {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .pl-count {
+            font-size: 12px;
+            color: #666;
+            font-weight: 400;
+        }
+        .pl-header button {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .pl-header button:hover { color: #ff4444; background: #2a1515; }
+        .pl-list {
+            max-height: 320px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .pl-list::-webkit-scrollbar { width: 4px; }
+        .pl-list::-webkit-scrollbar-track { background: transparent; }
+        .pl-list::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+        .pl-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s;
+            background: #1a1a1a;
+        }
+        .pl-item:hover { background: #252525; }
+        .pl-item.active {
+            background: #2a1515;
+            border-left: 3px solid #ff4444;
+        }
+        .pl-item .thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            background: #333;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .pl-item .thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .pl-item .info {
+            flex: 1;
+            min-width: 0;
+            margin-bottom: 0;
+            gap: 0;
+        }
+        .pl-item .info .t {
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .pl-item .info .c {
+            font-size: 11px;
+            color: #666;
+        }
+        .pl-item .del {
+            background: none;
+            border: none;
+            color: #555;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: all 0.15s;
+        }
+        .pl-item:hover .del { opacity: 1; }
+        .pl-item .del:hover { color: #ff4444; background: #2a1515; }
+        .pl-item .dl {
+            background: none;
+            border: none;
+            color: #555;
+            cursor: pointer;
+            font-size: 13px;
+            padding: 4px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: all 0.15s;
+            text-decoration: none;
+        }
+        .pl-item:hover .dl { opacity: 1; }
+        .pl-item .dl:hover { color: #4caf50; background: #1a2a1a; }
+        .pl-empty {
+            text-align: center;
+            padding: 24px;
+            color: #555;
+            font-size: 13px;
+        }
+        .error {
+            color: #ff6b6b;
+            text-align: center;
+            font-size: 14px;
+            padding: 10px;
+            background: #2a1515;
+            border-radius: 8px;
+            display: none;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+        .error.show { display: block; }
+        .loading {
+            text-align: center;
+            color: #aaa;
+            padding: 16px;
+            display: none;
+        }
+        .loading.show { display: block; }
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #555;
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-left: 6px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .youtube-player { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+        .mode-shuffle { color: #ff4444 !important; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>YouTube Audio Player</h1>
+    <p class="subtitle">Putar audio YouTube dengan playlist</p>
+
+    <div class="input-group">
+        <input type="text" id="urlInput" placeholder="https://youtube.com/watch?v=..." />
+        <button class="primary" id="playBtn2">Putar</button>
+        <button id="addBtn">+ Daftar</button>
+    </div>
+    <div class="input-actions">
+        <button id="clearPlaylistBtn">Kosongkan</button>
+        <button id="savePlaylistBtn">Simpan</button>
+        <button id="loadPlaylistBtn">Muat</button>
+        <button id="shuffleBtn">Acak</button>
+    </div>
+
+    <div class="loading" id="loading"><span>Memuat</span><span class="spinner"></span></div>
+    <div class="error" id="error">
+        <span id="errorText"></span>
+        <div class="hint" id="errorHint"></div>
+    </div>
+
+    <div class="player-card" id="playerCard">
+        <div class="info">
+            <div class="thumbnail"><img id="thumbImg" src="" alt="" /></div>
+            <div class="details">
+                <div class="title" id="videoTitle">-</div>
+                <div class="channel" id="channelName">-</div>
+            </div>
+        </div>
+        <div class="controls">
+            <button id="prevBtn">⏮</button>
+            <button class="play-btn" id="playBtn">▶</button>
+            <button id="nextBtn">⏭</button>
+        </div>
+        <div class="progress-area">
+            <span id="currentTime">0:00</span>
+            <input type="range" id="seekBar" value="0" min="0" max="100" />
+            <span id="duration">0:00</span>
+        </div>
+        <div class="volume-area">
+            <span class="volume-icon" id="muteBtn">🔊</span>
+            <input type="range" id="volumeBar" value="100" min="0" max="100" />
+        </div>
+    </div>
+
+    <div class="pl-section">
+        <div class="pl-header">
+            <span>Playlist <span class="pl-count" id="plCount">(0)</span></span>
+            <button id="shuffleBtn2">🔀 Acak</button>
+        </div>
+        <div class="pl-list" id="plList">
+            <div class="pl-empty" id="plEmpty">Belum ada lagu. Cari & tambahkan video YouTube.</div>
+        </div>
+    </div>
+</div>
+
+<div id="youtubePlayer" class="youtube-player"></div>
+
+<script>
+let player = null;
+let isPlaying = false;
+let isSeeking = false;
+let volume = 100;
+let isMuted = false;
+let prevVolume = 100;
+let progressInterval = null;
+let apiReady = false;
+let pendingVideoId = null;
+let playlist = [];
+let currentIndex = -1;
+let shuffleMode = false;
+
+const LS_KEY = 'ytaudio_playlist';
+
+const $ = id => document.getElementById(id);
+
+function extractVideoId(url) {
+    const s = url.trim();
+    const patterns = [
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/|youtube\.com\/watch\?.+?v=)([a-zA-Z0-9_-]{11})/,
+        /^([a-zA-Z0-9_-]{11})$/
+    ];
+    for (const p of patterns) {
+        const m = s.match(p);
+        if (m) return m[1];
+    }
+    return null;
+}
+
+function formatTime(t) {
+    if (!t || isNaN(t)) return '0:00';
+    const m = Math.floor(t / 60);
+    const s = Math.floor(t % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+function showError(msg, hint = '') {
+    $('loading').classList.remove('show');
+    $('errorText').textContent = msg;
+    $('errorHint').textContent = hint;
+    $('error').classList.add('show');
+}
+
+function hideError() {
+    $('error').classList.remove('show');
+}
+
+function loadVideo(videoId, index) {
+    hideError();
+    $('loading').classList.add('show');
+    $('playerCard').classList.remove('active');
+    pendingVideoId = videoId;
+
+    if (typeof index === 'number') currentIndex = index;
+
+    if (!apiReady) {
+        $('loading').textContent = 'Memuat YouTube API...';
+        return;
+    }
+
+    $('loading').textContent = 'Memuat video...';
+
+    if (player && player.destroy) {
+        player.destroy();
+        player = null;
+    }
+
+    player = new YT.Player('youtubePlayer', {
+        height: 1,
+        width: 1,
+        videoId: videoId,
+        playerVars: {
+            autoplay: 1,
+            controls: 0,
+            disablekb: 1,
+            fs: 0,
+            rel: 0,
+            modestbranding: 1,
+            iv_load_policy: 3,
+            playsinline: 1,
+            origin: window.location.origin || window.location.href
+        },
+        events: {
+            onReady: onPlayerReady,
+            onStateChange: onPlayerStateChange,
+            onError: onPlayerError
+        }
+    });
+}
+
+function onPlayerReady() {
+    $('loading').classList.remove('show');
+    $('playerCard').classList.add('active');
+
+    try {
+        const d = player.getVideoData();
+        $('videoTitle').textContent = d.title || '-';
+        $('channelName').textContent = d.author || '-';
+        const id = d.video_id || '';
+        $('thumbImg').src = `https://img.youtube.com/vi/${id}/mqdefault.jpg`;
+
+        if (currentIndex >= 0 && playlist[currentIndex]) {
+            playlist[currentIndex].title = d.title || playlist[currentIndex].title;
+            playlist[currentIndex].channel = d.author || playlist[currentIndex].channel;
+            renderPlaylist();
+        }
+    } catch(e) {
+        $('videoTitle').textContent = 'Memuat...';
+    }
+
+    player.setVolume(volume);
+    if (isMuted) player.mute();
+
+    $('duration').textContent = formatTime(player.getDuration());
+    $('playBtn').textContent = '⏸';
+    isPlaying = true;
+    startProgressInterval();
+}
+
+function onPlayerStateChange(e) {
+    switch (e.data) {
+        case YT.PlayerState.PLAYING:
+            $('playBtn').textContent = '⏸';
+            isPlaying = true;
+            $('duration').textContent = formatTime(player.getDuration());
+            startProgressInterval();
+            break;
+        case YT.PlayerState.PAUSED:
+            $('playBtn').textContent = '▶';
+            isPlaying = false;
+            stopProgressInterval();
+            break;
+        case YT.PlayerState.ENDED:
+            $('playBtn').textContent = '▶';
+            isPlaying = false;
+            stopProgressInterval();
+            playNext();
+            break;
+        case YT.PlayerState.CUED:
+            $('duration').textContent = formatTime(player.getDuration());
+            break;
+    }
+}
+
+function onPlayerError(e) {
+    $('loading').classList.remove('show');
+    let msg, hint;
+    switch (e.data) {
+        case 2: msg = 'Parameter video tidak valid.'; hint = 'Coba periksa link YouTube.'; break;
+        case 5: msg = 'Error pemutar HTML5.'; hint = 'Coba refresh atau browser lain.'; break;
+        case 100: msg = 'Video tidak ditemukan.'; hint = 'Periksa link YouTube.'; break;
+        case 101: case 150: msg = 'Video tidak bisa diputar.'; hint = 'Embedding mungkin dinonaktifkan.'; break;
+        default: msg = 'Gagal memuat video.'; hint = 'Coba refresh atau nonaktifkan ad blocker.';
+    }
+    showError(msg, hint);
+}
+
+function startProgressInterval() {
+    stopProgressInterval();
+    progressInterval = setInterval(() => {
+        if (!player || !player.getCurrentTime) return;
+        try {
+            const cur = player.getCurrentTime();
+            const dur = player.getDuration();
+            $('currentTime').textContent = formatTime(cur);
+            if (!isSeeking && dur > 0) $('seekBar').value = (cur / dur) * 100;
+        } catch(e) {}
+    }, 250);
+}
+
+function stopProgressInterval() {
+    if (progressInterval) {
+        clearInterval(progressInterval);
+        progressInterval = null;
+    }
+}
+
+function onYouTubeIframeAPIReady() {
+    apiReady = true;
+    if (pendingVideoId) {
+        const id = pendingVideoId;
+        pendingVideoId = null;
+        loadVideo(id);
+    }
+}
+
+// --- Playlist ---
+
+function addToPlaylist(videoId, title, channel) {
+    if (!videoId) return;
+    if (playlist.some(item => item.id === videoId)) {
+        showError('Video sudah ada di playlist.');
+        return;
+    }
+    playlist.push({ id: videoId, title: title || 'Memuat...', channel: channel || '' });
+    if (playlist.length === 1) currentIndex = 0;
+    renderPlaylist();
+    savePlaylist();
+}
+
+function removeFromPlaylist(index) {
+    playlist.splice(index, 1);
+    if (currentIndex === index) {
+        currentIndex = -1;
+    } else if (currentIndex > index) {
+        currentIndex--;
+    }
+    if (playlist.length === 0) currentIndex = -1;
+    renderPlaylist();
+    savePlaylist();
+}
+
+function playFromPlaylist(index) {
+    if (index < 0 || index >= playlist.length) return;
+    currentIndex = index;
+    loadVideo(playlist[index].id, index);
+    renderPlaylist();
+}
+
+function playNext() {
+    if (playlist.length === 0) return;
+    let next;
+    if (shuffleMode) {
+        next = Math.floor(Math.random() * playlist.length);
+    } else {
+        next = currentIndex + 1;
+        if (next >= playlist.length) return;
+    }
+    playFromPlaylist(next);
+}
+
+function playPrev() {
+    if (playlist.length === 0 || currentIndex <= 0) return;
+    playFromPlaylist(currentIndex - 1);
+}
+
+function shufflePlaylist() {
+    shuffleMode = !shuffleMode;
+    updateShuffleUI();
+}
+
+function updateShuffleUI() {
+    $('shuffleBtn').style.color = shuffleMode ? '#ff4444' : '';
+    $('shuffleBtn2').style.color = shuffleMode ? '#ff4444' : '';
+}
+
+function renderPlaylist() {
+    const list = $('plList');
+    const empty = $('plEmpty');
+    const count = $('plCount');
+
+    list.innerHTML = '';
+    count.textContent = `(${playlist.length})`;
+
+    if (playlist.length === 0) {
+        list.appendChild(empty);
+        return;
+    }
+
+    playlist.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = 'pl-item' + (i === currentIndex ? ' active' : '');
+        div.innerHTML = `
+            <div class="thumb"><img src="https://img.youtube.com/vi/${item.id}/default.jpg" alt="" onerror="this.style.display='none'" /></div>
+            <div class="info">
+                <div class="t">${escHtml(item.title)}</div>
+                <div class="c">${escHtml(item.channel)}</div>
+            </div>
+            <a class="dl" href="download.php?id=${item.id}&title=${encodeURIComponent(item.title)}" download title="Download MP3">⬇</a>
+            <button class="del" data-i="${i}">✕</button>
+        `;
+        div.addEventListener('click', e => {
+            if (e.target.closest('.del')) return;
+            if (e.target.closest('.dl')) return;
+            playFromPlaylist(i);
+        });
+        list.appendChild(div);
+    });
+}
+
+function escHtml(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+}
+
+function savePlaylist() {
+    try {
+        localStorage.setItem(LS_KEY, JSON.stringify(playlist));
+    } catch(e) {}
+}
+
+function loadPlaylist() {
+    try {
+        const data = localStorage.getItem(LS_KEY);
+        if (data) {
+            playlist = JSON.parse(data);
+            if (!Array.isArray(playlist)) playlist = [];
+            if (playlist.length > 0) currentIndex = 0;
+            renderPlaylist();
+        }
+    } catch(e) {
+        playlist = [];
+    }
+}
+
+function clearPlaylist() {
+    if (playlist.length === 0) return;
+    playlist = [];
+    currentIndex = -1;
+    renderPlaylist();
+    savePlaylist();
+}
+
+// --- Event handlers ---
+
+$('playBtn2').addEventListener('click', () => {
+    const videoId = extractVideoId($('urlInput').value);
+    if (!videoId) {
+        showError('Link YouTube tidak valid.', 'Masukkan URL seperti https://youtube.com/watch?v=...');
+        return;
+    }
+    addToPlaylist(videoId);
+    playFromPlaylist(playlist.length - 1);
+    $('urlInput').value = '';
+});
+
+$('addBtn').addEventListener('click', () => {
+    const videoId = extractVideoId($('urlInput').value);
+    if (!videoId) {
+        showError('Link YouTube tidak valid.');
+        return;
+    }
+    addToPlaylist(videoId);
+    $('urlInput').value = '';
+    hideError();
+});
+
+$('urlInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') $('playBtn2').click();
+});
+
+$('playBtn').addEventListener('click', () => {
+    if (!player) return;
+    if (isPlaying) player.pauseVideo();
+    else player.playVideo();
+});
+
+$('nextBtn').addEventListener('click', playNext);
+$('prevBtn').addEventListener('click', playPrev);
+
+$('seekBar').addEventListener('input', e => {
+    isSeeking = true;
+    if (player && player.getDuration) {
+        try {
+            const time = (e.target.value / 100) * player.getDuration();
+            $('currentTime').textContent = formatTime(time);
+        } catch(e) {}
+    }
+});
+
+$('seekBar').addEventListener('change', e => {
+    if (player && player.getDuration) {
+        try {
+            const time = (e.target.value / 100) * player.getDuration();
+            player.seekTo(time, true);
+        } catch(e) {}
+    }
+    isSeeking = false;
+});
+
+$('volumeBar').addEventListener('input', e => {
+    volume = parseInt(e.target.value);
+    if (player) player.setVolume(volume);
+    if (volume === 0) {
+        $('muteBtn').textContent = '🔇';
+        isMuted = true;
+    } else {
+        $('muteBtn').textContent = volume > 50 ? '🔊' : '🔉';
+        isMuted = false;
+    }
+});
+
+$('muteBtn').addEventListener('click', () => {
+    if (!player) return;
+    if (isMuted) {
+        player.unMute();
+        player.setVolume(prevVolume || 100);
+        volume = prevVolume || 100;
+        $('volumeBar').value = volume;
+        $('muteBtn').textContent = volume > 50 ? '🔊' : '🔉';
+        isMuted = false;
+    } else {
+        prevVolume = volume;
+        player.mute();
+        $('volumeBar').value = 0;
+        $('muteBtn').textContent = '🔇';
+        isMuted = true;
+    }
+});
+
+$('clearPlaylistBtn').addEventListener('click', clearPlaylist);
+$('savePlaylistBtn').addEventListener('click', savePlaylist);
+$('loadPlaylistBtn').addEventListener('click', loadPlaylist);
+$('shuffleBtn').addEventListener('click', shufflePlaylist);
+$('shuffleBtn2').addEventListener('click', shufflePlaylist);
+
+// Init
+const tag = document.createElement('script');
+tag.src = 'https://www.youtube.com/iframe_api';
+document.head.appendChild(tag);
+
+loadPlaylist();
+
+setTimeout(() => {
+    if (!apiReady) {
+        showError('YouTube API tidak bisa dimuat.', 'Ad blocker memblokir atau dibuka via file://. Jalankan via localhost.');
+    }
+}, 5000);
+</script>
+</body>
+</html>
