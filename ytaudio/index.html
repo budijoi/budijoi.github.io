@@ -333,6 +333,153 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .youtube-player { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
         .mode-shuffle { color: #ff4444 !important; }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 100;
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 40px 16px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal {
+            background: #1a1a1a;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 480px;
+            max-height: calc(100vh - 80px);
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 16px 0;
+            font-size: 15px;
+            font-weight: 600;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .modal-close:hover { color: #fff; background: #333; }
+        .modal-body {
+            padding: 12px 16px 16px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .search-box {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .search-box input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background: #0f0f0f;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+        }
+        .search-box input:focus { border-color: #ff4444; }
+        .search-box input::placeholder { color: #666; }
+        .search-box button {
+            padding: 10px 16px;
+            background: #ff4444;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .search-box button:hover { background: #cc0000; }
+        .sr-loading {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+            font-size: 13px;
+            display: none;
+        }
+        .sr-loading.show { display: block; }
+        .sr-error {
+            padding: 10px;
+            color: #ff6b6b;
+            font-size: 13px;
+            background: #2a1515;
+            border-radius: 8px;
+            display: none;
+            margin-bottom: 8px;
+        }
+        .sr-error.show { display: block; }
+        .sr-results {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-height: 60px;
+        }
+        .sr-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s;
+            background: #0f0f0f;
+        }
+        .sr-item:hover { background: #252525; }
+        .sr-item .thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            background: #333;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .sr-item .thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .sr-item .info { flex: 1; min-width: 0; }
+        .sr-item .info .t {
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .sr-item .info .c {
+            font-size: 11px;
+            color: #666;
+        }
+        .sr-item .add-sr {
+            background: none;
+            border: none;
+            color: #4caf50;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px 6px;
+            border-radius: 4px;
+            opacity: 0.6;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+        .sr-item .add-sr:hover { opacity: 1; background: #1a2a1a; }
+        .sr-item .add-sr.added { color: #555; }
+        .sr-empty {
+            text-align: center;
+            padding: 20px;
+            color: #555;
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
@@ -351,6 +498,7 @@
         <button id="savePlaylistBtn">Simpan</button>
         <button id="loadPlaylistBtn">Muat</button>
         <button id="shuffleBtn">Acak</button>
+        <button id="searchOpenBtn">Cari</button>
     </div>
 
     <div class="loading" id="loading"><span>Memuat</span><span class="spinner"></span></div>
@@ -390,6 +538,26 @@
         </div>
         <div class="pl-list" id="plList">
             <div class="pl-empty" id="plEmpty">Belum ada lagu. Cari & tambahkan video YouTube.</div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="searchModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span>Cari Video YouTube</span>
+                <button class="modal-close" id="searchCloseBtn">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Cari lagu..." autofocus />
+                    <button id="searchBtn">Cari</button>
+                </div>
+                <div class="sr-loading" id="srLoading">Mencari...</div>
+                <div class="sr-error" id="srError"></div>
+                <div class="sr-results" id="srResults">
+                    <div class="sr-empty">Ketik kata kunci lalu tekan Cari atau Enter.</div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -674,6 +842,10 @@ function renderPlaylist() {
             if (e.target.closest('.dl')) return;
             playFromPlaylist(i);
         });
+        div.querySelector('.del').addEventListener('click', e => {
+            e.stopPropagation();
+            removeFromPlaylist(i);
+        });
         list.appendChild(div);
     });
 }
@@ -710,6 +882,80 @@ function clearPlaylist() {
     currentIndex = -1;
     renderPlaylist();
     savePlaylist();
+}
+
+// --- Search ---
+
+let searchTimeout = null;
+
+function doSearch() {
+    const q = $('searchInput').value.trim();
+    if (q.length < 2) return;
+
+    $('srLoading').classList.add('show');
+    $('srError').classList.remove('show');
+    $('srResults').innerHTML = '';
+
+    fetch('search.php?q=' + encodeURIComponent(q) + '&max=10')
+        .then(r => r.json())
+        .then(data => {
+            $('srLoading').classList.remove('show');
+            if (data.error) {
+                $('srError').textContent = data.error;
+                $('srError').classList.add('show');
+                return;
+            }
+            renderSearchResults(data.results || []);
+        })
+        .catch(err => {
+            $('srLoading').classList.remove('show');
+            $('srError').textContent = 'Gagal mencari. Coba lagi.';
+            $('srError').classList.add('show');
+        });
+}
+
+function renderSearchResults(results) {
+    const container = $('srResults');
+    container.innerHTML = '';
+
+    if (results.length === 0) {
+        container.innerHTML = '<div class="sr-empty">Tidak ada hasil.</div>';
+        return;
+    }
+
+    results.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'sr-item';
+        const inPlaylist = playlist.some(p => p.id === item.id);
+        const dur = item.duration_string ? item.duration_string : formatTime(item.duration);
+        div.innerHTML = `
+            <div class="thumb"><img src="${item.thumbnail}" alt="" onerror="this.style.display='none'" /></div>
+            <div class="info">
+                <div class="t">${escHtml(item.title)}</div>
+                <div class="c">${escHtml(item.channel)} &middot; ${dur}</div>
+            </div>
+            <button class="add-sr${inPlaylist ? ' added' : ''}" data-id="${item.id}" title="${inPlaylist ? 'Sudah di playlist' : 'Tambahkan ke playlist'}">${inPlaylist ? '✓' : '+'}</button>
+        `;
+        div.querySelector('.add-sr').addEventListener('click', e => {
+            e.stopPropagation();
+            const btn = e.currentTarget;
+            if (btn.classList.contains('added')) return;
+            addToPlaylist(item.id, item.title, item.channel);
+            btn.textContent = '✓';
+            btn.classList.add('added');
+            btn.title = 'Sudah di playlist';
+        });
+        div.addEventListener('click', e => {
+            if (e.target.closest('.add-sr')) return;
+            addToPlaylist(item.id, item.title, item.channel);
+            const btn = div.querySelector('.add-sr');
+            btn.textContent = '✓';
+            btn.classList.add('added');
+            btn.title = 'Sudah di playlist';
+            playFromPlaylist(playlist.length - 1);
+        });
+        container.appendChild(div);
+    });
 }
 
 // --- Event handlers ---
@@ -804,6 +1050,35 @@ $('savePlaylistBtn').addEventListener('click', savePlaylist);
 $('loadPlaylistBtn').addEventListener('click', loadPlaylist);
 $('shuffleBtn').addEventListener('click', shufflePlaylist);
 $('shuffleBtn2').addEventListener('click', shufflePlaylist);
+
+function openSearch() {
+    $('searchModal').classList.add('show');
+    $('searchInput').value = '';
+    $('searchInput').focus();
+    $('srResults').innerHTML = '<div class="sr-empty">Ketik kata kunci lalu tekan Cari atau Enter.</div>';
+    $('srError').classList.remove('show');
+    $('srLoading').classList.remove('show');
+}
+
+function closeSearch() {
+    $('searchModal').classList.remove('show');
+}
+
+$('searchOpenBtn').addEventListener('click', openSearch);
+$('searchCloseBtn').addEventListener('click', closeSearch);
+$('searchModal').addEventListener('click', e => {
+    if (e.target === $('searchModal')) closeSearch();
+});
+
+$('searchBtn').addEventListener('click', doSearch);
+$('searchInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSearch();
+    if (e.key === 'Escape') closeSearch();
+});
+$('searchInput').addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(doSearch, 500);
+});
 
 // Init
 const tag = document.createElement('script');
