@@ -270,30 +270,32 @@
         .pl-item .del {
             background: none;
             border: none;
-            color: #555;
+            color: #888;
             cursor: pointer;
             font-size: 16px;
             padding: 4px;
             border-radius: 4px;
-            opacity: 0;
             transition: all 0.15s;
         }
-        .pl-item:hover .del { opacity: 1; }
         .pl-item .del:hover { color: #ff4444; background: #2a1515; }
         .pl-item .dl {
             background: none;
             border: none;
-            color: #555;
+            color: #888;
             cursor: pointer;
             font-size: 13px;
             padding: 4px;
             border-radius: 4px;
-            opacity: 0;
             transition: all 0.15s;
             text-decoration: none;
         }
-        .pl-item:hover .dl { opacity: 1; }
         .pl-item .dl:hover { color: #4caf50; background: #1a2a1a; }
+        @media (hover: hover) {
+            .pl-item .del { opacity: 0; }
+            .pl-item:hover .del { opacity: 1; }
+            .pl-item:hover .dl { opacity: 1; }
+            .pl-item .dl { opacity: 0; }
+        }
         .pl-empty {
             text-align: center;
             padding: 24px;
@@ -468,17 +470,80 @@
             font-size: 18px;
             padding: 4px 6px;
             border-radius: 4px;
-            opacity: 0.6;
             transition: all 0.15s;
             flex-shrink: 0;
         }
-        .sr-item .add-sr:hover { opacity: 1; background: #1a2a1a; }
+        .sr-item .add-sr:hover { background: #1a2a1a; }
         .sr-item .add-sr.added { color: #555; }
+        @media (hover: hover) {
+            .sr-item .add-sr { opacity: 0.6; }
+            .sr-item .add-sr:hover { opacity: 1; }
+        }
         .sr-empty {
             text-align: center;
             padding: 20px;
             color: #555;
             font-size: 13px;
+        }
+
+        .donate-section {
+            text-align: center;
+            margin-top: 20px;
+            padding: 12px 0 4px;
+            border-top: 1px solid #1a1a1a;
+        }
+        #donateBtn {
+            background: none;
+            border: 1px solid #333;
+            color: #888;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        #donateBtn:hover {
+            border-color: #ff4444;
+            color: #ff4444;
+            background: #2a1515;
+        }
+        .modal-donate .modal { max-width: 360px; }
+        .qr-wrap {
+            text-align: center;
+            padding: 10px 0;
+        }
+        .qr-wrap img {
+            width: 220px;
+            height: 220px;
+            border-radius: 8px;
+            background: #fff;
+            padding: 8px;
+        }
+        .qr-wrap p {
+            color: #aaa;
+            font-size: 13px;
+            margin-top: 12px;
+            line-height: 1.5;
+        }
+        .donate-ticker {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid #222;
+            overflow: hidden;
+            white-space: nowrap;
+            height: 24px;
+            position: relative;
+        }
+        .donate-ticker span {
+            display: inline-block;
+            animation: ticker 20s linear infinite;
+            color: #666;
+            font-size: 12px;
+            padding-left: 100%;
+        }
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
         }
     </style>
 </head>
@@ -559,6 +624,26 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="modal-overlay modal-donate" id="donateModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span>Donasi</span>
+                <button class="modal-close" id="donateCloseBtn">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="qr-wrap">
+                    <img src="https://github.com/budijoi/budijoi.github.io/blob/main/QRIS.png?raw=true" alt="QRIS" />
+                    <p>Berapapun jumlahnya tentu akan sangat berarti, terima kasih.</p>
+                    <div class="donate-ticker"><span id="donateTicker"></span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="donate-section">
+        <button id="donateBtn">☕ Donasi</button>
     </div>
 </div>
 
@@ -1069,6 +1154,31 @@ $('searchCloseBtn').addEventListener('click', closeSearch);
 $('searchModal').addEventListener('click', e => {
     if (e.target === $('searchModal')) closeSearch();
 });
+
+$('donateBtn').addEventListener('click', () => {
+    $('donateModal').classList.add('show');
+});
+$('donateCloseBtn').addEventListener('click', () => {
+    $('donateModal').classList.remove('show');
+});
+$('donateModal').addEventListener('click', e => {
+    if (e.target === $('donateModal')) $('donateModal').classList.remove('show');
+});
+
+const names = ['A***i', 'D***a', 'R***i', 'S***i', 'B***n', 'F***d', 'H***a', 'I***l', 'J***k', 'M***r', 'N***a', 'P***t', 'T***o', 'W***n', 'Y***a', 'E***s', 'G***h', 'K***m', 'L***n', 'Z***h'];
+const ticker = $('donateTicker');
+function generateDonations() {
+    const count = 8 + Math.floor(Math.random() * 5);
+    const items = [];
+    for (let i = 0; i < count; i++) {
+        const name = names[Math.floor(Math.random() * names.length)];
+        const amount = 2000 + Math.floor(Math.random() * 14) * 1000;
+        items.push(`${name} Rp${amount.toLocaleString('id-ID')}`);
+    }
+    ticker.textContent = 'Terima kasih kepada: ' + items.join('  •  ') + '  •  ';
+}
+generateDonations();
+setInterval(generateDonations, 60000);
 
 $('searchBtn').addEventListener('click', doSearch);
 $('searchInput').addEventListener('keydown', e => {
