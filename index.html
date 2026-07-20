@@ -1,310 +1,210 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>budijoi · Repositori</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background: #0d1117;
-      color: #e6edf3;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-    .container { max-width: 880px; margin: 0 auto; padding: 32px 24px 24px; flex: 1; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Donasi</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid #30363d;
-      margin-bottom: 28px;
-    }
-    .topbar .brand { font-size: 18px; font-weight: 700; color: #e6edf3; text-decoration: none; }
-    .topbar .brand:hover { color: #58a6ff; }
-    .topbar nav { display: flex; gap: 6px; }
-    .topbar nav a {
-      padding: 8px 16px;
-      border-radius: 8px;
-      color: #8b949e;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all .2s;
-    }
-    .topbar nav a:hover { background: #21262d; color: #e6edf3; }
-    .topbar nav a.active { background: #1f6feb; color: #fff; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.5);
+  }
 
-    .profile-summary {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      background: #151b23;
-      border: 1px solid #30363d;
-      border-radius: 12px;
-      padding: 24px 28px;
-      margin-bottom: 28px;
-    }
-    .profile-summary .avatar {
-      width: 72px; height: 72px; border-radius: 50%;
-      border: 2px solid #30363d; flex-shrink: 0;
-    }
-    .profile-summary .info { flex: 1; min-width: 0; }
-    .profile-summary .info h2 { font-size: 20px; font-weight: 600; }
-    .profile-summary .info h2 a { color: #e6edf3; text-decoration: none; }
-    .profile-summary .info h2 a:hover { color: #58a6ff; }
-    .profile-summary .info .bio { color: #8b949e; font-size: 14px; margin-top: 2px; }
-    .profile-summary .info .detail { color: #8b949e; font-size: 13px; margin-top: 6px; display: flex; flex-wrap: wrap; gap: 14px; }
-    .profile-summary .info .detail span { display: flex; align-items: center; gap: 4px; }
-    .profile-summary .btn-profil {
-      background: #21262d; border: 1px solid #30363d; color: #e6edf3;
-      padding: 8px 20px; border-radius: 8px; text-decoration: none;
-      font-size: 14px; font-family: inherit; font-weight: 500;
-      transition: border-color .2s; white-space: nowrap;
-    }
-    .profile-summary .btn-profil:hover { border-color: #58a6ff; }
+  .modal {
+    background: #fff;
+    border-radius: 24px;
+    width: 420px;
+    max-width: 94vw;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: fadeIn 0.3s ease;
+  }
 
-    .repo-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-    .repo-header h3 { font-size: 17px; font-weight: 600; }
-    .repo-header .count { color: #8b949e; font-size: 14px; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
 
-    .repo-list { display: flex; flex-direction: column; gap: 10px; }
-    .repo-card {
-      background: #151b23; border: 1px solid #30363d; border-radius: 8px;
-      padding: 18px 22px; transition: border-color .2s;
-    }
-    .repo-card:hover { border-color: #58a6ff; }
-    .repo-card a { text-decoration: none; }
-    .repo-name { font-size: 16px; font-weight: 600; color: #58a6ff; }
-    .repo-name:hover { text-decoration: underline; }
-    .repo-desc { color: #8b949e; font-size: 14px; margin-top: 5px; line-height: 1.5; }
-    .repo-meta {
-      display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px;
-      font-size: 13px; color: #8b949e; align-items: center;
-    }
-    .repo-meta .lang-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 3px; vertical-align: middle; }
-    .repo-meta .fork-label {
-      display: inline-flex; align-items: center; gap: 4px;
-      background: #21262d; padding: 2px 8px; border-radius: 12px; font-size: 12px; color: #8b949e;
-    }
+  .modal-header {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff;
+    text-align: center;
+    padding: 32px 24px 28px;
+  }
 
-    .pagination {
-      display: flex; align-items: center; justify-content: center; gap: 12px;
-      margin-top: 24px;
-    }
-    .pagination button {
-      background: #21262d; border: 1px solid #30363d; color: #e6edf3;
-      padding: 8px 20px; border-radius: 8px; cursor: pointer;
-      font-size: 14px; font-family: inherit; transition: border-color .2s;
-      display: inline-flex; align-items: center; gap: 6px;
-    }
-    .pagination button:hover:not(:disabled) { border-color: #58a6ff; }
-    .pagination button:disabled { opacity: .4; cursor: default; }
-    .pagination .page-info { color: #8b949e; font-size: 14px; }
+  .modal-header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
 
-    .loading { text-align: center; color: #8b949e; padding: 50px 0; }
-    .loading .spinner {
-      width: 28px; height: 28px; border: 3px solid #30363d;
-      border-top-color: #58a6ff; border-radius: 50%;
-      animation: spin .8s linear infinite; margin: 0 auto 10px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .error { color: #f85149; text-align: center; padding: 50px 0; }
+  .modal-header p {
+    font-size: 14px;
+    opacity: 0.85;
+  }
 
-    footer { text-align: center; padding: 24px; color: #484f58; font-size: 13px; }
-    footer a { color: #58a6ff; text-decoration: none; }
-  </style>
+  .modal-body {
+    padding: 28px 24px 20px;
+    text-align: center;
+  }
+
+  .qr-wrapper {
+    background: #fff;
+    border: 2px dashed #e5e7eb;
+    border-radius: 16px;
+    padding: 16px;
+    display: inline-block;
+    margin-bottom: 16px;
+  }
+
+  .qr-wrapper img {
+    display: block;
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+  }
+
+  .modal-body .label {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 4px;
+  }
+
+  .modal-body .bank {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  .thanks {
+    background: #f0fdf4;
+    color: #16a34a;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 10px;
+    margin: 16px 0 0;
+    line-height: 1.5;
+  }
+
+  .ticker-wrap {
+    background: #111827;
+    padding: 10px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+  }
+
+  .ticker-wrap::before,
+  .ticker-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .ticker-wrap::before {
+    left: 0;
+    background: linear-gradient(to right, #111827, transparent);
+  }
+
+  .ticker-wrap::after {
+    right: 0;
+    background: linear-gradient(to left, #111827, transparent);
+  }
+
+  .ticker {
+    display: inline-flex;
+    gap: 48px;
+    animation: scroll 30s linear infinite;
+  }
+
+  .ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #d1d5db;
+    font-size: 13px;
+  }
+
+  .ticker-item .name {
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .ticker-item .amount {
+    color: #fbbf24;
+    font-weight: 700;
+  }
+
+  @keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <div class="topbar">
-      <a href="index.html" class="brand">budijoi</a>
-      <nav>
-        <a href="index.html" class="active">Repositori</a>
-        <a href="profile.html">Profil</a>
-      </nav>
-    </div>
-
-    <div id="profile-summary" class="profile-summary">
-      <div class="loading" style="width:100%;padding:20px 0;">
-        <div class="spinner"></div>
-        Memuat profil...
-      </div>
-    </div>
-
-    <div class="repo-header">
-      <h3>Repositori</h3>
-      <span class="count" id="repo-count">--</span>
-    </div>
-    <div id="repo-list" class="repo-list">
-      <div class="loading">
-        <div class="spinner"></div>
-        Memuat repositori...
-      </div>
-    </div>
-    <div id="pagination" class="pagination"></div>
+<div class="modal">
+  <div class="modal-header">
+    <h1>💜 Sampaikan Donasi</h1>
+    <p>Pilih metode di bawah ini</p>
   </div>
-  <footer>
-    <a href="https://github.com/budijoi">github.com/budijoi</a>
-  </footer>
+  <div class="modal-body">
+    <div class="qr-wrapper">
+      <img src="QRIS.png" alt="QRIS">
+    </div>
+    <div class="label">Scan QRIS</div>
+    <div class="bank">Semua E-Wallet & Mobile Banking</div>
+    <div class="thanks">
+      Berapapun jumlahnya tentu akan sangat berarti, terima kasih.
+    </div>
+  </div>
+  <div class="ticker-wrap">
+    <div class="ticker" id="ticker"></div>
+  </div>
+</div>
 
-  <script>
-    let currentPage = 1;
-    let totalCount = 0;
-    const PER_PAGE = 10;
+<script>
+  const donors = [
+    { name: 'Ahmad Fauzi', amount: 'Rp5.000' },
+    { name: 'Siti Nurhaliza', amount: 'Rp10.000' },
+    { name: 'Budi Santoso', amount: 'Rp5.000' },
+    { name: 'Dewi Lestari', amount: 'Rp5.000' },
+    { name: 'Rudi Hartono', amount: 'Rp10.000' },
+    { name: 'Ani Rahmawati', amount: 'Rp5.000' },
+    { name: 'Dimas Prayoga', amount: 'Rp2.000' },
+    { name: 'Rina Wijaya', amount: 'Rp5.000' },
+    { name: 'Agus Prasetyo', amount: 'Rp6.000' },
+    { name: 'Maya Anggraini', amount: 'Rp9.000' },
+    { name: 'Hendra Gunawan', amount: 'Rp12.000' },
+    { name: 'Fitri Handayani', amount: 'Rp5.000' },
+  ];
 
-    const profileEl = document.getElementById('profile-summary');
-    const container = document.getElementById('repo-list');
-    const countEl = document.getElementById('repo-count');
-    const paginationEl = document.getElementById('pagination');
+  const ticker = document.getElementById('ticker');
 
-    const CACHE_EXPIRY = 5 * 60 * 1000;
+  function renderItems(list) {
+    return list.map(d => `
+      <span class="ticker-item">
+        <span class="name">${d.name}</span>
+        <span class="amount">${d.amount}</span>
+      </span>
+    `).join('');
+  }
 
-    function cacheGet(key) {
-      try {
-        const raw = sessionStorage.getItem('gh_' + key);
-        if (!raw) return null;
-        const { data, ts } = JSON.parse(raw);
-        if (Date.now() - ts > CACHE_EXPIRY) { sessionStorage.removeItem('gh_' + key); return null; }
-        return data;
-      } catch { return null; }
-    }
-    function cacheSet(key, data) {
-      try { sessionStorage.setItem('gh_' + key, JSON.stringify({ data, ts: Date.now() })); } catch {}
-    }
-
-    async function ghFetch(url) {
-      const cached = cacheGet(url);
-      if (cached) return { data: cached, link: '' };
-      const res = await fetch(url);
-      if (res.status === 403) throw new Error('Rate limit GitHub API. Coba lagi nanti.');
-      if (!res.ok) throw new Error('Gagal memuat data');
-      const data = await res.json();
-      cacheSet(url, data);
-      return { data, link: res.headers.get('Link') || '' };
-    }
-
-    const langColors = {
-      JavaScript: '#f1e05a', Python: '#3572A5', HTML: '#e34c26',
-      Shell: '#89e051', CSS: '#563d7c', TypeScript: '#3178c6',
-      PHP: '#4F5D95', Ruby: '#701516', Go: '#00ADD8',
-      Rust: '#dea584', Java: '#b07219', C: '#555555',
-      'C++': '#f34b7d', 'C#': '#178600', Kotlin: '#A97BFF',
-      Dart: '#00B4AB', Swift: '#F05138', Scala: '#c22d40',
-    };
-
-    (async () => {
-      try {
-        const { data: user } = await ghFetch('https://api.github.com/users/budijoi');
-
-        profileEl.innerHTML = `
-          <img class="avatar" src="${user.avatar_url}" alt="${user.login}" loading="lazy">
-          <div class="info">
-            <h2><a href="https://github.com/${user.login}">${escHtml(user.name || user.login)}</a></h2>
-            ${user.bio ? `<div class="bio">${escHtml(user.bio)}</div>` : ''}
-            <div class="detail">
-              ${user.location ? `<span>📍 ${escHtml(user.location)}</span>` : ''}
-              ${user.company ? `<span>🏢 ${escHtml(user.company)}</span>` : ''}
-              <span>📦 ${user.public_repos} repositori</span>
-              <span>👥 ${user.followers} pengikut</span>
-            </div>
-            <div class="socmed" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">
-              <a href="https://facebook.com/budijoiBBJ" target="_blank" style="color:#8b949e;text-decoration:none;font-size:13px;display:flex;align-items:center;gap:4px;">Facebook</a>
-              <a href="https://instagram.com/budijoi_eco" target="_blank" style="color:#8b949e;text-decoration:none;font-size:13px;display:flex;align-items:center;gap:4px;">Instagram</a>
-              <a href="https://threads.com/budijoi_eco" target="_blank" style="color:#8b949e;text-decoration:none;font-size:13px;display:flex;align-items:center;gap:4px;">Threads</a>
-              <a href="https://youtube.com/@budijoi" target="_blank" style="color:#8b949e;text-decoration:none;font-size:13px;display:flex;align-items:center;gap:4px;">YouTube</a>
-              <a href="mailto:admin@budijoi.my.id" style="color:#8b949e;text-decoration:none;font-size:13px;display:flex;align-items:center;gap:4px;">Email</a>
-            </div>
-          </div>
-          <a href="profile.html" class="btn-profil">Profil Lengkap →</a>
-        `;
-
-        totalCount = user.public_repos;
-        countEl.textContent = totalCount + ' repositori';
-        loadRepos();
-      } catch (e) {
-        profileEl.innerHTML = '<div class="error">Gagal memuat profil.</div>';
-        container.innerHTML = '<div class="error">Gagal memuat repositori.</div>';
-        console.error(e);
-      }
-    })();
-
-    async function loadRepos() {
-      container.innerHTML = '<div class="loading"><div class="spinner"></div>Memuat repositori...</div>';
-      paginationEl.innerHTML = '';
-
-      try {
-        const { data: repos, link: linkHeader } = await ghFetch(`https://api.github.com/users/budijoi/repos?sort=updated&per_page=${PER_PAGE}&page=${currentPage}&type=owner`);
-
-        const hasNext = linkHeader.includes('rel="next"');
-        const lastMatch = linkHeader.match(/page=(\d+)>; rel="last"/);
-        const totalPages = lastMatch ? parseInt(lastMatch[1]) : currentPage;
-
-        if (repos.length === 0) {
-          container.innerHTML = '<p style="text-align:center;color:#8b949e;padding:50px 0;">Tidak ada repositori.</p>';
-          return;
-        }
-
-        container.innerHTML = repos.map(repo => {
-          const desc = repo.description || '';
-          const lang = repo.language || '';
-          const color = langColors[lang] || '#8b949e';
-          return `
-            <div class="repo-card">
-              <a href="${repo.html_url}"><span class="repo-name">${escHtml(repo.name)}</span></a>
-              ${desc ? `<div class="repo-desc">${escHtml(desc)}</div>` : ''}
-              <div class="repo-meta">
-                ${lang ? `<span><span class="lang-dot" style="background:${color}"></span>${lang}</span>` : ''}
-                ${repo.stargazers_count > 0 ? `<span>${repo.stargazers_count} ★</span>` : ''}
-                ${repo.forks_count > 0 ? `<span>${repo.forks_count} 🍴</span>` : ''}
-                ${repo.fork ? '<span class="fork-label">Fork</span>' : ''}
-                <span>Diperbarui ${timeAgo(repo.pushed_at)}</span>
-              </div>
-            </div>
-          `;
-        }).join('');
-
-        paginationEl.innerHTML = `
-          <button id="prev-btn" ${currentPage <= 1 ? 'disabled' : ''}>← Sebelumnya</button>
-          <span class="page-info">Halaman ${currentPage}${totalPages > 1 ? ' dari ' + totalPages : ''}</span>
-          <button id="next-btn" ${!hasNext ? 'disabled' : ''}>Selanjutnya →</button>
-        `;
-
-        document.getElementById('prev-btn').addEventListener('click', () => {
-          if (currentPage > 1) { currentPage--; loadRepos(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        });
-        document.getElementById('next-btn').addEventListener('click', () => {
-          if (hasNext) { currentPage++; loadRepos(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        });
-      } catch (e) {
-        container.innerHTML = '<div class="error">Gagal memuat repositori. Coba lagi nanti.</div>';
-        console.error(e);
-      }
-    }
-
-    function escHtml(s) {
-      const d = document.createElement('div');
-      d.textContent = s;
-      return d.innerHTML;
-    }
-
-    function timeAgo(dateStr) {
-      const now = Date.now();
-      const then = new Date(dateStr).getTime();
-      const diff = Math.floor((now - then) / 1000);
-      if (diff < 60) return 'baru saja';
-      if (diff < 3600) return Math.floor(diff / 60) + ' menit lalu';
-      if (diff < 86400) return Math.floor(diff / 3600) + ' jam lalu';
-      if (diff < 2592000) return Math.floor(diff / 86400) + ' hari lalu';
-      if (diff < 31536000) return Math.floor(diff / 2592000) + ' bulan lalu';
-      return Math.floor(diff / 31536000) + ' tahun lalu';
-    }
-  </script>
+  ticker.innerHTML = renderItems(donors) + renderItems(donors);
+</script>
 </body>
 </html>
