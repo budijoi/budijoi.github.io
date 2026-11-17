@@ -1,0 +1,2369 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Melodify — Pemutar Musik Bebas Iklan & Karaoke</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    
+    :root {
+      --theme-color: #10b981;
+      --theme-hover: #34d399;
+      --theme-soft: rgba(16, 185, 129, 0.16);
+      --theme-border: rgba(16, 185, 129, 0.35);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #000000;
+      color: #ffffff;
+      overscroll-behavior-y: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .bg-theme { background-color: var(--theme-color) !important; }
+    .hover-bg-theme:hover { background-color: var(--theme-hover) !important; }
+    .text-theme { color: var(--theme-color) !important; }
+    .border-theme { border-color: var(--theme-border) !important; }
+    .bg-theme-soft { background-color: var(--theme-soft) !important; }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+
+    input[type="range"].custom-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 5px;
+      border-radius: 9999px;
+      background: #3f3f46;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type="range"].custom-slider::-webkit-slider-runnable-track {
+      height: 5px;
+      border-radius: 9999px;
+    }
+    input[type="range"].custom-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 13px;
+      width: 13px;
+      border-radius: 50%;
+      background: #ffffff;
+      margin-top: -4px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.65);
+      transition: transform 0.12s ease;
+    }
+    input[type="range"].custom-slider:hover::-webkit-slider-thumb {
+      transform: scale(1.25);
+      background: var(--theme-color);
+    }
+    input[type="range"].custom-slider::-moz-range-track {
+      height: 5px;
+      border-radius: 9999px;
+      background: #3f3f46;
+    }
+    input[type="range"].custom-slider::-moz-range-thumb {
+      height: 13px;
+      width: 13px;
+      border: none;
+      border-radius: 50%;
+      background: #ffffff;
+    }
+
+    .glass-panel {
+      background: rgba(18, 18, 21, 0.94);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+    }
+
+    .equalizer-bar {
+      width: 3px;
+      background-color: var(--theme-color);
+      border-radius: 2px;
+      animation: eq 0.8s ease-in-out infinite alternate;
+    }
+    .equalizer-bar:nth-child(2) { animation-delay: 0.2s; }
+    .equalizer-bar:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes eq {
+      0% { height: 4px; }
+      100% { height: 14px; }
+    }
+
+    .lyric-line {
+      transition: all 0.28s ease;
+    }
+    .lyric-line.active {
+      color: var(--theme-color);
+      font-size: 1.25rem;
+      font-weight: 800;
+      transform: scale(1.03);
+    }
+
+    #yt-hidden-container {
+      position: fixed;
+      width: 200px;
+      height: 200px;
+      opacity: 0.001;
+      pointer-events: none;
+      bottom: 0;
+      right: 0;
+      z-index: -1;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden select-none">
+
+  <audio id="native-audio" preload="auto" playsinline></audio>
+
+  <div id="yt-hidden-container">
+    <div id="yt-player"></div>
+  </div>
+
+  <div class="flex-1 flex overflow-hidden p-0 md:p-2 md:gap-2">
+    <!-- Desktop Sidebar -->
+    <aside class="hidden md:flex md:w-72 flex-col gap-2 shrink-0">
+      <div class="bg-neutral-900/95 rounded-xl p-4 space-y-3 border border-neutral-800/60">
+        <div class="flex items-center justify-between px-1">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-8 h-8 rounded-lg bg-theme flex items-center justify-center text-black font-extrabold text-base shrink-0">
+              <i class="fa-solid fa-wave-square"></i>
+            </div>
+            <div class="min-w-0">
+              <h1 id="brand-name-desktop" class="font-extrabold text-base tracking-tight leading-none truncate">Melodify</h1>
+              <span class="text-[10px] text-theme font-semibold block mt-0.5">100% Musisi Asli • No Ads</span>
+            </div>
+          </div>
+          <button onclick="openSettingsModal()" class="text-neutral-400 hover:text-white p-1.5 rounded-lg hover:bg-neutral-800 transition shrink-0" title="Pengaturan Web & Tema">
+            <i class="fa-solid fa-gear"></i>
+          </button>
+        </div>
+
+        <nav class="flex flex-col gap-1">
+          <button onclick="switchTab('home')" data-nav="home" class="nav-btn active flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold bg-neutral-800 text-white transition">
+            <i class="fa-solid fa-house w-5 text-center"></i> Beranda
+          </button>
+          <button onclick="switchTab('bestsongs')" data-nav="bestsongs" class="nav-btn flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold text-neutral-400 hover:text-white hover:bg-neutral-800/50 transition">
+            <i class="fa-solid fa-trophy w-5 text-center"></i> Best Songs
+          </button>
+          <button onclick="switchTab('bestartist')" data-nav="bestartist" class="nav-btn flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold text-neutral-400 hover:text-white hover:bg-neutral-800/50 transition">
+            <i class="fa-solid fa-microphone-lines w-5 text-center"></i> Best Artist
+          </button>
+          <button onclick="switchTab('bestalbums')" data-nav="bestalbums" class="nav-btn flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold text-neutral-400 hover:text-white hover:bg-neutral-800/50 transition">
+            <i class="fa-solid fa-compact-disc w-5 text-center"></i> Best Albums
+          </button>
+          <button onclick="switchTab('search')" data-nav="search" class="nav-btn flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold text-neutral-400 hover:text-white hover:bg-neutral-800/50 transition">
+            <i class="fa-solid fa-magnifying-glass w-5 text-center"></i> Cari Lagu, Artis, Album
+          </button>
+        </nav>
+      </div>
+
+      <!-- Sidebar Library + Playlists + Terakhir Diputar -->
+      <div class="bg-neutral-900/95 rounded-xl p-4 flex-1 flex flex-col overflow-hidden border border-neutral-800/60">
+        <!-- Koleksi & Playlist -->
+        <div class="flex items-center justify-between mb-2 shrink-0">
+          <button onclick="switchTab('library')" class="flex items-center gap-2 text-neutral-300 hover:text-white font-bold text-xs uppercase tracking-wider transition">
+            <i class="fa-solid fa-book-open text-theme"></i>
+            <span>Koleksi & Playlist</span>
+          </button>
+          <button onclick="openCreatePlaylistModal()" class="w-7 h-7 rounded-full hover:bg-neutral-800 text-neutral-400 hover:text-white flex items-center justify-center transition" title="Buat Playlist Baru">
+            <i class="fa-solid fa-plus text-xs"></i>
+          </button>
+        </div>
+
+        <div onclick="switchTab('library')" class="flex items-center gap-2.5 p-2 rounded-lg hover:bg-neutral-800/70 cursor-pointer transition mb-1 shrink-0">
+          <div class="w-8 h-8 rounded-md bg-gradient-to-br from-indigo-600 to-emerald-400 flex items-center justify-center text-white shrink-0 shadow">
+            <i class="fa-solid fa-heart text-xs"></i>
+          </div>
+          <div class="min-w-0 flex-1">
+            <p class="text-xs font-bold text-white truncate">Lagu Disukai</p>
+            <p id="sidebar-liked-count" class="text-[11px] text-neutral-400 truncate">0 lagu tersimpan</p>
+          </div>
+        </div>
+
+        <!-- Daftar Playlist Buatan + Terakhir Diputar dalam Area Scroll -->
+        <div class="flex-1 overflow-y-auto pr-1 space-y-3">
+          <div id="sidebar-playlists" class="space-y-1"></div>
+
+          <!-- Bagian Baru: Terakhir Diputar (Maks 10 Lagu) -->
+          <div class="pt-2.5 border-t border-neutral-800/80">
+            <div class="flex items-center justify-between mb-1.5 px-1">
+              <span class="flex items-center gap-1.5 text-neutral-300 font-bold text-[11px] uppercase tracking-wider">
+                <i class="fa-solid fa-clock-rotate-left text-theme"></i>
+                <span>Terakhir Diputar</span>
+              </span>
+              <button onclick="clearRecentTracks()" id="btn-clear-recent" class="hidden text-[10px] text-neutral-500 hover:text-red-400 transition" title="Hapus Riwayat">
+                Hapus
+              </button>
+            </div>
+            <div id="sidebar-recent-tracks" class="space-y-1"></div>
+          </div>
+        </div>
+
+        <div class="pt-2.5 mt-2 border-t border-neutral-800/80 shrink-0">
+          <button onclick="openDonateModal()" class="w-full py-2 px-3 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-400/30 text-sky-300 font-bold text-xs flex items-center justify-center gap-2 transition">
+            <i class="fa-solid fa-hand-holding-heart text-sky-400"></i> Donasi via DANA
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col bg-gradient-to-b from-neutral-900 via-neutral-950 to-black md:rounded-xl overflow-hidden relative border border-neutral-800/40">
+      
+      <!-- Mobile Top Header -->
+      <header class="md:hidden flex items-center justify-between px-4 pt-3.5 pb-2.5 bg-neutral-950/90 backdrop-blur-md z-10 border-b border-neutral-800/60">
+        <div class="flex items-center gap-2 min-w-0">
+          <div class="w-8 h-8 rounded-lg bg-theme flex items-center justify-center text-black font-bold shrink-0">
+            <i class="fa-solid fa-wave-square text-sm"></i>
+          </div>
+          <span id="brand-name-mobile" class="font-extrabold text-base tracking-tight truncate">Melodify</span>
+        </div>
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button onclick="openDonateModal()" class="text-[10px] bg-sky-500/20 text-sky-300 border border-sky-400/30 px-2.5 py-1.5 rounded-full font-bold">
+            <i class="fa-solid fa-heart text-sky-400 mr-1"></i>Donasi
+          </button>
+          <button onclick="openLyricsModal()" class="w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center text-theme" title="Lirik Karaoke">
+            <i class="fa-solid fa-microphone text-xs"></i>
+          </button>
+          <button onclick="openSettingsModal()" class="w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-200" title="Pengaturan">
+            <i class="fa-solid fa-gear text-xs"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Desktop Top Bar -->
+      <header class="hidden md:flex items-center justify-between px-6 py-3.5 bg-neutral-900/70 backdrop-blur-md border-b border-neutral-800/50 z-10">
+        <div class="relative w-96">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 text-sm"></i>
+          <input type="text" id="desktop-search-input" placeholder="Cari lagu asli, artis, album, atau URL YouTube..." 
+                 onkeyup="handleQuickSearch(event, this.value)"
+                 class="w-full bg-neutral-800/90 border border-neutral-700/70 focus:border-emerald-500 rounded-full pl-10 pr-4 py-2 text-sm text-white placeholder-neutral-400 focus:outline-none transition">
+        </div>
+        <div class="flex items-center gap-2.5">
+          <button onclick="openLyricsModal()" class="bg-neutral-800 hover:bg-neutral-700 text-theme font-bold text-xs px-3.5 py-2 rounded-full flex items-center gap-1.5 border border-theme transition">
+            <i class="fa-solid fa-microphone"></i> Lirik Karaoke
+          </button>
+          <button onclick="openAddModal()" class="bg-theme hover-bg-theme text-black font-bold text-xs px-4 py-2 rounded-full flex items-center gap-1.5 transition">
+            <i class="fa-brands fa-youtube"></i> Tambah URL YT
+          </button>
+          <button onclick="openSettingsModal()" class="bg-neutral-800 hover:bg-neutral-700 text-neutral-200 font-semibold text-xs px-3.5 py-2 rounded-full flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-sliders"></i> Setting
+          </button>
+        </div>
+      </header>
+
+      <!-- Scrollable Views -->
+      <div id="main-scroll" class="flex-1 overflow-y-auto px-4 md:px-6 pt-4 pb-40 md:pb-32 flex flex-col justify-between">
+        <div>
+          <div id="file-protocol-warning" class="hidden mb-4 bg-amber-500/15 border border-amber-500/40 rounded-xl p-3.5 text-xs text-amber-200 flex items-start gap-3">
+            <i class="fa-solid fa-triangle-exclamation text-amber-400 text-base mt-0.5"></i>
+            <div>
+              <p class="font-bold text-amber-300">Buka lewat Localhost agar Audio & Lirik Karaoke Berjalan Lancar!</p>
+              <p class="mt-0.5 text-amber-100/90">Akses melalui <a href="http://localhost:8080" class="underline font-bold text-white">http://localhost:8080</a> agar proxy audio bebas blokir aktif.</p>
+            </div>
+          </div>
+
+          <!-- VIEW: HOME -->
+          <section id="view-home" class="space-y-8">
+            <div class="flex items-center justify-between">
+              <h1 id="greeting-text" class="text-2xl md:text-3xl font-extrabold tracking-tight text-white">Selamat Malam</h1>
+              <span class="text-[11px] font-semibold text-theme bg-theme-soft border border-theme px-3 py-1 rounded-full hidden sm:inline-flex items-center gap-1.5">
+                <i class="fa-solid fa-user-check"></i> Spotify & YouTube Music • 100% Musisi Asli
+              </span>
+            </div>
+
+            <!-- 5 Daily Rotating Playlists (50 Songs Each) -->
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <h2 class="text-xl font-extrabold tracking-tight">Playlist Rekomendasi Harian</h2>
+                  <p class="text-xs text-neutral-400">Diperbarui otomatis setiap hari • 50 lagu pilihan di setiap playlist (Bebas AI)</p>
+                </div>
+                <button onclick="openCreatePlaylistModal()" class="text-xs font-bold text-theme hover:underline">+ Buat Playlist</button>
+              </div>
+              <div id="playlists-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5"></div>
+            </div>
+
+            <!-- Top Hits Preview -->
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <h2 class="text-xl font-extrabold tracking-tight flex items-center gap-2">
+                    <i class="fa-solid fa-fire text-theme"></i> Rekomendasi Lagu Terpopuler
+                  </h2>
+                  <p class="text-xs text-neutral-400">Gabungan chart YouTube Music & Spotify (100% Rekaman Studio Asli)</p>
+                </div>
+                <button onclick="switchTab('bestsongs')" class="text-xs font-bold text-theme hover:underline">Lihat Semua Chart →</button>
+              </div>
+              <div id="home-best-songs-preview" class="grid grid-cols-1 md:grid-cols-2 gap-2.5"></div>
+            </div>
+
+            <!-- Best Artists Preview -->
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <h2 class="text-xl font-extrabold tracking-tight">Musisi & Band Unggulan</h2>
+                  <p class="text-xs text-neutral-400">Ketuk artis untuk mendengarkan diskografi populer</p>
+                </div>
+                <button onclick="switchTab('bestartist')" class="text-xs font-bold text-theme hover:underline">Semua Artis →</button>
+              </div>
+              <div id="home-artists-preview" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 md:gap-4"></div>
+            </div>
+
+            <!-- Best Albums Preview -->
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <h2 class="text-xl font-extrabold tracking-tight">Album Terbaik Pilihan</h2>
+                  <p class="text-xs text-neutral-400">Album ikonik Indonesia & Internasional</p>
+                </div>
+                <button onclick="switchTab('bestalbums')" class="text-xs font-bold text-theme hover:underline">Semua Album →</button>
+              </div>
+              <div id="home-albums-preview" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5"></div>
+            </div>
+          </section>
+
+          <!-- VIEW: BEST SONGS -->
+          <section id="view-bestsongs" class="hidden space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-theme">Spotify & YouTube Music Charts</span>
+                <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight">Best Songs</h2>
+                <p class="text-xs text-neutral-400">Tangga lagu terpopuler dari musisi asli (bebas lagu AI)</p>
+              </div>
+              <button onclick="playCurrentChartList()" class="bg-theme hover-bg-theme text-black font-bold text-xs px-5 py-2.5 rounded-full inline-flex items-center gap-2 self-start sm:self-auto shadow-lg">
+                <i class="fa-solid fa-play"></i> Putar Semua Chart
+              </button>
+            </div>
+
+            <div class="flex gap-2 overflow-x-auto pb-1" id="chart-period-tabs">
+              <button onclick="loadChartPeriod('daily')" data-period="daily" class="period-btn px-4 py-2 rounded-full text-xs font-bold bg-theme text-black whitespace-nowrap transition">Harian (Daily)</button>
+              <button onclick="loadChartPeriod('weekly')" data-period="weekly" class="period-btn px-4 py-2 rounded-full text-xs font-bold bg-neutral-800 text-neutral-300 hover:bg-neutral-700 whitespace-nowrap transition">Mingguan (Weekly)</button>
+              <button onclick="loadChartPeriod('monthly')" data-period="monthly" class="period-btn px-4 py-2 rounded-full text-xs font-bold bg-neutral-800 text-neutral-300 hover:bg-neutral-700 whitespace-nowrap transition">Bulanan (Monthly)</button>
+              <button onclick="loadChartPeriod('yearly')" data-period="yearly" class="period-btn px-4 py-2 rounded-full text-xs font-bold bg-neutral-800 text-neutral-300 hover:bg-neutral-700 whitespace-nowrap transition">Tahunan (Yearly)</button>
+              <button onclick="loadChartPeriod('alltime')" data-period="alltime" class="period-btn px-4 py-2 rounded-full text-xs font-bold bg-neutral-800 text-neutral-300 hover:bg-neutral-700 whitespace-nowrap transition">Sepanjang Masa (All-Time)</button>
+            </div>
+
+            <div id="bestsongs-loading" class="hidden py-10 text-center text-neutral-400 text-sm">
+              <i class="fa-solid fa-circle-notch fa-spin text-theme text-2xl mb-2"></i>
+              <p>Mengambil data tangga lagu terbaru dari Spotify & YouTube Music...</p>
+            </div>
+
+            <div id="bestsongs-list" class="space-y-2"></div>
+          </section>
+
+          <!-- VIEW: BEST ARTIST -->
+          <section id="view-bestartist" class="hidden space-y-5">
+            <div>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-theme">Top Streamed Artists</span>
+              <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight">Best Artist</h2>
+              <p class="text-xs text-neutral-400">12 Musisi & Band terbaik Indonesia dan Dunia — klik untuk memutar</p>
+            </div>
+            <div id="all-artists-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
+          </section>
+
+          <!-- VIEW: BEST ALBUMS -->
+          <section id="view-bestalbums" class="hidden space-y-5">
+            <div>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-theme">Essential Discography</span>
+              <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight">Best Albums</h2>
+              <p class="text-xs text-neutral-400">Koleksi album penuh terbaik dari Spotify & YouTube Music</p>
+            </div>
+            <div id="all-albums-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+          </section>
+
+          <!-- VIEW: COLLECTION DETAIL -->
+          <section id="view-collection" class="hidden space-y-5">
+            <button onclick="switchTab('home')" class="inline-flex items-center gap-2 text-xs font-bold text-neutral-300 hover:text-white bg-neutral-800/90 px-3.5 py-2 rounded-full transition">
+              <i class="fa-solid fa-arrow-left"></i> Kembali
+            </button>
+            <div id="collection-header" class="flex flex-col sm:flex-row items-center sm:items-end gap-5 bg-gradient-to-b from-neutral-800/70 to-neutral-900/40 border border-neutral-800 p-5 rounded-2xl"></div>
+            <div id="collection-tracks" class="space-y-1.5"></div>
+          </section>
+
+          <!-- VIEW: SEARCH -->
+          <section id="view-search" class="hidden space-y-5">
+            <div>
+              <h2 class="text-xl md:text-2xl font-extrabold mb-1">Cari Lagu, Artis, Album</h2>
+              <p class="text-xs text-neutral-400 mb-3">Otomatis menyaring hasil cover AI, Suno, dan Udio. Klik <b>+</b> untuk simpan ke playlist.</p>
+              <form onsubmit="executeSearch(event)" class="flex gap-2">
+                <div class="relative flex-1">
+                  <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400"></i>
+                  <input type="text" id="search-query-input" placeholder="Cari judul lagu, artis asli, album, atau paste link YouTube..." 
+                         class="w-full bg-neutral-800 border border-neutral-700 focus:border-emerald-500 rounded-full pl-11 pr-4 py-3 text-sm text-white placeholder-neutral-400 focus:outline-none">
+                </div>
+                <button type="submit" class="bg-theme hover-bg-theme text-black font-bold px-6 rounded-full text-sm transition shrink-0">
+                  Cari
+                </button>
+              </form>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <button onclick="quickFillSearch('Tulus official audio')" class="text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-3 py-1.5 rounded-full transition">Tulus</button>
+              <button onclick="quickFillSearch('Bernadya official audio')" class="text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-3 py-1.5 rounded-full transition">Bernadya</button>
+              <button onclick="quickFillSearch('Mahalini official audio')" class="text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-3 py-1.5 rounded-full transition">Mahalini</button>
+              <button onclick="quickFillSearch('Sheila On 7 official')" class="text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-3 py-1.5 rounded-full transition">Sheila On 7</button>
+              <button onclick="quickFillSearch('Dewa 19 official')" class="text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-3 py-1.5 rounded-full transition">Dewa 19</button>
+              <button onclick="quickFillSearch('Hindia official audio')" class="text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-3 py-1.5 rounded-full transition">Hindia</button>
+              <button onclick="quickFillSearch('The Weeknd official audio')" class="text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-3 py-1.5 rounded-full transition">The Weeknd</button>
+              <button onclick="quickFillSearch('Coldplay official')" class="text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-3 py-1.5 rounded-full transition">Coldplay</button>
+              <button onclick="quickFillSearch('NIKI official audio')" class="text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-3 py-1.5 rounded-full transition">NIKI</button>
+              <button onclick="quickFillSearch('Bruno Mars official')" class="text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-3 py-1.5 rounded-full transition">Bruno Mars</button>
+            </div>
+
+            <div id="search-status" class="hidden py-10 text-center text-neutral-400 text-sm">
+              <i class="fa-solid fa-circle-notch fa-spin text-theme text-2xl mb-2"></i>
+              <p>Mencari rekaman musik asli bebas iklan...</p>
+            </div>
+
+            <div id="search-results-container" class="space-y-1.5"></div>
+          </section>
+
+          <!-- VIEW: LIBRARY -->
+          <section id="view-library" class="hidden space-y-6">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h2 class="text-xl md:text-2xl font-extrabold">Koleksi & Playlist Kamu</h2>
+                <p class="text-xs text-neutral-400 mt-0.5">Kelola playlist pribadi dan lagu favorit tersimpan</p>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="openCreatePlaylistModal()" class="bg-theme hover-bg-theme text-black text-xs font-bold px-3.5 py-2 rounded-full flex items-center gap-1.5">
+                  <i class="fa-solid fa-plus"></i> Playlist Baru
+                </button>
+                <button onclick="openAddModal()" class="bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-semibold px-3.5 py-2 rounded-full flex items-center gap-1.5">
+                  <i class="fa-brands fa-youtube text-red-500"></i> Tambah URL
+                </button>
+              </div>
+            </div>
+
+            <div class="space-y-3">
+              <h3 class="text-sm font-bold uppercase tracking-wider text-neutral-400">Playlist Buatanmu</h3>
+              <div id="library-playlists-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
+            </div>
+
+            <div class="space-y-3">
+              <h3 class="text-sm font-bold uppercase tracking-wider text-neutral-400">Lagu Disukai</h3>
+              <div id="library-list" class="space-y-1.5"></div>
+            </div>
+          </section>
+        </div>
+
+        <footer class="mt-12 pt-6 pb-4 border-t border-neutral-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-400">
+          <p class="text-center sm:text-left">
+            dibuat oleh <span class="font-bold text-white">ApahUdi</span> dengan bantuan <span class="text-theme font-semibold">VSCode+Gemini+SnapGentV3</span>
+          </p>
+          <button onclick="openDonateModal()" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sky-500/15 hover:bg-sky-500/25 border border-sky-400/40 text-sky-300 font-bold transition">
+            <i class="fa-solid fa-wallet text-sky-400"></i> Donasi: DANA 085323073037
+          </button>
+        </footer>
+      </div>
+    </main>
+  </div>
+
+  <!-- Bottom Player Bar -->
+  <div id="player-bar" class="fixed bottom-[60px] md:bottom-0 left-0 right-0 z-30 px-2 md:px-3 pb-1.5 md:pb-2.5 pointer-events-none">
+    <div class="glass-panel border border-neutral-800 rounded-2xl md:rounded-xl p-2.5 md:px-5 md:py-3 shadow-2xl pointer-events-auto max-w-screen-2xl mx-auto">
+      <div class="md:hidden w-full bg-neutral-800 h-1 rounded-full overflow-hidden mb-2" onclick="openFullPlayer()">
+        <div id="mobile-mini-progress" class="bg-theme h-full w-0 transition-all duration-200"></div>
+      </div>
+
+      <div class="flex items-center justify-between gap-3">
+        <div onclick="openFullPlayer()" class="flex items-center gap-3 min-w-0 flex-1 md:flex-initial md:w-[30%] cursor-pointer group">
+          <div class="relative w-11 h-11 md:w-13 md:h-13 rounded-lg overflow-hidden bg-neutral-800 shrink-0 shadow-md">
+            <img id="bar-thumb" src="https://i.ytimg.com/vi/F44tk5-p2iM/hqdefault.jpg" alt="Cover" class="w-full h-full object-cover">
+            <div id="bar-eq" class="hidden absolute inset-0 bg-black/50 flex items-center justify-center gap-0.5">
+              <span class="equalizer-bar"></span>
+              <span class="equalizer-bar"></span>
+              <span class="equalizer-bar"></span>
+            </div>
+          </div>
+          <div class="min-w-0 flex-1">
+            <h4 id="bar-title" class="text-sm font-bold text-white truncate group-hover:text-theme transition">Pilih lagu untuk memutar</h4>
+            <p id="bar-artist" class="text-xs text-neutral-400 truncate">YouTube Music & Spotify • No Ads</p>
+          </div>
+          <button onclick="event.stopPropagation(); toggleLikeCurrent()" id="bar-like-btn" class="text-neutral-400 hover:text-theme p-2 transition shrink-0" title="Sukai Lagu">
+            <i class="fa-regular fa-heart"></i>
+          </button>
+        </div>
+
+        <div class="flex flex-col items-center md:w-[40%]">
+          <div class="flex items-center gap-4 md:gap-5">
+            <button onclick="toggleShuffle()" id="btn-shuffle" class="hidden md:block text-neutral-400 hover:text-white text-sm transition" title="Acak">
+              <i class="fa-solid fa-shuffle"></i>
+            </button>
+            <button onclick="playPrev()" class="text-neutral-300 hover:text-white text-base md:text-lg p-1.5 transition" title="Sebelumnya">
+              <i class="fa-solid fa-backward-step"></i>
+            </button>
+            <button onclick="togglePlay()" id="btn-play-pause" class="w-10 h-10 rounded-full bg-white hover:scale-105 active:scale-95 text-black flex items-center justify-center text-base shadow-md transition" title="Putar / Jeda">
+              <i class="fa-solid fa-play ml-0.5"></i>
+            </button>
+            <button onclick="playNext()" class="text-neutral-300 hover:text-white text-base md:text-lg p-1.5 transition" title="Berikutnya">
+              <i class="fa-solid fa-forward-step"></i>
+            </button>
+            <button onclick="toggleRepeat()" id="btn-repeat" class="hidden md:block text-neutral-400 hover:text-white text-sm transition" title="Ulangi">
+              <i class="fa-solid fa-repeat"></i>
+            </button>
+          </div>
+          
+          <div class="hidden md:flex items-center gap-2.5 w-full max-w-lg mt-2">
+            <span id="time-current" class="text-[11px] font-medium text-neutral-400 w-10 text-right tabular-nums">0:00</span>
+            <input type="range" id="desktop-seek" min="0" max="100" step="0.1" value="0" oninput="seekTo(this.value)" class="custom-slider flex-1">
+            <span id="time-duration" class="text-[11px] font-medium text-neutral-400 w-10 tabular-nums">0:00</span>
+          </div>
+        </div>
+
+        <div class="hidden md:flex items-center justify-end gap-3 w-[30%]">
+          <button onclick="openLyricsModal()" class="text-xs font-bold text-neutral-300 hover:text-theme bg-neutral-800/90 hover:bg-neutral-800 px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-neutral-700/70 transition" title="Buka Lirik Karaoke">
+            <i class="fa-solid fa-microphone text-theme"></i> Lirik
+          </button>
+          <button onclick="toggleMute()" id="btn-mute" class="text-neutral-300 hover:text-white text-sm p-1.5 transition" title="Mute / Unmute">
+            <i class="fa-solid fa-volume-high"></i>
+          </button>
+          <div class="flex items-center gap-2 w-28">
+            <input type="range" id="volume-slider" min="0" max="100" value="85" oninput="setVolume(this.value)" class="custom-slider w-full">
+          </div>
+          <span id="volume-pct" class="text-[11px] text-neutral-400 w-8 tabular-nums">85%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Navigation -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 h-[60px] bg-black/95 backdrop-blur-lg border-t border-neutral-800/90 flex items-center justify-around z-30 px-1">
+    <button onclick="switchTab('home')" data-nav="home" class="nav-btn active flex flex-col items-center justify-center gap-1 text-white w-1/5 py-1">
+      <i class="fa-solid fa-house text-base"></i>
+      <span class="text-[9px] font-semibold">Beranda</span>
+    </button>
+    <button onclick="switchTab('bestsongs')" data-nav="bestsongs" class="nav-btn flex flex-col items-center justify-center gap-1 text-neutral-500 w-1/5 py-1">
+      <i class="fa-solid fa-trophy text-base"></i>
+      <span class="text-[9px] font-semibold">Best Songs</span>
+    </button>
+    <button onclick="switchTab('bestartist')" data-nav="bestartist" class="nav-btn flex flex-col items-center justify-center gap-1 text-neutral-500 w-1/5 py-1">
+      <i class="fa-solid fa-microphone-lines text-base"></i>
+      <span class="text-[9px] font-semibold">Artis</span>
+    </button>
+    <button onclick="switchTab('bestalbums')" data-nav="bestalbums" class="nav-btn flex flex-col items-center justify-center gap-1 text-neutral-500 w-1/5 py-1">
+      <i class="fa-solid fa-compact-disc text-base"></i>
+      <span class="text-[9px] font-semibold">Album</span>
+    </button>
+    <button onclick="switchTab('search')" data-nav="search" class="nav-btn flex flex-col items-center justify-center gap-1 text-neutral-500 w-1/5 py-1">
+      <i class="fa-solid fa-magnifying-glass text-base"></i>
+      <span class="text-[9px] font-semibold">Cari</span>
+    </button>
+  </nav>
+
+  <!-- Fullscreen Mobile Now Playing Modal -->
+  <div id="full-player-modal" class="fixed inset-0 bg-gradient-to-b from-neutral-800 via-neutral-950 to-black z-50 flex flex-col justify-between p-6 translate-y-full transition-transform duration-300 ease-out md:hidden">
+    <div class="flex items-center justify-between">
+      <button onclick="closeFullPlayer()" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white">
+        <i class="fa-solid fa-chevron-down"></i>
+      </button>
+      <div class="text-center">
+        <span class="text-[10px] uppercase tracking-widest text-theme font-bold block">Sedang Memutar</span>
+        <span class="text-xs text-neutral-300 font-medium">Original Artist Audio</span>
+      </div>
+      <button onclick="openLyricsModal()" class="px-3 py-1.5 rounded-full bg-theme text-black text-xs font-bold flex items-center gap-1">
+        <i class="fa-solid fa-microphone"></i> Lirik
+      </button>
+    </div>
+
+    <div class="my-auto flex flex-col items-center">
+      <div class="w-60 h-60 sm:w-72 sm:h-72 rounded-2xl overflow-hidden shadow-2xl shadow-black/80 border border-white/10 mb-6">
+        <img id="full-thumb" src="https://i.ytimg.com/vi/F44tk5-p2iM/hqdefault.jpg" alt="Album Art" class="w-full h-full object-cover">
+      </div>
+      <div class="w-full flex items-center justify-between gap-4">
+        <div class="min-w-0 flex-1">
+          <h3 id="full-title" class="text-xl font-extrabold text-white truncate">Judul Lagu</h3>
+          <p id="full-artist" class="text-sm text-neutral-400 truncate mt-0.5">Nama Artis</p>
+        </div>
+        <button onclick="toggleLikeCurrent()" id="full-like-btn" class="text-2xl text-neutral-400 hover:text-theme p-2">
+          <i class="fa-regular fa-heart"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="space-y-5 pb-4">
+      <div>
+        <input type="range" id="mobile-seek" min="0" max="100" step="0.1" value="0" oninput="seekTo(this.value)" class="custom-slider w-full">
+        <div class="flex justify-between text-xs text-neutral-400 mt-1.5 tabular-nums">
+          <span id="full-time-current">0:00</span>
+          <span id="full-time-duration">0:00</span>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between px-2">
+        <button onclick="toggleShuffle()" id="full-btn-shuffle" class="text-neutral-400 text-lg p-2">
+          <i class="fa-solid fa-shuffle"></i>
+        </button>
+        <button onclick="playPrev()" class="text-white text-2xl p-2">
+          <i class="fa-solid fa-backward-step"></i>
+        </button>
+        <button onclick="togglePlay()" id="full-btn-play" class="w-16 h-16 rounded-full bg-theme text-black flex items-center justify-center text-2xl shadow-xl">
+          <i class="fa-solid fa-play ml-1"></i>
+        </button>
+        <button onclick="playNext()" class="text-white text-2xl p-2">
+          <i class="fa-solid fa-forward-step"></i>
+        </button>
+        <button onclick="toggleRepeat()" id="full-btn-repeat" class="text-neutral-400 text-lg p-2">
+          <i class="fa-solid fa-repeat"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: KARAOKE LYRICS WITH SYNC +/- CONTROLS -->
+  <div id="lyrics-modal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-xl z-50 flex flex-col p-4 md:p-8">
+    <div class="max-w-3xl w-full mx-auto flex-1 flex flex-col overflow-hidden bg-neutral-900/90 border border-neutral-800 rounded-3xl p-5 md:p-8 shadow-2xl">
+      <div class="flex items-center justify-between pb-4 border-b border-neutral-800 gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <img id="lyrics-thumb" src="https://i.ytimg.com/vi/F44tk5-p2iM/hqdefault.jpg" class="w-12 h-12 rounded-xl object-cover shrink-0">
+          <div class="min-w-0">
+            <span class="text-[10px] font-extrabold uppercase tracking-widest text-theme flex items-center gap-1.5">
+              <i class="fa-solid fa-microphone-lines"></i> Mode Karaoke Lirik
+            </span>
+            <h3 id="lyrics-song-title" class="text-base md:text-lg font-extrabold text-white truncate">Judul Lagu</h3>
+            <p id="lyrics-song-artist" class="text-xs text-neutral-400 truncate">Artis</p>
+          </div>
+        </div>
+        <button onclick="closeLyricsModal()" class="w-10 h-10 rounded-full bg-neutral-800 hover:bg-neutral-700 text-white flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div id="lyrics-body" class="flex-1 overflow-y-auto py-6 px-2 text-center space-y-4 scroll-smooth">
+        <p class="text-neutral-400 text-sm">Putar lagu untuk menampilkan lirik karaoke secara otomatis.</p>
+      </div>
+
+      <div class="pt-4 border-t border-neutral-800 flex flex-wrap items-center justify-between gap-3 text-xs text-neutral-400">
+        <span id="lyrics-sync-status" class="hidden sm:inline">Sinkronisasi LRC Otomatis</span>
+
+        <div class="flex items-center gap-1.5 bg-neutral-950 border border-neutral-800 px-2.5 py-1.5 rounded-full">
+          <span class="text-[11px] font-semibold text-neutral-400 mr-1 hidden xs:inline">Geser Lirik:</span>
+          <button onclick="adjustLyricOffset(-0.5)" class="w-7 h-7 rounded-full bg-neutral-800 hover:bg-theme hover:text-black text-white font-extrabold flex items-center justify-center transition" title="Lirik Lebih Cepat (-0.5 detik)">
+            <i class="fa-solid fa-minus text-[11px]"></i>
+          </button>
+          <button onclick="resetLyricOffset()" id="lyric-offset-display" class="px-2.5 py-1 rounded-md text-xs font-extrabold text-theme tabular-nums hover:bg-neutral-800 transition" title="Klik untuk reset ke 0.0s">
+            0.0s
+          </button>
+          <button onclick="adjustLyricOffset(0.5)" class="w-7 h-7 rounded-full bg-neutral-800 hover:bg-theme hover:text-black text-white font-extrabold flex items-center justify-center transition" title="Lirik Lebih Lambat (+0.5 detik)">
+            <i class="fa-solid fa-plus text-[11px]"></i>
+          </button>
+        </div>
+
+        <button onclick="togglePlay()" class="bg-theme hover-bg-theme text-black font-bold px-4 py-2 rounded-full flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-play"></i> Play / Pause
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SETTINGS -->
+  <div id="settings-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-5 space-y-5 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="font-extrabold text-lg flex items-center gap-2">
+          <i class="fa-solid fa-sliders text-theme"></i> Pengaturan Web
+        </h3>
+        <button onclick="closeSettingsModal()" class="text-neutral-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1.5">Nama Website</label>
+          <input type="text" id="setting-site-name" placeholder="Masukkan nama web..." class="w-full bg-neutral-950 border border-neutral-700 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Warna Tema Utama</label>
+          <div class="flex flex-wrap gap-3" id="theme-color-options">
+            <button type="button" onclick="selectThemePreset('#10b981', '#34d399')" class="w-9 h-9 rounded-full bg-emerald-500 border-2 border-white shadow" title="Spotify Emerald"></button>
+            <button type="button" onclick="selectThemePreset('#0ea5e9', '#38bdf8')" class="w-9 h-9 rounded-full bg-sky-500 border-2 border-transparent hover:border-white shadow" title="Ocean Blue"></button>
+            <button type="button" onclick="selectThemePreset('#8b5cf6', '#a78bfa')" class="w-9 h-9 rounded-full bg-violet-500 border-2 border-transparent hover:border-white shadow" title="Royal Violet"></button>
+            <button type="button" onclick="selectThemePreset('#f43f5e', '#fb7185')" class="w-9 h-9 rounded-full bg-rose-500 border-2 border-transparent hover:border-white shadow" title="Crimson Rose"></button>
+            <button type="button" onclick="selectThemePreset('#f59e0b', '#fbbf24')" class="w-9 h-9 rounded-full bg-amber-500 border-2 border-transparent hover:border-white shadow" title="Sunset Gold"></button>
+            <button type="button" onclick="selectThemePreset('#ec4899', '#f472b6')" class="w-9 h-9 rounded-full bg-pink-500 border-2 border-transparent hover:border-white shadow" title="Neon Pink"></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-neutral-800">
+        <button onclick="closeSettingsModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-neutral-400 hover:bg-neutral-800">Tutup</button>
+        <button onclick="saveSettings()" class="bg-theme hover-bg-theme text-black font-bold px-5 py-2 rounded-xl text-xs transition">Simpan Perubahan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DONASI DANA -->
+  <div id="donate-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-neutral-900 border border-sky-500/30 rounded-2xl w-full max-w-md p-6 space-y-4 shadow-2xl text-center">
+      <div class="w-14 h-14 rounded-2xl bg-sky-500/20 border border-sky-400/40 text-sky-400 flex items-center justify-center text-2xl mx-auto">
+        <i class="fa-solid fa-hand-holding-heart"></i>
+      </div>
+      <div>
+        <h3 class="font-extrabold text-xl text-white">Dukung Pengembangan Web</h3>
+        <p class="text-xs text-neutral-400 mt-1">Terima kasih telah menggunakan aplikasi pemutar musik bebas iklan ini.</p>
+      </div>
+      <div class="bg-neutral-950 border border-sky-500/30 rounded-2xl p-4 space-y-2">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-sky-400 block">Transfer ke E-Wallet DANA</span>
+        <p id="dana-number" class="text-2xl font-extrabold tracking-wider text-white select-all">085323073037</p>
+        <button onclick="copyDanaNumber()" class="mt-2 inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-black font-bold text-xs px-4 py-2 rounded-full transition">
+          <i class="fa-regular fa-copy"></i> Salin Nomor DANA
+        </button>
+      </div>
+      <button onclick="closeDonateModal()" class="w-full py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-xs font-bold text-neutral-300">Tutup</button>
+    </div>
+  </div>
+
+  <!-- Modal: Create Custom Playlist -->
+  <div id="create-playlist-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-lg">Buat Playlist Baru</h3>
+        <button onclick="closeCreatePlaylistModal()" class="text-neutral-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form onsubmit="handleCreatePlaylist(event)" class="space-y-3">
+        <input type="text" id="new-pl-name" required placeholder="Nama Playlist (mis. Lagu Karaoke Favorit)" class="w-full bg-neutral-950 border border-neutral-700 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none">
+        <input type="text" id="new-pl-desc" placeholder="Deskripsi singkat (opsional)" class="w-full bg-neutral-950 border border-neutral-700 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none">
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeCreatePlaylistModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-neutral-400 hover:bg-neutral-800">Batal</button>
+          <button type="submit" class="bg-theme hover-bg-theme text-black font-bold px-5 py-2 rounded-xl text-xs transition">Simpan Playlist</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Pick Playlist -->
+  <div id="pick-playlist-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-sm p-5 space-y-3 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-base">Tambahkan ke Playlist</h3>
+        <button onclick="closePickPlaylistModal()" class="text-neutral-400 hover:text-white p-1"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="pick-playlist-list" class="space-y-1.5 max-h-60 overflow-y-auto"></div>
+      <button onclick="closePickPlaylistModal(); openCreatePlaylistModal()" class="w-full py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-xs font-bold text-theme transition">
+        + Buat Playlist Baru
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal: Tambah URL YouTube Manual -->
+  <div id="add-url-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-lg flex items-center gap-2">
+          <i class="fa-brands fa-youtube text-red-500"></i> Putar Link YouTube
+        </h3>
+        <button onclick="closeAddModal()" class="text-neutral-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+      <p class="text-xs text-neutral-400 leading-relaxed">
+        Tempel tautan lagu dari YouTube / YouTube Music. Audio akan diputar langsung tanpa iklan.
+      </p>
+      <form onsubmit="handleManualUrlSubmit(event)" class="space-y-3">
+        <input type="text" id="manual-yt-url" required placeholder="https://music.youtube.com/watch?v=..." 
+               class="w-full bg-neutral-950 border border-neutral-700 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none">
+        <input type="text" id="manual-yt-title" placeholder="Judul Lagu (Opsional)" 
+               class="w-full bg-neutral-950 border border-neutral-700 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none">
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeAddModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-neutral-400 hover:bg-neutral-800">Batal</button>
+          <button type="submit" class="bg-theme hover-bg-theme text-black font-bold px-5 py-2 rounded-xl text-xs transition">Putar Sekarang</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-neutral-800 border border-theme text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-xl z-50 opacity-0 pointer-events-none transition-opacity duration-300 flex items-center gap-2">
+    <i class="fa-solid fa-circle-check text-theme"></i>
+    <span id="toast-msg">Notifikasi</span>
+  </div>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+    const BEST_SONGS_PRESETS = {
+      daily: [
+        { id: 'F44tk5-p2iM', title: 'Hati-Hati di Jalan', artist: 'Tulus', duration: '4:02' },
+        { id: '4NRXx6U8ABQ', title: 'Blinding Lights', artist: 'The Weeknd', duration: '3:20' },
+        { id: 'kTJczUoc26U', title: 'STAY', artist: 'The Kid LAROI, Justin Bieber', duration: '2:21' },
+        { id: 'G7KNmW9a75Y', title: 'Flowers', artist: 'Miley Cyrus', duration: '3:20' },
+        { id: 'H5v3kku4y6Q', title: 'As It Was', artist: 'Harry Styles', duration: '2:47' },
+        { id: 'JGwWNGJdvx8', title: 'Shape of You', artist: 'Ed Sheeran', duration: '3:53' },
+        { id: '2Vv-BfVoq4g', title: 'Perfect', artist: 'Ed Sheeran', duration: '4:23' },
+        { id: 'XXYlFuWEuKI', title: 'Save Your Tears', artist: 'The Weeknd', duration: '3:35' }
+      ],
+      weekly: [
+        { id: 'wA5bQ3W2F9c', title: 'Monokrom', artist: 'Tulus', duration: '3:34' },
+        { id: 'x34p9X7w2tE', title: 'Dan...', artist: 'Sheila On 7', duration: '4:46' },
+        { id: '34Na4j8AVgA', title: 'Starboy', artist: 'The Weeknd ft. Daft Punk', duration: '3:50' },
+        { id: 'SlPhMPnQ58k', title: 'Memories', artist: 'Maroon 5', duration: '3:09' },
+        { id: 'DyDfgMOUjCI', title: 'bad guy', artist: 'Billie Eilish', duration: '3:14' },
+        { id: '7wtfhZwyrcc', title: 'Believer', artist: 'Imagine Dragons', duration: '3:24' },
+        { id: 'OPf0YbXqDm0', title: 'Uptown Funk', artist: 'Mark Ronson ft. Bruno Mars', duration: '4:30' },
+        { id: 'P7N6eL03r8M', title: 'Separuh Nafas', artist: 'Dewa 19', duration: '4:28' }
+      ],
+      monthly: [
+        { id: 'j3Q0V9p6c2A', title: 'Pamit', artist: 'Tulus', duration: '3:55' },
+        { id: '4fndeDfaWCg', title: 'Sephia', artist: 'Sheila On 7', duration: '4:50' },
+        { id: 'dvgZkm1xWPE', title: 'Viva La Vida', artist: 'Coldplay', duration: '4:02' },
+        { id: 'PMivT7MJ41M', title: 'That’s What I Like', artist: 'Bruno Mars', duration: '3:26' },
+        { id: 'rYEDA3JcQqw', title: 'Rolling in the Deep', artist: 'Adele', duration: '3:48' },
+        { id: 'h4B8N6x7W1k', title: 'Risalah Hati', artist: 'Dewa 19', duration: '4:51' },
+        { id: '1G4isv_Fylg', title: 'Paradise', artist: 'Coldplay', duration: '4:38' },
+        { id: 'bnVUHWCynig', title: 'Halo', artist: 'Beyoncé', duration: '4:21' }
+      ],
+      yearly: [
+        { id: 'F44tk5-p2iM', title: 'Hati-Hati di Jalan', artist: 'Tulus', duration: '4:02' },
+        { id: 'H5v3kku4y6Q', title: 'As It Was', artist: 'Harry Styles', duration: '2:47' },
+        { id: '4NRXx6U8ABQ', title: 'Blinding Lights', artist: 'The Weeknd', duration: '3:20' },
+        { id: 'G7KNmW9a75Y', title: 'Flowers', artist: 'Miley Cyrus', duration: '3:20' },
+        { id: 'kTJczUoc26U', title: 'STAY', artist: 'The Kid LAROI, Justin Bieber', duration: '2:21' },
+        { id: 'JGwWNGJdvx8', title: 'Shape of You', artist: 'Ed Sheeran', duration: '3:53' },
+        { id: 'g-1gQ3Q8c6M', title: 'Sepatu', artist: 'Tulus', duration: '3:38' },
+        { id: 'ekzHIouo8Q4', title: 'When I Was Your Man', artist: 'Bruno Mars', duration: '3:33' }
+      ],
+      alltime: [
+        { id: 'yKNxeF4KMsY', title: 'Yellow', artist: 'Coldplay', duration: '4:29' },
+        { id: '5lX-2sP0JFw', title: 'Kangen', artist: 'Dewa 19', duration: '5:35' },
+        { id: 'hLQl3WQQoQ0', title: 'Someone Like You', artist: 'Adele', duration: '4:45' },
+        { id: 'k4V3Mo61fJM', title: 'Fix You', artist: 'Coldplay', duration: '4:55' },
+        { id: 'LjhCEhWiKXk', title: 'Just The Way You Are', artist: 'Bruno Mars', duration: '3:40' },
+        { id: 'x34p9X7w2tE', title: 'Dan...', artist: 'Sheila On 7', duration: '4:46' },
+        { id: '6d5STszrV5Y', title: 'Pupus', artist: 'Dewa 19', duration: '5:05' },
+        { id: '2Vv-BfVoq4g', title: 'Perfect', artist: 'Ed Sheeran', duration: '4:23' }
+      ]
+    };
+
+    const BEST_ARTISTS = [
+      {
+        name: 'Tulus',
+        genre: 'Pop / Soul Indonesia',
+        thumbId: 'F44tk5-p2iM',
+        tracks: [
+          { id: 'F44tk5-p2iM', title: 'Hati-Hati di Jalan', artist: 'Tulus' },
+          { id: 'wA5bQ3W2F9c', title: 'Monokrom', artist: 'Tulus' },
+          { id: 'g-1gQ3Q8c6M', title: 'Sepatu', artist: 'Tulus' },
+          { id: 'j3Q0V9p6c2A', title: 'Pamit', artist: 'Tulus' },
+          { id: '7743211', title: 'Ruang Sendiri', artist: 'Tulus' }
+        ]
+      },
+      {
+        name: 'Sheila On 7',
+        genre: 'Pop Rock Indonesia',
+        thumbId: 'x34p9X7w2tE',
+        tracks: [
+          { id: 'x34p9X7w2tE', title: 'Dan...', artist: 'Sheila On 7' },
+          { id: '4fndeDfaWCg', title: 'Sephia', artist: 'Sheila On 7' },
+          { id: '8p1q9m7x4tR', title: 'Seberapa Pantas', artist: 'Sheila On 7' },
+          { id: '2x8m4k9p1wQ', title: 'Melompat Lebih Tinggi', artist: 'Sheila On 7' }
+        ]
+      },
+      {
+        name: 'Dewa 19',
+        genre: 'Rock Legendaris',
+        thumbId: '5lX-2sP0JFw',
+        tracks: [
+          { id: '5lX-2sP0JFw', title: 'Kangen', artist: 'Dewa 19' },
+          { id: 'P7N6eL03r8M', title: 'Separuh Nafas', artist: 'Dewa 19' },
+          { id: '6d5STszrV5Y', title: 'Pupus', artist: 'Dewa 19' },
+          { id: 'h4B8N6x7W1k', title: 'Risalah Hati', artist: 'Dewa 19' }
+        ]
+      },
+      {
+        name: 'The Weeknd',
+        genre: 'R&B / Synth-Pop',
+        thumbId: '4NRXx6U8ABQ',
+        tracks: [
+          { id: '4NRXx6U8ABQ', title: 'Blinding Lights', artist: 'The Weeknd' },
+          { id: '34Na4j8AVgA', title: 'Starboy', artist: 'The Weeknd ft. Daft Punk' },
+          { id: 'XXYlFuWEuKI', title: 'Save Your Tears', artist: 'The Weeknd' },
+          { id: 'yzTuBuRdAyA', title: 'The Hills', artist: 'The Weeknd' }
+        ]
+      },
+      {
+        name: 'Coldplay',
+        genre: 'Alternative Rock',
+        thumbId: 'dvgZkm1xWPE',
+        tracks: [
+          { id: 'dvgZkm1xWPE', title: 'Viva La Vida', artist: 'Coldplay' },
+          { id: 'yKNxeF4KMsY', title: 'Yellow', artist: 'Coldplay' },
+          { id: 'k4V3Mo61fJM', title: 'Fix You', artist: 'Coldplay' },
+          { id: '1G4isv_Fylg', title: 'Paradise', artist: 'Coldplay' }
+        ]
+      },
+      {
+        name: 'Bruno Mars',
+        genre: 'Pop / Funk',
+        thumbId: 'OPf0YbXqDm0',
+        tracks: [
+          { id: 'OPf0YbXqDm0', title: 'Uptown Funk', artist: 'Mark Ronson ft. Bruno Mars' },
+          { id: 'PMivT7MJ41M', title: 'That’s What I Like', artist: 'Bruno Mars' },
+          { id: 'LjhCEhWiKXk', title: 'Just The Way You Are', artist: 'Bruno Mars' },
+          { id: 'ekzHIouo8Q4', title: 'When I Was Your Man', artist: 'Bruno Mars' }
+        ]
+      },
+      {
+        name: 'Ed Sheeran',
+        genre: 'Pop Akustik',
+        thumbId: 'JGwWNGJdvx8',
+        tracks: [
+          { id: 'JGwWNGJdvx8', title: 'Shape of You', artist: 'Ed Sheeran' },
+          { id: '2Vv-BfVoq4g', title: 'Perfect', artist: 'Ed Sheeran' },
+          { id: 'K0ibBPhiaG0', title: 'Castle on the Hill', artist: 'Ed Sheeran' },
+          { id: '87gWaABqGYs', title: 'Galway Girl', artist: 'Ed Sheeran' }
+        ]
+      },
+      {
+        name: 'Adele',
+        genre: 'Soul / Pop Ballad',
+        thumbId: 'hLQl3WQQoQ0',
+        tracks: [
+          { id: 'rYEDA3JcQqw', title: 'Rolling in the Deep', artist: 'Adele' },
+          { id: 'hLQl3WQQoQ0', title: 'Someone Like You', artist: 'Adele' },
+          { id: 'Ri7-vnrJD3k', title: 'Set Fire to the Rain', artist: 'Adele' },
+          { id: 'DDWKuo3gXMQ', title: 'Turning Tables', artist: 'Adele' }
+        ]
+      },
+      {
+        name: 'Bernadya',
+        genre: 'Pop Melankolis ID',
+        thumbId: 'chart_bernadya_1',
+        tracks: [
+          { id: 'chart_bernadya_1', title: 'Satu Bulan', artist: 'Bernadya' },
+          { id: 'chart_bernadya_2', title: 'Untungnya, Hidup Harus Tetap Berjalan', artist: 'Bernadya' },
+          { id: 'chart_bernadya_3', title: 'Kata Mereka Ini Berlebihan', artist: 'Bernadya' },
+          { id: 'chart_bernadya_4', title: 'Apa Mungkin', artist: 'Bernadya' }
+        ]
+      },
+      {
+        name: 'Hindia',
+        genre: 'Indie Rock Indonesia',
+        thumbId: 'chart_hindia_1',
+        tracks: [
+          { id: 'chart_hindia_1', title: 'Evaluasi', artist: 'Hindia' },
+          { id: 'chart_hindia_2', title: 'Secukupnya', artist: 'Hindia' },
+          { id: 'chart_hindia_3', title: 'Rumah Ke Rumah', artist: 'Hindia' },
+          { id: 'chart_hindia_4', title: 'Cincin', artist: 'Hindia' }
+        ]
+      },
+      {
+        name: 'NIKI',
+        genre: 'R&B / Indie Pop',
+        thumbId: 'chart_niki_1',
+        tracks: [
+          { id: 'chart_niki_1', title: 'Every Summertime', artist: 'NIKI' },
+          { id: 'chart_niki_2', title: 'Lowkey', artist: 'NIKI' },
+          { id: 'chart_niki_3', title: 'High School in Jakarta', artist: 'NIKI' },
+          { id: 'chart_niki_4', title: 'Backburner', artist: 'NIKI' }
+        ]
+      },
+      {
+        name: 'Imagine Dragons',
+        genre: 'Pop Rock / Arena',
+        thumbId: '7wtfhZwyrcc',
+        tracks: [
+          { id: '7wtfhZwyrcc', title: 'Believer', artist: 'Imagine Dragons' },
+          { id: 'fKopy74weus', title: 'Thunder', artist: 'Imagine Dragons' },
+          { id: 'ktvTqknDobU', title: 'Radioactive', artist: 'Imagine Dragons' },
+          { id: 'mWRsgZuwf_8', title: 'Demons', artist: 'Imagine Dragons' }
+        ]
+      }
+    ];
+
+    const BEST_ALBUMS = [
+      {
+        title: 'Manusia',
+        artist: 'Tulus (2022)',
+        thumbId: 'F44tk5-p2iM',
+        tracks: [
+          { id: 'F44tk5-p2iM', title: 'Hati-Hati di Jalan', artist: 'Tulus' },
+          { id: 'wA5bQ3W2F9c', title: 'Tujuh Belas', artist: 'Tulus' },
+          { id: 'g-1gQ3Q8c6M', title: 'Diri', artist: 'Tulus' },
+          { id: 'j3Q0V9p6c2A', title: 'Interaksi', artist: 'Tulus' }
+        ]
+      },
+      {
+        title: 'After Hours',
+        artist: 'The Weeknd (2020)',
+        thumbId: '4NRXx6U8ABQ',
+        tracks: [
+          { id: '4NRXx6U8ABQ', title: 'Blinding Lights', artist: 'The Weeknd' },
+          { id: 'XXYlFuWEuKI', title: 'Save Your Tears', artist: 'The Weeknd' },
+          { id: '1DpH-icPpl0', title: 'Heartless', artist: 'The Weeknd' },
+          { id: 'M4ZoCHID9GI', title: 'In Your Eyes', artist: 'The Weeknd' }
+        ]
+      },
+      {
+        title: 'Bintang Lima',
+        artist: 'Dewa 19 (2000)',
+        thumbId: '5lX-2sP0JFw',
+        tracks: [
+          { id: 'P7N6eL03r8M', title: 'Separuh Nafas', artist: 'Dewa 19' },
+          { id: 'h4B8N6x7W1k', title: 'Risalah Hati', artist: 'Dewa 19' },
+          { id: '5lX-2sP0JFw', title: 'Roman Picisan', artist: 'Dewa 19' },
+          { id: '6d5STszrV5Y', title: 'Cemburu', artist: 'Dewa 19' }
+        ]
+      },
+      {
+        title: '÷ (Divide)',
+        artist: 'Ed Sheeran (2017)',
+        thumbId: 'JGwWNGJdvx8',
+        tracks: [
+          { id: 'JGwWNGJdvx8', title: 'Shape of You', artist: 'Ed Sheeran' },
+          { id: '2Vv-BfVoq4g', title: 'Perfect', artist: 'Ed Sheeran' },
+          { id: 'K0ibBPhiaG0', title: 'Castle on the Hill', artist: 'Ed Sheeran' },
+          { id: '87gWaABqGYs', title: 'Galway Girl', artist: 'Ed Sheeran' }
+        ]
+      },
+      {
+        title: '21',
+        artist: 'Adele (2011)',
+        thumbId: 'hLQl3WQQoQ0',
+        tracks: [
+          { id: 'rYEDA3JcQqw', title: 'Rolling in the Deep', artist: 'Adele' },
+          { id: 'hLQl3WQQoQ0', title: 'Someone Like You', artist: 'Adele' },
+          { id: 'Ri7-vnrJD3k', title: 'Set Fire to the Rain', artist: 'Adele' },
+          { id: 'DDWKuo3gXMQ', title: 'Turning Tables', artist: 'Adele' }
+        ]
+      },
+      {
+        title: 'Sialnya, Hidup Harus Tetap Berjalan',
+        artist: 'Bernadya (2024)',
+        thumbId: 'F44tk5-p2iM',
+        tracks: [
+          { id: 'chart_bernadya_1', title: 'Satu Bulan', artist: 'Bernadya' },
+          { id: 'chart_bernadya_2', title: 'Untungnya, Hidup Harus Tetap Berjalan', artist: 'Bernadya' },
+          { id: 'chart_bernadya_3', title: 'Kata Mereka Ini Berlebihan', artist: 'Bernadya' },
+          { id: 'chart_bernadya_5', title: 'Lama-Lama', artist: 'Bernadya' }
+        ]
+      },
+      {
+        title: 'Menari Dengan Bayangan',
+        artist: 'Hindia (2019)',
+        thumbId: 'yKNxeF4KMsY',
+        tracks: [
+          { id: 'chart_hindia_1', title: 'Evaluasi', artist: 'Hindia' },
+          { id: 'chart_hindia_2', title: 'Secukupnya', artist: 'Hindia' },
+          { id: 'chart_hindia_3', title: 'Rumah Ke Rumah', artist: 'Hindia' },
+          { id: 'chart_hindia_5', title: 'Membasuh', artist: 'Hindia ft. Rara Sekar' }
+        ]
+      },
+      {
+        title: 'Kisah Klasik Untuk Masa Depan',
+        artist: 'Sheila On 7 (2000)',
+        thumbId: 'x34p9X7w2tE',
+        tracks: [
+          { id: '4fndeDfaWCg', title: 'Sephia', artist: 'Sheila On 7' },
+          { id: '8p1q9m7x4tR', title: 'Seberapa Pantas', artist: 'Sheila On 7' },
+          { id: 'x34p9X7w2tE', title: 'Sahabat Sejati', artist: 'Sheila On 7' },
+          { id: '2x8m4k9p1wQ', title: 'Bila Kau Tak Disampingku', artist: 'Sheila On 7' }
+        ]
+      },
+      {
+        title: 'A Rush of Blood to the Head',
+        artist: 'Coldplay (2002)',
+        thumbId: 'dvgZkm1xWPE',
+        tracks: [
+          { id: 'RB-RcX5DS5A', title: 'The Scientist', artist: 'Coldplay' },
+          { id: 'd020hcWA_Wg', title: 'Clocks', artist: 'Coldplay' },
+          { id: 'k4V3Mo61fJM', title: 'In My Place', artist: 'Coldplay' },
+          { id: 'yKNxeF4KMsY', title: 'Yellow', artist: 'Coldplay' }
+        ]
+      },
+      {
+        title: '24K Magic',
+        artist: 'Bruno Mars (2016)',
+        thumbId: 'OPf0YbXqDm0',
+        tracks: [
+          { id: 'UqyT8IEBkvY', title: '24K Magic', artist: 'Bruno Mars' },
+          { id: 'PMivT7MJ41M', title: 'That’s What I Like', artist: 'Bruno Mars' },
+          { id: 'dElRVQFqj-k', title: 'Versace on the Floor', artist: 'Bruno Mars' },
+          { id: 'OPf0YbXqDm0', title: 'Finesse', artist: 'Bruno Mars' }
+        ]
+      }
+    ];
+
+    const BASE_HUMAN_TRACK_POOL = [
+      { id: 'F44tk5-p2iM', title: 'Hati-Hati di Jalan', artist: 'Tulus' },
+      { id: 'wA5bQ3W2F9c', title: 'Monokrom', artist: 'Tulus' },
+      { id: 'g-1gQ3Q8c6M', title: 'Sepatu', artist: 'Tulus' },
+      { id: 'j3Q0V9p6c2A', title: 'Pamit', artist: 'Tulus' },
+      { id: 'x34p9X7w2tE', title: 'Dan...', artist: 'Sheila On 7' },
+      { id: '4fndeDfaWCg', title: 'Sephia', artist: 'Sheila On 7' },
+      { id: '8p1q9m7x4tR', title: 'Seberapa Pantas', artist: 'Sheila On 7' },
+      { id: '2x8m4k9p1wQ', title: 'Melompat Lebih Tinggi', artist: 'Sheila On 7' },
+      { id: '5lX-2sP0JFw', title: 'Kangen', artist: 'Dewa 19' },
+      { id: 'P7N6eL03r8M', title: 'Separuh Nafas', artist: 'Dewa 19' },
+      { id: '6d5STszrV5Y', title: 'Pupus', artist: 'Dewa 19' },
+      { id: 'h4B8N6x7W1k', title: 'Risalah Hati', artist: 'Dewa 19' },
+      { id: '4NRXx6U8ABQ', title: 'Blinding Lights', artist: 'The Weeknd' },
+      { id: '34Na4j8AVgA', title: 'Starboy', artist: 'The Weeknd ft. Daft Punk' },
+      { id: 'XXYlFuWEuKI', title: 'Save Your Tears', artist: 'The Weeknd' },
+      { id: 'yzTuBuRdAyA', title: 'The Hills', artist: 'The Weeknd' },
+      { id: 'dvgZkm1xWPE', title: 'Viva La Vida', artist: 'Coldplay' },
+      { id: 'yKNxeF4KMsY', title: 'Yellow', artist: 'Coldplay' },
+      { id: 'k4V3Mo61fJM', title: 'Fix You', artist: 'Coldplay' },
+      { id: '1G4isv_Fylg', title: 'Paradise', artist: 'Coldplay' },
+      { id: 'RB-RcX5DS5A', title: 'The Scientist', artist: 'Coldplay' },
+      { id: 'd020hcWA_Wg', title: 'Clocks', artist: 'Coldplay' },
+      { id: 'OPf0YbXqDm0', title: 'Uptown Funk', artist: 'Mark Ronson ft. Bruno Mars' },
+      { id: 'PMivT7MJ41M', title: 'That’s What I Like', artist: 'Bruno Mars' },
+      { id: 'LjhCEhWiKXk', title: 'Just The Way You Are', artist: 'Bruno Mars' },
+      { id: 'ekzHIouo8Q4', title: 'When I Was Your Man', artist: 'Bruno Mars' },
+      { id: 'UqyT8IEBkvY', title: '24K Magic', artist: 'Bruno Mars' },
+      { id: 'dElRVQFqj-k', title: 'Versace on the Floor', artist: 'Bruno Mars' },
+      { id: 'JGwWNGJdvx8', title: 'Shape of You', artist: 'Ed Sheeran' },
+      { id: '2Vv-BfVoq4g', title: 'Perfect', artist: 'Ed Sheeran' },
+      { id: 'K0ibBPhiaG0', title: 'Castle on the Hill', artist: 'Ed Sheeran' },
+      { id: '87gWaABqGYs', title: 'Galway Girl', artist: 'Ed Sheeran' },
+      { id: 'rYEDA3JcQqw', title: 'Rolling in the Deep', artist: 'Adele' },
+      { id: 'hLQl3WQQoQ0', title: 'Someone Like You', artist: 'Adele' },
+      { id: 'Ri7-vnrJD3k', title: 'Set Fire to the Rain', artist: 'Adele' },
+      { id: 'DDWKuo3gXMQ', title: 'Turning Tables', artist: 'Adele' },
+      { id: 'kTJczUoc26U', title: 'STAY', artist: 'The Kid LAROI, Justin Bieber' },
+      { id: 'G7KNmW9a75Y', title: 'Flowers', artist: 'Miley Cyrus' },
+      { id: 'H5v3kku4y6Q', title: 'As It Was', artist: 'Harry Styles' },
+      { id: 'SlPhMPnQ58k', title: 'Memories', artist: 'Maroon 5' },
+      { id: 'DyDfgMOUjCI', title: 'bad guy', artist: 'Billie Eilish' },
+      { id: '7wtfhZwyrcc', title: 'Believer', artist: 'Imagine Dragons' },
+      { id: 'fKopy74weus', title: 'Thunder', artist: 'Imagine Dragons' },
+      { id: 'ktvTqknDobU', title: 'Radioactive', artist: 'Imagine Dragons' },
+      { id: 'mWRsgZuwf_8', title: 'Demons', artist: 'Imagine Dragons' },
+      { id: 'bnVUHWCynig', title: 'Halo', artist: 'Beyoncé' },
+      { id: '4Tr0otuiQuU', title: 'Moonlight Sonata (Live Piano)', artist: 'Ludwig van Beethoven' },
+      { id: '9E6b3swbnWg', title: 'Nocturne Op. 9 No. 2', artist: 'Frédéric Chopin' },
+      { id: 'CvFH_6DNRCY', title: 'Clair de Lune', artist: 'Claude Debussy' },
+      { id: 'chart_bernadya_1', title: 'Satu Bulan', artist: 'Bernadya' },
+      { id: 'chart_bernadya_2', title: 'Untungnya, Hidup Harus Tetap Berjalan', artist: 'Bernadya' },
+      { id: 'chart_hindia_1', title: 'Evaluasi', artist: 'Hindia' },
+      { id: 'chart_hindia_2', title: 'Secukupnya', artist: 'Hindia' },
+      { id: 'chart_hindia_4', title: 'Cincin', artist: 'Hindia' },
+      { id: 'chart_niki_1', title: 'Every Summertime', artist: 'NIKI' },
+      { id: 'chart_niki_2', title: 'Lowkey', artist: 'NIKI' }
+    ];
+
+    function getDailyRotatedFallback(offsetSeed) {
+      const todayNumber = Math.floor(Date.now() / 86400000);
+      const copy = [...BASE_HUMAN_TRACK_POOL];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = (todayNumber * 31 + offsetSeed * 17 + i * 13) % (i + 1);
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy.slice(0, 50);
+    }
+
+    let CURATED_PLAYLISTS = [
+      {
+        id: 'pagi',
+        title: 'Playlist Pagi',
+        desc: 'Lagu yg cocok menemani sarapan dan perjalanan',
+        color: '#f59e0b',
+        icon: 'fa-sun',
+        thumbId: 'F44tk5-p2iM',
+        tracks: getDailyRotatedFallback(1)
+      },
+      {
+        id: 'siang',
+        title: 'Playlist Siang',
+        desc: 'Lagu yang cocok menemani waktu istirahat dan makan siang',
+        color: '#10b981',
+        icon: 'fa-utensils',
+        thumbId: 'JGwWNGJdvx8',
+        tracks: getDailyRotatedFallback(2)
+      },
+      {
+        id: 'sore',
+        title: 'Playlist Sore',
+        desc: 'Lagu yang cocok menemani perjalanan pulang',
+        color: '#ea580c',
+        icon: 'fa-car-side',
+        thumbId: 'yKNxeF4KMsY',
+        tracks: getDailyRotatedFallback(3)
+      },
+      {
+        id: 'petang',
+        title: 'Playlist Petang',
+        desc: 'Lagu yang cocok menemani istirahat setelah beraktivitas',
+        color: '#8b5cf6',
+        icon: 'fa-couch',
+        thumbId: 'wA5bQ3W2F9c',
+        tracks: getDailyRotatedFallback(4)
+      },
+      {
+        id: 'malam',
+        title: 'Playlist Malam',
+        desc: 'Lagu yang cocok untuk menemani saat tidur',
+        color: '#1d4ed8',
+        icon: 'fa-moon',
+        thumbId: '4Tr0otuiQuU',
+        tracks: getDailyRotatedFallback(5)
+      }
+    ];
+
+    async function loadDailyPlaylists() {
+      const todayKey = new Date().toISOString().slice(0, 10);
+      const cachedRaw = localStorage.getItem('melodify_daily_playlists');
+      if (cachedRaw) {
+        try {
+          const parsed = JSON.parse(cachedRaw);
+          if (parsed.date === todayKey && Array.isArray(parsed.playlists) && parsed.playlists.length === 5) {
+            CURATED_PLAYLISTS = parsed.playlists.map((pl, idx) => ({
+              ...pl,
+              thumbId: pl.tracks?.[0]?.id || CURATED_PLAYLISTS[idx].thumbId,
+              tracks: (pl.tracks && pl.tracks.length >= 50) ? pl.tracks.slice(0, 50) : getDailyRotatedFallback(idx + 1)
+            }));
+            renderHomeAndCatalogSections();
+            return;
+          }
+        } catch (e) {}
+      }
+
+      if (!window.location.protocol.startsWith('http')) return;
+      try {
+        const res = await fetch('/api/daily_playlists');
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.playlists) && data.playlists.length === 5) {
+            CURATED_PLAYLISTS = data.playlists.map((pl, idx) => {
+              const validTracks = (pl.tracks || []).filter(t => !isAiTrack(t));
+              const merged = validTracks.length >= 50
+                ? validTracks.slice(0, 50)
+                : [...validTracks, ...getDailyRotatedFallback(idx + 1)].slice(0, 50);
+              return {
+                ...pl,
+                thumbId: merged[0]?.id || CURATED_PLAYLISTS[idx].thumbId,
+                tracks: merged
+              };
+            });
+            localStorage.setItem('melodify_daily_playlists', JSON.stringify({
+              date: todayKey,
+              playlists: CURATED_PLAYLISTS
+            }));
+            renderHomeAndCatalogSections();
+          }
+        }
+      } catch (e) {}
+    }
+
+    const AI_BLOCK_REGEX = /\b(ai\s*cover|ai\s*music|ai\s*generated|ai\s*song|suno|udio|made\s*with\s*ai|cover\s*ai|lagu\s*ai)\b/i;
+    function isAiTrack(track) {
+      return AI_BLOCK_REGEX.test(`${track.title || ''} ${track.artist || ''}`);
+    }
+
+    const nativeAudio = document.getElementById('native-audio');
+    let ytPlayer = null;
+    let isYtReady = false;
+    let activeEngine = 'none';
+    let queue = [...BEST_SONGS_PRESETS.daily];
+    let currentChartTracks = [...BEST_SONGS_PRESETS.daily];
+    let currentIndex = 0;
+    let isPlaying = false;
+    let isShuffle = false;
+    let isRepeat = false;
+    let progressTimer = null;
+    let pendingTrackToAdd = null;
+    let parsedSyncedLyrics = [];
+    let lyricTimeOffset = 0;
+
+    let likedTracks = JSON.parse(localStorage.getItem('melodify_likes') || '[]');
+    let customPlaylists = JSON.parse(localStorage.getItem('melodify_playlists') || '[]');
+    let recentTracks = JSON.parse(localStorage.getItem('melodify_recent') || '[]');
+    let savedLyricOffsets = JSON.parse(localStorage.getItem('melodify_lyric_offsets') || '{}');
+    let appSettings = JSON.parse(localStorage.getItem('melodify_settings') || '{"siteName":"Melodify","themeColor":"#10b981","themeHover":"#34d399"}');
+
+    if (window.location.protocol === 'file:') {
+      document.getElementById('file-protocol-warning').classList.remove('hidden');
+    }
+
+    // --- RECENTLY PLAYED TRACKS (MAX 10) ---
+    function recordRecentTrack(track) {
+      if (!track || !track.title) return;
+      // Hapus duplikat jika lagu yang sama sudah ada di riwayat
+      recentTracks = recentTracks.filter(t => !(t.id === track.id && t.title === track.title));
+      // Tambahkan di urutan paling atas
+      recentTracks.unshift({
+        id: track.id,
+        title: track.title,
+        artist: track.artist || 'Musisi Asli',
+        artwork: track.artwork || ''
+      });
+      // Batasi maksimal 10 lagu
+      if (recentTracks.length > 10) {
+        recentTracks = recentTracks.slice(0, 10);
+      }
+      localStorage.setItem('melodify_recent', JSON.stringify(recentTracks));
+      renderSidebarRecentTracks();
+    }
+
+    function clearRecentTracks() {
+      recentTracks = [];
+      localStorage.removeItem('melodify_recent');
+      renderSidebarRecentTracks();
+      showToast('Riwayat terakhir diputar dibersihkan');
+    }
+
+    function renderSidebarRecentTracks() {
+      const container = document.getElementById('sidebar-recent-tracks');
+      const clearBtn = document.getElementById('btn-clear-recent');
+      if (!container) return;
+
+      if (recentTracks.length === 0) {
+        if (clearBtn) clearBtn.classList.add('hidden');
+        container.innerHTML = '<p class="text-[11px] text-neutral-500 px-1 py-1.5">Belum ada lagu yang diputar.</p>';
+        return;
+      }
+
+      if (clearBtn) clearBtn.classList.remove('hidden');
+      container.innerHTML = recentTracks.map((track, idx) => `
+        <div onclick='playTrackObject(${JSON.stringify(track).replace(/'/g, "&#39;")})' class="group flex items-center gap-2 p-1.5 rounded-lg hover:bg-neutral-800/75 cursor-pointer transition" title="${escapeHtml(track.title)} - ${escapeHtml(track.artist)}">
+          <div class="relative w-8 h-8 rounded-md overflow-hidden bg-neutral-800 shrink-0">
+            <img src="${getTrackThumb(track)}" alt="Cover" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+              <i class="fa-solid fa-play text-[10px] text-theme"></i>
+            </div>
+          </div>
+          <div class="min-w-0 flex-1">
+            <p class="text-xs font-semibold text-neutral-200 group-hover:text-theme truncate transition">${escapeHtml(track.title)}</p>
+            <p class="text-[10px] text-neutral-500 truncate">${escapeHtml(track.artist)}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function applyAppSettings() {
+      const name = appSettings.siteName || 'Melodify';
+      document.title = `${name} — Pemutar Musik Bebas Iklan & Karaoke`;
+      document.getElementById('brand-name-desktop').textContent = name;
+      document.getElementById('brand-name-mobile').textContent = name;
+      document.getElementById('setting-site-name').value = name;
+
+      const color = appSettings.themeColor || '#10b981';
+      const hover = appSettings.themeHover || '#34d399';
+      document.documentElement.style.setProperty('--theme-color', color);
+      document.documentElement.style.setProperty('--theme-hover', hover);
+      document.documentElement.style.setProperty('--theme-soft', hexToRgba(color, 0.16));
+      document.documentElement.style.setProperty('--theme-border', hexToRgba(color, 0.35));
+      updateSliderFill(document.getElementById('volume-slider'));
+      updateSliderFill(document.getElementById('desktop-seek'));
+    }
+
+    function hexToRgba(hex, alpha) {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function selectThemePreset(color, hover) {
+      appSettings.themeColor = color;
+      appSettings.themeHover = hover;
+      applyAppSettings();
+    }
+
+    function saveSettings() {
+      const newName = document.getElementById('setting-site-name').value.trim() || 'Melodify';
+      appSettings.siteName = newName;
+      localStorage.setItem('melodify_settings', JSON.stringify(appSettings));
+      applyAppSettings();
+      closeSettingsModal();
+      showToast('Pengaturan web & tema disimpan');
+    }
+
+    function setDynamicGreeting() {
+      const h = new Date().getHours();
+      const el = document.getElementById('greeting-text');
+      if (h < 12) el.textContent = 'Selamat Pagi';
+      else if (h < 18) el.textContent = 'Selamat Siang';
+      else el.textContent = 'Selamat Malam';
+    }
+
+    function updateSliderFill(slider) {
+      if (!slider) return;
+      const min = parseFloat(slider.min || 0);
+      const max = parseFloat(slider.max || 100);
+      const val = parseFloat(slider.value || 0);
+      const pct = ((val - min) / (max - min)) * 100;
+      const color = appSettings.themeColor || '#10b981';
+      slider.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, #3f3f46 ${pct}%, #3f3f46 100%)`;
+    }
+
+    function onYouTubeIframeAPIReady() {
+      ytPlayer = new YT.Player('yt-player', {
+        height: '200',
+        width: '200',
+        playerVars: {
+          autoplay: 0, controls: 0, disablekb: 1, fs: 0,
+          iv_load_policy: 3, modestbranding: 1, rel: 0, playsinline: 1,
+          origin: window.location.origin
+        },
+        events: {
+          onReady: () => { isYtReady = true; ytPlayer.setVolume(85); },
+          onStateChange: onYtStateChange,
+          onError: onYtError
+        }
+      });
+    }
+
+    function onYtStateChange(event) {
+      if (activeEngine !== 'youtube') return;
+      if (event.data === YT.PlayerState.PLAYING) {
+        isPlaying = true;
+        updatePlayButtons(true);
+        checkAndSkipAd();
+      } else if (event.data === YT.PlayerState.PAUSED) {
+        isPlaying = false;
+        updatePlayButtons(false);
+      } else if (event.data === YT.PlayerState.ENDED) {
+        handleTrackEnded();
+      }
+    }
+
+    function onYtError() {
+      if (activeEngine !== 'youtube') return;
+      showToast('Mencari sumber alternatif untuk lagu ini...');
+      resolveAndPlayByTitle(queue[currentIndex]);
+    }
+
+    function checkAndSkipAd() {
+      if (activeEngine !== 'youtube' || !ytPlayer || !isYtReady) return;
+      try {
+        const videoData = ytPlayer.getVideoData();
+        const expectedId = queue[currentIndex]?.id;
+        if (videoData && videoData.video_id && expectedId && videoData.video_id !== expectedId) {
+          ytPlayer.loadVideoById({ videoId: expectedId, startSeconds: 0 });
+          showToast('Iklan diblokir otomatis');
+        }
+      } catch (err) {}
+    }
+
+    nativeAudio.addEventListener('playing', () => {
+      if (activeEngine !== 'native') return;
+      isPlaying = true;
+      updatePlayButtons(true);
+    });
+    nativeAudio.addEventListener('pause', () => {
+      if (activeEngine !== 'native') return;
+      isPlaying = false;
+      updatePlayButtons(false);
+    });
+    nativeAudio.addEventListener('ended', () => {
+      if (activeEngine !== 'native') return;
+      handleTrackEnded();
+    });
+    nativeAudio.addEventListener('error', () => {
+      if (activeEngine !== 'native') return;
+      fallbackToYouTubeEmbed(queue[currentIndex]);
+    });
+
+    function handleTrackEnded() {
+      if (isRepeat) {
+        seekTo(0);
+        resumeCurrentEngine();
+      } else {
+        playNext();
+      }
+    }
+
+    async function playTrack(index) {
+      if (index < 0 || index >= queue.length) return;
+      currentIndex = index;
+      const track = queue[currentIndex];
+      updatePlayerUI(track);
+      recordRecentTrack(track);
+      fetchKaraokeLyrics(track);
+      stopAllEngines();
+
+      document.querySelector('#btn-play-pause i').className = 'fa-solid fa-circle-notch fa-spin';
+      document.querySelector('#full-btn-play i').className = 'fa-solid fa-circle-notch fa-spin';
+
+      if (window.location.protocol.startsWith('http')) {
+        try {
+          const queryStr = `${track.title} ${track.artist}`;
+          const res = await fetch(`/api/stream?id=${encodeURIComponent(track.id)}&q=${encodeURIComponent(queryStr)}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.audioUrl) {
+              if (data.resolvedId) {
+                track.id = data.resolvedId;
+                recordRecentTrack(track);
+              }
+              updatePlayerUI(track);
+              activeEngine = 'native';
+              nativeAudio.src = data.audioUrl;
+              nativeAudio.volume = document.getElementById('volume-slider').value / 100;
+              await nativeAudio.play();
+              return;
+            }
+          }
+        } catch (err) {}
+      }
+
+      fallbackToYouTubeEmbed(track);
+    }
+
+    async function resolveAndPlayByTitle(track) {
+      if (!track) return;
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(track.title + ' ' + track.artist + ' official audio')}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.items && data.items.length > 0) {
+            queue[currentIndex].id = data.items[0].id;
+            playTrack(currentIndex);
+            return;
+          }
+        }
+      } catch (e) {}
+      playNext();
+    }
+
+    function fallbackToYouTubeEmbed(track) {
+      if (!track) return;
+      if (track.id.startsWith('chart_')) {
+        resolveAndPlayByTitle(track);
+        return;
+      }
+      activeEngine = 'youtube';
+      if (isYtReady && ytPlayer) {
+        ytPlayer.loadVideoById(track.id);
+        ytPlayer.playVideo();
+      } else {
+        setTimeout(() => fallbackToYouTubeEmbed(track), 500);
+      }
+    }
+
+    function stopAllEngines() {
+      try {
+        nativeAudio.pause();
+        nativeAudio.removeAttribute('src');
+        nativeAudio.load();
+      } catch (e) {}
+      try {
+        if (isYtReady && ytPlayer && typeof ytPlayer.stopVideo === 'function') {
+          ytPlayer.stopVideo();
+        }
+      } catch (e) {}
+    }
+
+    function playTrackObject(track) {
+      if (isAiTrack(track)) {
+        showToast('Diblokir: Lagu terdeteksi sebagai hasil kreasi AI');
+        return;
+      }
+      const existingIdx = queue.findIndex(t => t.id === track.id && t.title === track.title);
+      if (existingIdx !== -1) {
+        playTrack(existingIdx);
+      } else {
+        queue.unshift(track);
+        playTrack(0);
+      }
+    }
+
+    function playTrackList(tracks, startIdx = 0, label = 'Playlist') {
+      const cleanList = tracks.filter(t => !isAiTrack(t));
+      if (cleanList.length === 0) return;
+      queue = [...cleanList];
+      playTrack(startIdx);
+      showToast(`Memutar: ${label}`);
+    }
+
+    function playCurrentChartList() {
+      playTrackList(currentChartTracks, 0, 'Best Songs Chart');
+    }
+
+    function togglePlay() {
+      if (activeEngine === 'none') {
+        playTrack(currentIndex);
+        return;
+      }
+      if (activeEngine === 'native') {
+        if (nativeAudio.paused) nativeAudio.play();
+        else nativeAudio.pause();
+      } else if (activeEngine === 'youtube' && isYtReady) {
+        const state = ytPlayer.getPlayerState();
+        if (state === YT.PlayerState.PLAYING) ytPlayer.pauseVideo();
+        else ytPlayer.playVideo();
+      }
+    }
+
+    function resumeCurrentEngine() {
+      if (activeEngine === 'native') nativeAudio.play();
+      else if (activeEngine === 'youtube' && isYtReady) ytPlayer.playVideo();
+    }
+
+    function playNext() {
+      if (queue.length === 0) return;
+      if (isShuffle) {
+        playTrack(Math.floor(Math.random() * queue.length));
+      } else {
+        playTrack((currentIndex + 1) % queue.length);
+      }
+    }
+
+    function playPrev() {
+      if (getCurrentTime() > 4) {
+        seekTo(0);
+        return;
+      }
+      playTrack((currentIndex - 1 + queue.length) % queue.length);
+    }
+
+    function getCurrentTime() {
+      if (activeEngine === 'native') return nativeAudio.currentTime || 0;
+      if (activeEngine === 'youtube' && isYtReady) return ytPlayer.getCurrentTime() || 0;
+      return 0;
+    }
+
+    function getDuration() {
+      if (activeEngine === 'native') return nativeAudio.duration || 0;
+      if (activeEngine === 'youtube' && isYtReady) return ytPlayer.getDuration() || 0;
+      return 0;
+    }
+
+    function seekTo(percent) {
+      const dur = getDuration();
+      if (!dur || !isFinite(dur)) return;
+      const target = (percent / 100) * dur;
+      if (activeEngine === 'native') nativeAudio.currentTime = target;
+      else if (activeEngine === 'youtube' && isYtReady) ytPlayer.seekTo(target, true);
+      updateSliderFill(document.getElementById('desktop-seek'));
+      updateSliderFill(document.getElementById('mobile-seek'));
+    }
+
+    function setVolume(val) {
+      nativeAudio.volume = val / 100;
+      if (isYtReady && ytPlayer) ytPlayer.setVolume(val);
+      document.getElementById('volume-pct').textContent = `${val}%`;
+      updateSliderFill(document.getElementById('volume-slider'));
+      const icon = document.querySelector('#btn-mute i');
+      icon.className = val == 0 ? 'fa-solid fa-volume-xmark' : val < 50 ? 'fa-solid fa-volume-low' : 'fa-solid fa-volume-high';
+    }
+
+    function toggleMute() {
+      const isMuted = nativeAudio.muted || (isYtReady && ytPlayer.isMuted());
+      nativeAudio.muted = !isMuted;
+      if (isYtReady && ytPlayer) {
+        if (isMuted) ytPlayer.unMute();
+        else ytPlayer.mute();
+      }
+      document.querySelector('#btn-mute i').className = !isMuted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
+    }
+
+    function toggleShuffle() {
+      isShuffle = !isShuffle;
+      ['btn-shuffle', 'full-btn-shuffle'].forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.toggle('text-theme', isShuffle);
+        el.classList.toggle('text-neutral-400', !isShuffle);
+      });
+      showToast(isShuffle ? 'Mode Acak Aktif' : 'Mode Acak Nonaktif');
+    }
+
+    function toggleRepeat() {
+      isRepeat = !isRepeat;
+      ['btn-repeat', 'full-btn-repeat'].forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.toggle('text-theme', isRepeat);
+        el.classList.toggle('text-neutral-400', !isRepeat);
+      });
+      showToast(isRepeat ? 'Ulangi Lagu Aktif' : 'Ulangi Lagu Nonaktif');
+    }
+
+    function getTrackLyricKey(track) {
+      if (!track) return '';
+      return `${track.title}_${track.artist}`.toLowerCase();
+    }
+
+    function updateLyricOffsetUI() {
+      const disp = document.getElementById('lyric-offset-display');
+      if (!disp) return;
+      const sign = lyricTimeOffset > 0 ? '+' : '';
+      disp.textContent = `${sign}${lyricTimeOffset.toFixed(1)}s`;
+    }
+
+    function adjustLyricOffset(delta) {
+      lyricTimeOffset = Math.round((lyricTimeOffset + delta) * 10) / 10;
+      updateLyricOffsetUI();
+      const key = getTrackLyricKey(queue[currentIndex]);
+      if (key) {
+        savedLyricOffsets[key] = lyricTimeOffset;
+        localStorage.setItem('melodify_lyric_offsets', JSON.stringify(savedLyricOffsets));
+      }
+      highlightActiveLyric(getCurrentTime());
+      const desc = delta < 0 ? 'Lirik dimajukan' : 'Lirik dimundurkan';
+      showToast(`${desc} (${lyricTimeOffset > 0 ? '+' : ''}${lyricTimeOffset.toFixed(1)}s)`);
+    }
+
+    function resetLyricOffset() {
+      lyricTimeOffset = 0;
+      updateLyricOffsetUI();
+      const key = getTrackLyricKey(queue[currentIndex]);
+      if (key) {
+        delete savedLyricOffsets[key];
+        localStorage.setItem('melodify_lyric_offsets', JSON.stringify(savedLyricOffsets));
+      }
+      highlightActiveLyric(getCurrentTime());
+      showToast('Sinkronisasi lirik di-reset ke 0.0s');
+    }
+
+    async function fetchKaraokeLyrics(track) {
+      if (!track) return;
+      parsedSyncedLyrics = [];
+      const key = getTrackLyricKey(track);
+      lyricTimeOffset = savedLyricOffsets[key] || 0;
+      updateLyricOffsetUI();
+
+      const thumbUrl = getTrackThumb(track);
+      document.getElementById('lyrics-thumb').src = thumbUrl;
+      document.getElementById('lyrics-song-title').textContent = track.title;
+      document.getElementById('lyrics-song-artist').textContent = track.artist;
+      const bodyEl = document.getElementById('lyrics-body');
+      const statusEl = document.getElementById('lyrics-sync-status');
+      bodyEl.innerHTML = '<div class="py-12 text-neutral-400 text-sm"><i class="fa-solid fa-circle-notch fa-spin text-theme text-xl mb-2 block"></i>Mencari lirik karaoke...</div>';
+
+      try {
+        const res = await fetch(`/api/lyrics?title=${encodeURIComponent(track.title)}&artist=${encodeURIComponent(track.artist)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.syncedLyrics) {
+            parsedSyncedLyrics = parseLRC(data.syncedLyrics);
+            statusEl.textContent = 'Karaoke Tersinkronisasi Waktu';
+            bodyEl.innerHTML = parsedSyncedLyrics.map((line, i) => `
+              <p id="lrc-line-${i}" onclick="seekToSeconds(${line.time})" class="lyric-line text-neutral-400 hover:text-white text-base md:text-lg font-semibold cursor-pointer py-1">
+                ${escapeHtml(line.text || '♪ • • • ♪')}
+              </p>
+            `).join('');
+            return;
+          } else if (data.plainLyrics) {
+            statusEl.textContent = 'Lirik Teks Penuh';
+            bodyEl.innerHTML = `<pre class="whitespace-pre-wrap font-sans text-base md:text-lg text-neutral-200 leading-relaxed">${escapeHtml(data.plainLyrics)}</pre>`;
+            return;
+          }
+        }
+      } catch (e) {}
+
+      statusEl.textContent = 'Lirik belum tersedia';
+      bodyEl.innerHTML = '<div class="py-12 text-neutral-400 text-sm">Maaf, lirik untuk lagu ini belum ditemukan di database karaoke.</div>';
+    }
+
+    function parseLRC(lrcText) {
+      const lines = lrcText.split('\n');
+      const result = [];
+      const regex = /\[(\d{2}):(\d{2})\.(\d{2,3})\](.*)/;
+      for (const line of lines) {
+        const match = line.match(regex);
+        if (match) {
+          const min = parseInt(match[1], 10);
+          const sec = parseInt(match[2], 10);
+          const ms = parseInt(match[3].padEnd(3, '0'), 10);
+          const time = min * 60 + sec + ms / 1000;
+          result.push({ time, text: match[4].trim() });
+        }
+      }
+      return result;
+    }
+
+    function seekToSeconds(sec) {
+      const adjustedTarget = Math.max(0, sec + lyricTimeOffset);
+      if (activeEngine === 'native') nativeAudio.currentTime = adjustedTarget;
+      else if (activeEngine === 'youtube' && isYtReady) ytPlayer.seekTo(adjustedTarget, true);
+    }
+
+    function highlightActiveLyric(currentSec) {
+      if (parsedSyncedLyrics.length === 0) return;
+      const effectiveTime = currentSec - lyricTimeOffset;
+      let activeIdx = -1;
+      for (let i = 0; i < parsedSyncedLyrics.length; i++) {
+        if (effectiveTime >= parsedSyncedLyrics[i].time) activeIdx = i;
+        else break;
+      }
+      if (activeIdx === -1) return;
+      document.querySelectorAll('.lyric-line').forEach((el, idx) => {
+        const isNow = idx === activeIdx;
+        if (isNow && !el.classList.contains('active')) {
+          el.classList.add('active');
+          if (!document.getElementById('lyrics-modal').classList.contains('hidden')) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        } else if (!isNow) {
+          el.classList.remove('active');
+        }
+      });
+    }
+
+    function startProgressLoop() {
+      clearInterval(progressTimer);
+      progressTimer = setInterval(() => {
+        if (!isPlaying) return;
+        checkAndSkipAd();
+        const curr = getCurrentTime();
+        const dur = getDuration();
+        highlightActiveLyric(curr);
+        if (dur > 0 && isFinite(dur)) {
+          const pct = (curr / dur) * 100;
+          const dSeek = document.getElementById('desktop-seek');
+          const mSeek = document.getElementById('mobile-seek');
+          dSeek.value = pct;
+          mSeek.value = pct;
+          updateSliderFill(dSeek);
+          updateSliderFill(mSeek);
+          document.getElementById('mobile-mini-progress').style.width = `${pct}%`;
+          document.getElementById('time-current').textContent = formatTime(curr);
+          document.getElementById('time-duration').textContent = formatTime(dur);
+          document.getElementById('full-time-current').textContent = formatTime(curr);
+          document.getElementById('full-time-duration').textContent = formatTime(dur);
+        }
+      }, 250);
+    }
+
+    function formatTime(sec) {
+      if (!sec || isNaN(sec) || !isFinite(sec)) return '0:00';
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    function getTrackThumb(track) {
+      if (track.artwork) return track.artwork;
+      if (track.id && !track.id.startsWith('chart_')) return `https://i.ytimg.com/vi/${track.id}/hqdefault.jpg`;
+      return 'https://i.ytimg.com/vi/F44tk5-p2iM/hqdefault.jpg';
+    }
+
+    function updatePlayerUI(track) {
+      if (!track) return;
+      const thumbUrl = getTrackThumb(track);
+      document.getElementById('bar-thumb').src = thumbUrl;
+      document.getElementById('full-thumb').src = thumbUrl;
+      document.getElementById('bar-title').textContent = track.title;
+      document.getElementById('full-title').textContent = track.title;
+      document.getElementById('bar-artist').textContent = track.artist;
+      document.getElementById('full-artist').textContent = track.artist;
+      updateLikeIcons(track.id);
+    }
+
+    function updatePlayButtons(playing) {
+      const barBtn = document.querySelector('#btn-play-pause i');
+      const fullBtn = document.querySelector('#full-btn-play i');
+      const eq = document.getElementById('bar-eq');
+      if (playing) {
+        barBtn.className = 'fa-solid fa-pause';
+        fullBtn.className = 'fa-solid fa-pause';
+        eq.classList.remove('hidden');
+      } else {
+        barBtn.className = 'fa-solid fa-play ml-0.5';
+        fullBtn.className = 'fa-solid fa-play ml-1';
+        eq.classList.add('hidden');
+      }
+    }
+
+    async function loadChartPeriod(period) {
+      document.querySelectorAll('.period-btn').forEach(btn => {
+        const active = btn.dataset.period === period;
+        btn.className = active
+          ? 'period-btn px-4 py-2 rounded-full text-xs font-bold bg-theme text-black whitespace-nowrap transition'
+          : 'period-btn px-4 py-2 rounded-full text-xs font-bold bg-neutral-800 text-neutral-300 hover:bg-neutral-700 whitespace-nowrap transition';
+      });
+
+      const loader = document.getElementById('bestsongs-loading');
+      const listEl = document.getElementById('bestsongs-list');
+      loader.classList.remove('hidden');
+      listEl.innerHTML = '';
+
+      let items = BEST_SONGS_PRESETS[period] || BEST_SONGS_PRESETS.daily;
+      try {
+        const res = await fetch(`/api/charts?period=${encodeURIComponent(period)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.items && data.items.length > 0) {
+            items = data.items.filter(t => !isAiTrack(t));
+          }
+        }
+      } catch (e) {}
+
+      loader.classList.add('hidden');
+      currentChartTracks = items;
+
+      listEl.innerHTML = items.map((track, idx) => `
+        <div onclick="playTrackList(currentChartTracks, ${idx}, 'Best Songs (${period.toUpperCase()})')" class="flex items-center justify-between gap-3 p-3 rounded-xl bg-neutral-900/75 hover:bg-neutral-800/95 border border-neutral-800/70 transition cursor-pointer group">
+          <div class="flex items-center gap-3.5 min-w-0 flex-1">
+            <span class="text-sm font-extrabold ${idx < 3 ? 'text-theme' : 'text-neutral-500'} w-6 text-center">#${idx + 1}</span>
+            <img src="${getTrackThumb(track)}" class="w-12 h-12 rounded-lg object-cover bg-neutral-800 shrink-0">
+            <div class="min-w-0 flex-1">
+              <h4 class="text-sm font-bold text-white truncate group-hover:text-theme transition">${escapeHtml(track.title)}</h4>
+              <p class="text-xs text-neutral-400 truncate">${escapeHtml(track.artist)}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="text-[10px] hidden sm:inline-block px-2 py-0.5 rounded bg-neutral-800 text-neutral-400">${track.source || 'Spotify & YT Chart'}</span>
+            <button onclick='event.stopPropagation(); openPickPlaylistModal(${JSON.stringify(track).replace(/'/g, "&#39;")})' class="w-8 h-8 rounded-full bg-neutral-800 hover:bg-theme hover:text-black text-neutral-300 flex items-center justify-center transition" title="Simpan ke Playlist">
+              <i class="fa-solid fa-plus text-xs"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function toggleLikeCurrent() {
+      const track = queue[currentIndex];
+      if (track) toggleLikeTrack(track);
+    }
+
+    function toggleLikeTrack(track) {
+      const idx = likedTracks.findIndex(t => t.id === track.id && t.title === track.title);
+      if (idx === -1) {
+        likedTracks.unshift(track);
+        showToast('Disimpan ke Lagu Disukai');
+      } else {
+        likedTracks.splice(idx, 1);
+        showToast('Dihapus dari Lagu Disukai');
+      }
+      localStorage.setItem('melodify_likes', JSON.stringify(likedTracks));
+      updateLikeIcons(queue[currentIndex]?.id);
+      renderSidebarPlaylists();
+      renderLibrary();
+    }
+
+    function updateLikeIcons(trackId) {
+      const isLiked = likedTracks.some(t => t.id === trackId);
+      ['bar-like-btn', 'full-like-btn'].forEach(id => {
+        const btn = document.getElementById(id);
+        btn.innerHTML = isLiked ? '<i class="fa-solid fa-heart text-theme"></i>' : '<i class="fa-regular fa-heart"></i>';
+      });
+    }
+
+    function handleCreatePlaylist(e) {
+      e.preventDefault();
+      const name = document.getElementById('new-pl-name').value.trim();
+      const desc = document.getElementById('new-pl-desc').value.trim();
+      if (!name) return;
+      const colors = ['#059669', '#2563eb', '#7c3aed', '#db2777', '#d97706'];
+      const newPl = {
+        id: 'pl_' + Date.now(),
+        name,
+        desc: desc || 'Playlist Pribadi',
+        color: colors[customPlaylists.length % colors.length],
+        tracks: []
+      };
+      customPlaylists.unshift(newPl);
+      localStorage.setItem('melodify_playlists', JSON.stringify(customPlaylists));
+      closeCreatePlaylistModal();
+      document.getElementById('new-pl-name').value = '';
+      document.getElementById('new-pl-desc').value = '';
+      renderSidebarPlaylists();
+      renderLibrary();
+      showToast(`Playlist "${name}" dibuat`);
+      if (pendingTrackToAdd) {
+        addTrackToCustomPlaylist(pendingTrackToAdd, newPl.id);
+        pendingTrackToAdd = null;
+      }
+    }
+
+    function openPickPlaylistModal(track) {
+      if (!track) return;
+      pendingTrackToAdd = track;
+      const list = document.getElementById('pick-playlist-list');
+      if (customPlaylists.length === 0) {
+        list.innerHTML = '<p class="text-xs text-neutral-400 text-center py-4">Belum ada playlist pribadi. Buat baru di bawah.</p>';
+      } else {
+        list.innerHTML = customPlaylists.map(pl => `
+          <button onclick="addTrackToCustomPlaylist(pendingTrackToAdd, '${pl.id}')" class="w-full flex items-center gap-3 p-2.5 rounded-xl bg-neutral-800/70 hover:bg-neutral-800 text-left transition">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center text-white shrink-0" style="background:${pl.color}">
+              <i class="fa-solid fa-music text-xs"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="text-xs font-bold text-white truncate">${escapeHtml(pl.name)}</p>
+              <p class="text-[11px] text-neutral-400">${pl.tracks.length} lagu</p>
+            </div>
+          </button>
+        `).join('');
+      }
+      document.getElementById('pick-playlist-modal').classList.remove('hidden');
+    }
+
+    function addTrackToCustomPlaylist(track, plId) {
+      const pl = customPlaylists.find(p => p.id === plId);
+      if (!pl || !track) return;
+      if (!pl.tracks.some(t => t.id === track.id && t.title === track.title)) {
+        pl.tracks.push(track);
+        localStorage.setItem('melodify_playlists', JSON.stringify(customPlaylists));
+        showToast(`Ditambahkan ke ${pl.name}`);
+      } else {
+        showToast('Lagu sudah ada di playlist ini');
+      }
+      closePickPlaylistModal();
+      renderSidebarPlaylists();
+      renderLibrary();
+    }
+
+    function deleteCustomPlaylist(plId) {
+      customPlaylists = customPlaylists.filter(p => p.id !== plId);
+      localStorage.setItem('melodify_playlists', JSON.stringify(customPlaylists));
+      renderSidebarPlaylists();
+      renderLibrary();
+      showToast('Playlist dihapus');
+    }
+
+    function quickFillSearch(q) {
+      document.getElementById('search-query-input').value = q;
+      executeSearch();
+    }
+
+    async function executeSearch(e) {
+      if (e) e.preventDefault();
+      const rawQuery = document.getElementById('search-query-input').value.trim();
+      if (!rawQuery) return;
+
+      const extractedId = extractYouTubeId(rawQuery);
+      if (extractedId) {
+        playTrackObject({ id: extractedId, title: 'YouTube Audio Stream', artist: 'Tautan Langsung' });
+        showToast('Memutar langsung dari tautan YouTube');
+        return;
+      }
+
+      const statusEl = document.getElementById('search-status');
+      const resultsEl = document.getElementById('search-results-container');
+      statusEl.classList.remove('hidden');
+      resultsEl.innerHTML = '';
+
+      let items = [];
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(rawQuery)}`);
+        if (res.ok) {
+          const data = await res.json();
+          items = (data.items || []).filter(t => !isAiTrack(t));
+        }
+      } catch (err) {}
+
+      statusEl.classList.add('hidden');
+
+      if (items.length === 0) {
+        resultsEl.innerHTML = `
+          <div class="bg-neutral-900/80 border border-neutral-800 rounded-xl p-5 text-center space-y-2">
+            <p class="text-sm text-neutral-300">Tidak ditemukan rekaman asli yang cocok. Coba kata kunci lain atau tempel URL YouTube.</p>
+            <button onclick="openAddModal()" class="bg-theme text-black font-bold text-xs px-4 py-2 rounded-full">Tempel Link YouTube</button>
+          </div>
+        `;
+        return;
+      }
+
+      items.forEach(track => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between gap-3 p-2.5 rounded-xl bg-neutral-900/60 hover:bg-neutral-800/90 border border-neutral-800/60 transition cursor-pointer group';
+        row.onclick = () => playTrackObject(track);
+        row.innerHTML = `
+          <div class="flex items-center gap-3 min-w-0 flex-1">
+            <img src="${getTrackThumb(track)}" class="w-12 h-12 rounded-lg object-cover bg-neutral-800 shrink-0">
+            <div class="min-w-0 flex-1">
+              <h4 class="text-sm font-bold text-white truncate group-hover:text-theme">${escapeHtml(track.title)}</h4>
+              <p class="text-xs text-neutral-400 truncate">${escapeHtml(track.artist)}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="text-xs text-neutral-500 hidden sm:inline">${track.duration ? formatTime(track.duration) : ''}</span>
+            <button onclick='event.stopPropagation(); openPickPlaylistModal(${JSON.stringify(track).replace(/'/g, "&#39;")})' class="w-8 h-8 rounded-full bg-neutral-800 hover:bg-theme hover:text-black text-neutral-300 flex items-center justify-center transition" title="Simpan ke Playlist">
+              <i class="fa-solid fa-plus text-xs"></i>
+            </button>
+          </div>
+        `;
+        resultsEl.appendChild(row);
+      });
+    }
+
+    function handleQuickSearch(e, val) {
+      if (e.key === 'Enter') {
+        switchTab('search');
+        document.getElementById('search-query-input').value = val;
+        executeSearch();
+      }
+    }
+
+    function extractYouTubeId(url) {
+      const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|music\.youtube\.com\/watch\?v=)([^"&?\/\s]{11})/;
+      const match = url.match(regExp);
+      return match ? match[1] : null;
+    }
+
+    function handleManualUrlSubmit(e) {
+      e.preventDefault();
+      const url = document.getElementById('manual-yt-url').value.trim();
+      const title = document.getElementById('manual-yt-title').value.trim() || 'Lagu YouTube Kustom';
+      const id = extractYouTubeId(url);
+      if (!id) {
+        showToast('Format URL YouTube tidak valid!');
+        return;
+      }
+      const newTrack = { id, title, artist: 'YouTube Music • Custom URL' };
+      playTrackObject(newTrack);
+      toggleLikeTrack(newTrack);
+      closeAddModal();
+      document.getElementById('manual-yt-url').value = '';
+      document.getElementById('manual-yt-title').value = '';
+    }
+
+    function renderSidebarPlaylists() {
+      document.getElementById('sidebar-liked-count').textContent = `${likedTracks.length} lagu tersimpan`;
+      const container = document.getElementById('sidebar-playlists');
+      container.innerHTML = customPlaylists.map((pl, idx) => `
+        <div onclick="openCustomPlaylist(${idx})" class="group flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-neutral-800/70 cursor-pointer transition">
+          <div class="flex items-center gap-2 min-w-0 flex-1">
+            <div class="w-8 h-8 rounded-md flex items-center justify-center text-white shrink-0" style="background:${pl.color}">
+              <i class="fa-solid fa-music text-[10px]"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="text-xs font-bold text-white truncate">${escapeHtml(pl.name)}</p>
+              <p class="text-[10px] text-neutral-400 truncate">${pl.tracks.length} lagu</p>
+            </div>
+          </div>
+          <button onclick="event.stopPropagation(); deleteCustomPlaylist('${pl.id}')" class="opacity-0 group-hover:opacity-100 text-neutral-400 hover:text-red-400 p-1 transition" title="Hapus">
+            <i class="fa-solid fa-trash text-[10px]"></i>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function renderArtistCard(art, idx) {
+      return `
+        <div onclick="openCollection('artist', ${idx})" class="group bg-neutral-900/60 hover:bg-neutral-800/80 border border-neutral-800/60 p-3 rounded-2xl text-center cursor-pointer transition">
+          <div class="relative w-20 h-20 sm:w-24 sm:h-24 mx-auto rounded-full overflow-hidden mb-2.5 border-2 border-neutral-700 group-hover:border-emerald-400 transition shadow-lg">
+            <img src="${getTrackThumb({ id: art.thumbId })}" alt="${escapeHtml(art.name)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+          </div>
+          <h4 class="text-xs sm:text-sm font-bold text-white truncate group-hover:text-theme">${escapeHtml(art.name)}</h4>
+          <p class="text-[10px] sm:text-[11px] text-neutral-400 truncate mt-0.5">${escapeHtml(art.genre)}</p>
+        </div>
+      `;
+    }
+
+    function renderAlbumCard(alb, idx) {
+      return `
+        <div onclick="openCollection('album', ${idx})" class="group bg-neutral-900/80 hover:bg-neutral-800/90 border border-neutral-800/70 p-3 rounded-2xl transition cursor-pointer flex flex-col">
+          <div class="relative aspect-square rounded-xl overflow-hidden bg-neutral-800 mb-3 shadow-md">
+            <img src="${getTrackThumb({ id: alb.thumbId })}" alt="${escapeHtml(alb.title)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+            <button onclick="event.stopPropagation(); playTrackList(BEST_ALBUMS[${idx}].tracks, 0, 'Album: ${escapeHtml(alb.title)}')" class="absolute bottom-2 right-2 w-10 h-10 rounded-full bg-theme text-black flex items-center justify-center shadow-lg opacity-95 md:opacity-0 group-hover:opacity-100 transition">
+              <i class="fa-solid fa-play ml-0.5 text-xs"></i>
+            </button>
+          </div>
+          <h4 class="text-sm font-bold text-white line-clamp-1 group-hover:text-theme transition">${escapeHtml(alb.title)}</h4>
+          <p class="text-xs text-neutral-400 line-clamp-1 mt-0.5">${escapeHtml(alb.artist)}</p>
+        </div>
+      `;
+    }
+
+    function renderHomeAndCatalogSections() {
+      document.getElementById('playlists-grid').innerHTML = CURATED_PLAYLISTS.map((pl, idx) => `
+        <div onclick="openCollection('playlist', ${idx})" class="group cursor-pointer rounded-xl p-3 bg-neutral-900/80 hover:bg-neutral-800/90 border border-neutral-800/70 transition flex flex-col justify-between">
+          <div>
+            <div class="relative aspect-square rounded-lg flex items-center justify-center shadow-lg mb-3" style="background:${pl.color}">
+              <i class="fa-solid ${pl.icon} text-4xl text-white/35"></i>
+              <span class="absolute top-2 left-2 bg-black/55 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                ${pl.tracks.length} Lagu
+              </span>
+              <button onclick="event.stopPropagation(); playTrackList(CURATED_PLAYLISTS[${idx}].tracks, 0, '${escapeHtml(pl.title)}')" class="absolute bottom-2 right-2 w-10 h-10 rounded-full bg-theme text-black flex items-center justify-center shadow-xl opacity-95 md:opacity-0 group-hover:opacity-100 transition hover:scale-105">
+                <i class="fa-solid fa-play text-xs ml-0.5"></i>
+              </button>
+            </div>
+            <p class="text-white font-bold text-sm truncate">${escapeHtml(pl.title)}</p>
+            <p class="text-neutral-400 text-xs line-clamp-2 mt-1">${escapeHtml(pl.desc)}</p>
+          </div>
+          <span class="text-[10px] text-theme font-semibold mt-2 block">Update Harian</span>
+        </div>
+      `).join('');
+
+      document.getElementById('home-best-songs-preview').innerHTML = BEST_SONGS_PRESETS.daily.slice(0, 6).map((track, idx) => `
+        <div onclick="playTrackList(BEST_SONGS_PRESETS.daily, ${idx}, 'Rekomendasi Terpopuler')" class="flex items-center justify-between gap-3 p-2.5 rounded-xl bg-neutral-900/70 hover:bg-neutral-800/90 border border-neutral-800/70 transition cursor-pointer group">
+          <div class="flex items-center gap-3 min-w-0 flex-1">
+            <span class="text-xs font-extrabold text-neutral-500 w-5 text-center">${idx + 1}</span>
+            <img src="${getTrackThumb(track)}" class="w-11 h-11 rounded-lg object-cover bg-neutral-800 shrink-0">
+            <div class="min-w-0 flex-1">
+              <h4 class="text-sm font-bold text-white truncate group-hover:text-theme transition">${escapeHtml(track.title)}</h4>
+              <p class="text-xs text-neutral-400 truncate">${escapeHtml(track.artist)}</p>
+            </div>
+          </div>
+          <button onclick='event.stopPropagation(); openPickPlaylistModal(${JSON.stringify(track).replace(/'/g, "&#39;")})' class="w-8 h-8 rounded-full bg-neutral-800 hover:bg-theme hover:text-black text-neutral-400 flex items-center justify-center transition shrink-0">
+            <i class="fa-solid fa-plus text-xs"></i>
+          </button>
+        </div>
+      `).join('');
+
+      document.getElementById('home-artists-preview').innerHTML = BEST_ARTISTS.slice(0, 6).map((a, i) => renderArtistCard(a, i)).join('');
+      document.getElementById('all-artists-grid').innerHTML = BEST_ARTISTS.map((a, i) => renderArtistCard(a, i)).join('');
+
+      document.getElementById('home-albums-preview').innerHTML = BEST_ALBUMS.slice(0, 5).map((a, i) => renderAlbumCard(a, i)).join('');
+      document.getElementById('all-albums-grid').innerHTML = BEST_ALBUMS.map((a, i) => renderAlbumCard(a, i)).join('');
+    }
+
+    function openCollection(type, idx) {
+      let title = '', subtitle = '', thumbId = '', tracks = [];
+      if (type === 'playlist') {
+        const item = CURATED_PLAYLISTS[idx];
+        title = item.title; subtitle = `${item.desc} • Diperbarui Hari Ini`; thumbId = item.thumbId; tracks = item.tracks;
+      } else if (type === 'artist') {
+        const item = BEST_ARTISTS[idx];
+        title = item.name; subtitle = `Best Artist • ${item.genre}`; thumbId = item.thumbId; tracks = item.tracks;
+      } else if (type === 'album') {
+        const item = BEST_ALBUMS[idx];
+        title = item.title; subtitle = `Best Album • ${item.artist}`; thumbId = item.thumbId; tracks = item.tracks;
+      }
+      renderCollectionDetail(type.toUpperCase(), title, subtitle, thumbId, tracks);
+    }
+
+    function openCustomPlaylist(idx) {
+      const pl = customPlaylists[idx];
+      if (!pl) return;
+      const thumbId = pl.tracks[0]?.id || 'F44tk5-p2iM';
+      renderCollectionDetail('PLAYLIST PRIBADI', pl.name, pl.desc, thumbId, pl.tracks);
+    }
+
+    function renderCollectionDetail(badge, title, subtitle, thumbId, tracks) {
+      ['home', 'bestsongs', 'bestartist', 'bestalbums', 'search', 'library'].forEach(v => document.getElementById(`view-${v}`).classList.add('hidden'));
+      document.getElementById('view-collection').classList.remove('hidden');
+
+      const header = document.getElementById('collection-header');
+      header.innerHTML = `
+        <img src="${getTrackThumb({ id: thumbId })}" class="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl object-cover shadow-2xl border border-white/10 shrink-0">
+        <div class="text-center sm:text-left flex-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-theme">${badge} • 100% MUSISI ASLI</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">${escapeHtml(title)}</h2>
+          <p class="text-xs sm:text-sm text-neutral-400 mt-1">${escapeHtml(subtitle)}</p>
+          <div class="mt-4">
+            <button id="play-collection-btn" class="bg-theme hover-bg-theme text-black font-bold text-xs sm:text-sm px-6 py-2.5 rounded-full inline-flex items-center gap-2 shadow-lg transition">
+              <i class="fa-solid fa-play"></i> Putar Semua (${tracks.length} Lagu)
+            </button>
+          </div>
+        </div>
+      `;
+      document.getElementById('play-collection-btn').onclick = () => playTrackList(tracks, 0, title);
+
+      const list = document.getElementById('collection-tracks');
+      if (tracks.length === 0) {
+        list.innerHTML = '<p class="text-center text-sm text-neutral-400 py-8">Playlist ini masih kosong. Cari lagu lalu klik tombol + untuk menambahkan.</p>';
+        return;
+      }
+      list.innerHTML = tracks.map((t, i) => `
+        <div onclick="playTrackList(${JSON.stringify(tracks).replace(/"/g, '&quot;')}, ${i}, '${escapeHtml(title)}')" class="flex items-center justify-between gap-3 p-3 rounded-xl bg-neutral-900/70 hover:bg-neutral-800 border border-neutral-800/70 cursor-pointer transition group">
+          <div class="flex items-center gap-3 min-w-0 flex-1">
+            <span class="text-xs font-bold text-neutral-500 w-5 text-center">${i + 1}</span>
+            <img src="${getTrackThumb(t)}" class="w-11 h-11 rounded-lg object-cover shrink-0">
+            <div class="min-w-0 flex-1">
+              <h4 class="text-sm font-bold text-white truncate group-hover:text-theme">${escapeHtml(t.title)}</h4>
+              <p class="text-xs text-neutral-400 truncate">${escapeHtml(t.artist)}</p>
+            </div>
+          </div>
+          <button onclick='event.stopPropagation(); openPickPlaylistModal(${JSON.stringify(t).replace(/'/g, "&#39;")})' class="w-8 h-8 rounded-full bg-neutral-800 hover:bg-theme hover:text-black text-neutral-400 flex items-center justify-center transition">
+            <i class="fa-solid fa-plus text-xs"></i>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function renderLibrary() {
+      const plGrid = document.getElementById('library-playlists-grid');
+      if (customPlaylists.length === 0) {
+        plGrid.innerHTML = '<p class="col-span-full text-xs text-neutral-500">Belum ada playlist buatanmu. Klik "Playlist Baru" untuk membuat.</p>';
+      } else {
+        plGrid.innerHTML = customPlaylists.map((pl, idx) => `
+          <div onclick="openCustomPlaylist(${idx})" class="p-3 rounded-xl bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 cursor-pointer transition">
+            <div class="w-full aspect-square rounded-lg mb-2.5 flex items-center justify-center text-white" style="background:${pl.color}">
+              <i class="fa-solid fa-music text-3xl text-white/30"></i>
+            </div>
+            <p class="text-sm font-bold text-white truncate">${escapeHtml(pl.name)}</p>
+            <p class="text-xs text-neutral-400">${pl.tracks.length} lagu</p>
+          </div>
+        `).join('');
+      }
+
+      const list = document.getElementById('library-list');
+      if (likedTracks.length === 0) {
+        list.innerHTML = `
+          <div class="text-center py-10 bg-neutral-900/40 rounded-2xl border border-neutral-800/60">
+            <i class="fa-regular fa-heart text-2xl text-neutral-600 mb-2"></i>
+            <p class="text-sm font-semibold text-neutral-300">Belum ada lagu yang disukai</p>
+          </div>
+        `;
+        return;
+      }
+      list.innerHTML = likedTracks.map(track => `
+        <div onclick='playTrackObject(${JSON.stringify(track).replace(/'/g, "&#39;")})' class="flex items-center justify-between gap-3 p-2.5 rounded-xl bg-neutral-900/70 hover:bg-neutral-800 border border-neutral-800/70 cursor-pointer transition">
+          <div class="flex items-center gap-3 min-w-0 flex-1">
+            <img src="${getTrackThumb(track)}" class="w-11 h-11 rounded-lg object-cover shrink-0">
+            <div class="min-w-0 flex-1">
+              <h4 class="text-sm font-bold text-white truncate">${escapeHtml(track.title)}</h4>
+              <p class="text-xs text-neutral-400 truncate">${escapeHtml(track.artist)}</p>
+            </div>
+          </div>
+          <button onclick='event.stopPropagation(); toggleLikeTrack(${JSON.stringify(track).replace(/'/g, "&#39;")})' class="text-theme p-2 hover:scale-110 transition">
+            <i class="fa-solid fa-heart"></i>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function switchTab(tab) {
+      document.getElementById('view-collection').classList.add('hidden');
+      ['home', 'bestsongs', 'bestartist', 'bestalbums', 'search', 'library'].forEach(v => {
+        document.getElementById(`view-${v}`).classList.toggle('hidden', v !== tab);
+      });
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        const isMatch = btn.dataset.nav === tab;
+        btn.classList.toggle('active', isMatch);
+        if (btn.closest('aside')) {
+          btn.classList.toggle('bg-neutral-800', isMatch);
+          btn.classList.toggle('text-white', isMatch);
+          btn.classList.toggle('text-neutral-400', !isMatch);
+        } else {
+          btn.classList.toggle('text-white', isMatch);
+          btn.classList.toggle('text-neutral-500', !isMatch);
+        }
+      });
+      if (tab === 'bestsongs') loadChartPeriod('daily');
+      if (tab === 'search') setTimeout(() => document.getElementById('search-query-input').focus(), 100);
+    }
+
+    function openFullPlayer() { if (window.innerWidth < 768) document.getElementById('full-player-modal').classList.remove('translate-y-full'); }
+    function closeFullPlayer() { document.getElementById('full-player-modal').classList.add('translate-y-full'); }
+    function openLyricsModal() { document.getElementById('lyrics-modal').classList.remove('hidden'); }
+    function closeLyricsModal() { document.getElementById('lyrics-modal').classList.add('hidden'); }
+    function openSettingsModal() { document.getElementById('settings-modal').classList.remove('hidden'); }
+    function closeSettingsModal() { document.getElementById('settings-modal').classList.add('hidden'); }
+    function openDonateModal() { document.getElementById('donate-modal').classList.remove('hidden'); }
+    function closeDonateModal() { document.getElementById('donate-modal').classList.add('hidden'); }
+    function openAddModal() { document.getElementById('add-url-modal').classList.remove('hidden'); }
+    function closeAddModal() { document.getElementById('add-url-modal').classList.add('hidden'); }
+    function openCreatePlaylistModal() { document.getElementById('create-playlist-modal').classList.remove('hidden'); }
+    function closeCreatePlaylistModal() { document.getElementById('create-playlist-modal').classList.add('hidden'); }
+    function closePickPlaylistModal() { document.getElementById('pick-playlist-modal').classList.add('hidden'); }
+
+    function copyDanaNumber() {
+      navigator.clipboard?.writeText('085323073037');
+      showToast('Nomor DANA 085323073037 berhasil disalin!');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').textContent = msg;
+      toast.classList.remove('opacity-0');
+      setTimeout(() => toast.classList.add('opacity-0'), 2600);
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+
+    // Initialize App
+    applyAppSettings();
+    setDynamicGreeting();
+    renderSidebarPlaylists();
+    renderSidebarRecentTracks();
+    renderHomeAndCatalogSections();
+    loadDailyPlaylists();
+    renderLibrary();
+    startProgressLoop();
+  </script>
+</body>
+</html>
