@@ -1,210 +1,468 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Donasi</title>
-<style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0,0,0,0.5);
-  }
-
-  .modal {
-    background: #fff;
-    border-radius: 24px;
-    width: 420px;
-    max-width: 94vw;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    animation: fadeIn 0.3s ease;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-  }
-
-  .modal-header {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    color: #fff;
-    text-align: center;
-    padding: 32px 24px 28px;
-  }
-
-  .modal-header h1 {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 4px;
-  }
-
-  .modal-header p {
-    font-size: 14px;
-    opacity: 0.85;
-  }
-
-  .modal-body {
-    padding: 28px 24px 20px;
-    text-align: center;
-  }
-
-  .qr-wrapper {
-    background: #fff;
-    border: 2px dashed #e5e7eb;
-    border-radius: 16px;
-    padding: 16px;
-    display: inline-block;
-    margin-bottom: 16px;
-  }
-
-  .qr-wrapper img {
-    display: block;
-    width: 200px;
-    height: 200px;
-    object-fit: contain;
-  }
-
-  .modal-body .label {
-    font-size: 13px;
-    color: #6b7280;
-    margin-bottom: 4px;
-  }
-
-  .modal-body .bank {
-    font-size: 16px;
-    font-weight: 700;
-    color: #111827;
-  }
-
-  .thanks {
-    background: #f0fdf4;
-    color: #16a34a;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 10px 16px;
-    border-radius: 10px;
-    margin: 16px 0 0;
-    line-height: 1.5;
-  }
-
-  .ticker-wrap {
-    background: #111827;
-    padding: 10px 0;
-    overflow: hidden;
-    white-space: nowrap;
-    position: relative;
-  }
-
-  .ticker-wrap::before,
-  .ticker-wrap::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 40px;
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  .ticker-wrap::before {
-    left: 0;
-    background: linear-gradient(to right, #111827, transparent);
-  }
-
-  .ticker-wrap::after {
-    right: 0;
-    background: linear-gradient(to left, #111827, transparent);
-  }
-
-  .ticker {
-    display: inline-flex;
-    gap: 48px;
-    animation: scroll 30s linear infinite;
-  }
-
-  .ticker-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: #d1d5db;
-    font-size: 13px;
-  }
-
-  .ticker-item .name {
-    color: #fff;
-    font-weight: 600;
-  }
-
-  .ticker-item .amount {
-    color: #fbbf24;
-    font-weight: 700;
-  }
-
-  @keyframes scroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SunoMaster Pro | AI Distribution-Ready Mastering</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-<div class="modal">
-  <div class="modal-header">
-    <h1>💜 Sampaikan Donasi</h1>
-    <p>Pilih metode di bawah ini</p>
+  <div class="app-shell">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M2 12h2l3-9 4 18 4-18 3 9h4"/>
+          </svg>
+        </div>
+        <div>
+          <h1>SunoMaster<span>PRO</span></h1>
+          <p class="brand-sub">Distribution Mastering Engine v4.2</p>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-btn active" data-tab="studio">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 7v10M12 7v10M16 7v10"/></svg>
+          Mastering Rack
+        </button>
+        <button class="nav-btn" data-tab="advisor">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/><path d="M16 14H8a4 4 0 0 0-4 4v2h16v-2a4 4 0 0 0-4-4z"/></svg>
+          AI Advisor & Remaster
+          <span class="badge badge-glow">AI</span>
+        </button>
+        <button class="nav-btn" data-tab="compliance">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Streaming Compliance
+        </button>
+        <button class="nav-btn" data-tab="marketplace">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          Preset Marketplace
+        </button>
+        <button class="nav-btn" data-tab="bulk">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+          Bulk Mastering
+          <span class="badge" id="bulkCountBadge">3</span>
+        </button>
+      </nav>
+
+      <div class="suno-status-card">
+        <div class="status-header">
+          <span class="pulse-dot"></span>
+          <span>SUNO V3.5 / V4 ARTIFACT ENGINE</span>
+        </div>
+        <p>Spectral de-harshing, transient reconstruction & neural stereo widening calibrated for AI-generated audio stems.</p>
+        <div class="status-metrics">
+          <div><span>Clipped Samples</span><strong id="sidebarClips">0 fixed</strong></div>
+          <div><span>Oversampling</span><strong>8× Linear</strong></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-workspace">
+      <!-- Top Transport & Audio Bar -->
+      <header class="transport-bar">
+        <div class="file-loader">
+          <label for="audioUpload" class="btn btn-primary upload-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Load Suno Track
+          </label>
+          <input type="file" id="audioUpload" accept="audio/*" hidden>
+          <button id="loadDemoBtn" class="btn btn-secondary" title="Synthesize a realistic Suno AI test track with simulated clipping">Load Demo Suno Track</button>
+          <div class="track-meta">
+            <span id="trackTitle" class="track-name">Suno_v4_Cyberpunk_Anthem_Raw.wav</span>
+            <span id="trackSpecs" class="track-specs">48.0 kHz / 24-bit • Stereo</span>
+          </div>
+        </div>
+
+        <div class="transport-controls">
+          <button id="playPauseBtn" class="btn-transport" title="Play / Pause (Space)">
+            <svg id="playIcon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </button>
+          <button id="stopBtn" class="btn-transport" title="Stop">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16"/></svg>
+          </button>
+          <div class="time-readout" id="timeReadout">00:00.0 / 00:16.0</div>
+
+          <div class="ab-toggle" role="group" aria-label="Bypass Comparison">
+            <button id="abOriginalBtn" class="ab-btn">ORIGINAL (RAW SUNO)</button>
+            <button id="abMasteredBtn" class="ab-btn active">MASTERED (8× DSP)</button>
+          </div>
+        </div>
+
+        <div class="export-actions">
+          <button id="exportBtn" class="btn btn-accent">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export Master WAV
+          </button>
+        </div>
+      </header>
+
+      <!-- Visualizer & Metering Deck -->
+      <section class="visualizer-deck">
+        <div class="canvas-container">
+          <div class="canvas-overlay-top">
+            <div class="genre-pill">
+              <span class="genre-dot"></span>
+              <span>AUTO-DETECTED GENRE:</span>
+              <strong id="detectedGenreText">Synthwave / Cyberpunk</strong>
+              <span class="genre-confidence" id="genreConfidence">96.4% Match</span>
+              <select id="genreSelect" class="genre-dropdown" title="Override Auto-Detected Genre (40+ Profiles)"></select>
+            </div>
+            <div class="dsp-badges">
+              <span class="dsp-tag active" id="tagDeclip">DE-CLIPPER ACTIVE</span>
+              <span class="dsp-tag active" id="tagExciter">HARMONIC EXCITER</span>
+              <span class="dsp-tag active" id="tagMS">M/S STEREO EQ</span>
+              <span class="dsp-tag active" id="tagLimiter">8× TRUE-PEAK</span>
+            </div>
+          </div>
+          <canvas id="spectrumCanvas" width="960" height="210"></canvas>
+          <div class="waveform-scrubber">
+            <input type="range" id="seekSlider" min="0" max="100" value="0" step="0.1">
+          </div>
+        </div>
+
+        <div class="meters-panel">
+          <div class="meter-column">
+            <span class="meter-label">LUFS-I</span>
+            <div class="meter-bar-wrap">
+              <div class="meter-bar" id="meterLufs"></div>
+              <div class="meter-target-line" style="bottom: 72%;" title="-14 LUFS Target"></div>
+            </div>
+            <span class="meter-val" id="valLufs">-14.0</span>
+          </div>
+          <div class="meter-column">
+            <span class="meter-label">TRUE PEAK</span>
+            <div class="meter-bar-wrap">
+              <div class="meter-bar" id="meterPeak"></div>
+              <div class="meter-target-line warn" style="bottom: 92%;" title="-1.0 dBTP Ceiling"></div>
+            </div>
+            <span class="meter-val" id="valPeak">-1.0 dB</span>
+          </div>
+          <div class="meter-column">
+            <span class="meter-label">DE-CLIP</span>
+            <div class="meter-bar-wrap">
+              <div class="meter-bar repair" id="meterClip"></div>
+            </div>
+            <span class="meter-val" id="valClip">+3.4 dB</span>
+          </div>
+          <div class="meter-column">
+            <span class="meter-label">M/S WIDTH</span>
+            <div class="meter-bar-wrap">
+              <div class="meter-bar stereo" id="meterWidth"></div>
+            </div>
+            <span class="meter-val" id="valWidth">118%</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 1: MASTERING RACK -->
+      <section class="tab-panel active" id="tab-studio">
+        <div class="rack-grid">
+          <!-- Module 1: Suno De-Clipper -->
+          <div class="rack-module">
+            <div class="module-header">
+              <div>
+                <h3>1. Suno Hard-Clip Repair</h3>
+                <p>Cubic-spline waveform restoration & de-harshing</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggleDeclip" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="module-body">
+              <div class="clip-Visualizer-mini">
+                <canvas id="clipRepairCanvas" width="280" height="76"></canvas>
+                <div class="clip-stats">
+                  <span>Detected Flat-Tops: <strong id="clipCountText">412 peaks</strong></span>
+                  <span>Recovered Headroom: <strong id="clipHeadroomText">+3.2 dB</strong></span>
+                </div>
+              </div>
+              <div class="control-row">
+                <label>Clip Threshold <span id="lblClipThresh">-0.3 dBFS</span></label>
+                <input type="range" id="ctrlClipThresh" min="-6" max="0" step="0.1" value="-0.3">
+              </div>
+              <div class="control-row">
+                <label>Spectral De-Harsh (Suno 4-8kHz Fizz) <span id="lblDeharsh">65%</span></label>
+                <input type="range" id="ctrlDeharsh" min="0" max="100" step="1" value="65">
+              </div>
+              <div class="control-row">
+                <label>Transient Rebuild <span id="lblTransient">45%</span></label>
+                <input type="range" id="ctrlTransient" min="0" max="100" step="1" value="45">
+              </div>
+            </div>
+          </div>
+
+          <!-- Module 2: Harmonic Exciter + M/S Stereo EQ -->
+          <div class="rack-module">
+            <div class="module-header">
+              <div>
+                <h3>2. Harmonic Exciter & M/S EQ</h3>
+                <p>Tube/Tape saturation + Mid/Side spatial sculpting</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggleExciter" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="module-body">
+              <div class="mode-pills">
+                <button class="pill-btn active" data-harm-mode="tape">Warm Tape (Odd)</button>
+                <button class="pill-btn" data-harm-mode="tube">Triode Tube (Even)</button>
+                <button class="pill-btn" data-harm-mode="transformer">Iron Transformer</button>
+              </div>
+              <div class="control-row">
+                <label>Harmonic Drive <span id="lblDrive">32%</span></label>
+                <input type="range" id="ctrlDrive" min="0" max="100" step="1" value="32">
+              </div>
+              <div class="control-row">
+                <label>Mid Presence (1.8 kHz Vocal Focus) <span id="lblMidEq">+1.5 dB</span></label>
+                <input type="range" id="ctrlMidEq" min="-6" max="6" step="0.1" value="1.5">
+              </div>
+              <div class="control-row">
+                <label>Side Air Exciter (12 kHz Shimmer) <span id="lblSideEq">+2.8 dB</span></label>
+                <input type="range" id="ctrlSideEq" min="-6" max="8" step="0.1" value="2.8">
+              </div>
+              <div class="control-row">
+                <label>Stereo Width & Mono Bass (<120Hz) <span id="lblWidth">118%</span></label>
+                <input type="range" id="ctrlWidth" min="50" max="160" step="1" value="118">
+              </div>
+            </div>
+          </div>
+
+          <!-- Module 3: Genre-Aware Tone & Glue Compression -->
+          <div class="rack-module">
+            <div class="module-header">
+              <div>
+                <h3>3. Genre-Aware EQ & Bus Glue</h3>
+                <p>Adaptive tonal curve & VCA dynamic compression</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggleGenreEq" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="module-body">
+              <div class="eq-bands-mini">
+                <div class="eq-knob-group">
+                  <label>Sub / Low</label>
+                  <input type="range" id="ctrlLowEq" min="-6" max="6" step="0.2" value="1.8">
+                  <span id="lblLowEq">+1.8 dB</span>
+                </div>
+                <div class="eq-knob-group">
+                  <label>Low-Mid Mud</label>
+                  <input type="range" id="ctrlMudEq" min="-6" max="6" step="0.2" value="-2.2">
+                  <span id="lblMudEq">-2.2 dB</span>
+                </div>
+                <div class="eq-knob-group">
+                  <label>Hi-Mid Bite</label>
+                  <input type="range" id="ctrlHighMidEq" min="-6" max="6" step="0.2" value="1.0">
+                  <span id="lblHighMidEq">+1.0 dB</span>
+                </div>
+                <div class="eq-knob-group">
+                  <label>Silk Top</label>
+                  <input type="range" id="ctrlHighEq" min="-6" max="6" step="0.2" value="2.4">
+                  <span id="lblHighEq">+2.4 dB</span>
+                </div>
+              </div>
+              <div class="control-row">
+                <label>Compressor Threshold <span id="lblCompThresh">-18.0 dB</span></label>
+                <input type="range" id="ctrlCompThresh" min="-36" max="0" step="0.5" value="-18">
+              </div>
+              <div class="control-row">
+                <label>Compression Ratio <span id="lblCompRatio">2.5 : 1</span></label>
+                <input type="range" id="ctrlCompRatio" min="1" max="8" step="0.1" value="2.5">
+              </div>
+            </div>
+          </div>
+
+          <!-- Module 4: 8x Oversampled True-Peak Limiter -->
+          <div class="rack-module">
+            <div class="module-header">
+              <div>
+                <h3>4. 8× Oversampled True-Peak Limiter</h3>
+                <p>Zero inter-sample peaking for Spotify / Apple Music</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggleLimiter" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="module-body">
+              <div class="oversample-selector">
+                <span>Oversampling Rate:</span>
+                <div class="os-buttons">
+                  <button class="os-btn" data-os="2">2×</button>
+                  <button class="os-btn" data-os="4">4×</button>
+                  <button class="os-btn active" data-os="8">8× IRC-IV</button>
+                </div>
+              </div>
+              <div class="control-row">
+                <label>Target Loudness (LUFS) <span id="lblTargetLufs">-14.0 LUFS</span></label>
+                <input type="range" id="ctrlTargetLufs" min="-18" max="-7" step="0.2" value="-14">
+              </div>
+              <div class="control-row">
+                <label>True-Peak Ceiling (dBTP) <span id="lblCeiling">-1.0 dBTP</span></label>
+                <input type="range" id="ctrlCeiling" min="-2.5" max="-0.1" step="0.1" value="-1.0">
+              </div>
+              <div class="control-row">
+                <label>Lookahead & Release Character <span id="lblRelease">45 ms (Transparent)</span></label>
+                <input type="range" id="ctrlRelease" min="10" max="250" step="5" value="45">
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: AI MASTERING ADVISOR + FIX & REMASTER -->
+      <section class="tab-panel" id="tab-advisor">
+        <div class="advisor-layout">
+          <div class="advisor-panel">
+            <div class="advisor-header">
+              <div>
+                <h2>AI Mastering Advisor & Suno Stem Diagnostics</h2>
+                <p>Deep spectral inspection specifically trained on Suno v3 / v3.5 / v4 generative artifacts.</p>
+              </div>
+              <button id="runDiagnosticBtn" class="btn btn-primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><polyline points="21 3 21 8 16 8"/></svg>
+                Re-Scan Audio
+              </button>
+            </div>
+
+            <div class="diagnostic-issues" id="diagnosticIssuesList">
+              <!-- Populated dynamically via JS -->
+            </div>
+
+            <div class="remaster-action-bar">
+              <div class="remaster-info">
+                <h4>One-Click Fix & Remaster</h4>
+                <p>Applies all AI Advisor corrective filters, repairs clipped transients, and matches distribution loudness.</p>
+              </div>
+              <button id="fixAndRemasterBtn" class="btn btn-accent btn-lg">
+                ✨ Auto-Fix All & Remaster Now
+              </button>
+            </div>
+          </div>
+
+          <div class="genre-intelligence-card">
+            <h3>40+ Genre Detection Matrix</h3>
+            <p>Top spectral & rhythmic matches for current audio:</p>
+            <div class="genre-bars" id="genreProbabilities">
+              <!-- Populated dynamically -->
+            </div>
+            <div class="advisor-log" id="advisorLog">
+              <div class="log-title">DSP Engine Activity Log</div>
+              <ul id="dspLogList">
+                <li>[00:00.1] Loaded 48kHz stereo buffer.</li>
+                <li>[00:00.2] Detected 412 Suno flat-top clipped samples.</li>
+                <li>[00:00.4] Classified genre: Synthwave / Cyberpunk (96.4%).</li>
+                <li>[00:00.5] Engaged 8× oversampled true-peak ceiling at -1.0 dBTP.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: STREAMING COMPLIANCE CHECK -->
+      <section class="tab-panel" id="tab-compliance">
+        <div class="compliance-header">
+          <div>
+            <h2>Streaming & Distribution Compliance Check</h2>
+            <p>Verify integrated loudness, true-peak ceiling, phase correlation, and format specs across major DSPs.</p>
+          </div>
+          <div class="overall-badge pass" id="overallComplianceBadge">
+            ✓ DISTRIBUTION READY (8/8 PASSED)
+          </div>
+        </div>
+
+        <div class="compliance-grid" id="complianceGrid">
+          <!-- Populated dynamically -->
+        </div>
+
+        <div class="technical-audit-row">
+          <div class="audit-box">
+            <span>Phase Correlation</span>
+            <strong class="good" id="auditPhase">+0.84 (Mono Compatible)</strong>
+          </div>
+          <div class="audit-box">
+            <span>Dynamic Range (DR)</span>
+            <strong class="good" id="auditDR">DR 9.4 (Healthy Crest)</strong>
+          </div>
+          <div class="audit-box">
+            <span>DC Offset</span>
+            <strong class="good" id="auditDC">0.000% (Removed)</strong>
+          </div>
+          <div class="audit-box">
+            <span>Tail / Silence Trim</span>
+            <strong class="good" id="auditTail">Clean Fade (-72 dBFS)</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: PRESET MARKETPLACE -->
+      <section class="tab-panel" id="tab-marketplace">
+        <div class="marketplace-header">
+          <div>
+            <h2>Suno Mastering Preset Marketplace</h2>
+            <p>Curated mastering chains by platinum audio engineers built specifically for Suno & Udio generations.</p>
+          </div>
+          <div class="marketplace-filters">
+            <input type="text" id="presetSearch" placeholder="Search presets or genres..." class="input-search">
+            <select id="presetCategoryFilter" class="genre-dropdown">
+              <option value="all">All Categories</option>
+              <option value="electronic">Electronic & EDM</option>
+              <option value="hiphop">Hip-Hop & Trap</option>
+              <option value="rock">Rock & Metal</option>
+              <option value="pop">Pop & Vocal</option>
+              <option value="cinematic">Cinematic & Lo-Fi</option>
+            </select>
+          </div>
+        </div>
+        <div class="presets-grid" id="presetsGrid">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+
+      <!-- TAB 5: BULK MASTERING -->
+      <section class="tab-panel" id="tab-bulk">
+        <div class="bulk-header">
+          <div>
+            <h2>Batch / Album Bulk Mastering</h2>
+            <p>Process entire Suno albums or EP stems with unified loudness normalization and automatic de-clipping.</p>
+          </div>
+          <div class="bulk-actions">
+            <label for="bulkFileInput" class="btn btn-secondary">+ Add Tracks to Queue</label>
+            <input type="file" id="bulkFileInput" accept="audio/*" multiple hidden>
+            <button id="runBulkMasterBtn" class="btn btn-accent">⚡ Master All Queued Tracks</button>
+          </div>
+        </div>
+
+        <div class="bulk-table-wrap">
+          <table class="bulk-table">
+            <thead>
+              <tr>
+                <th>Track Filename</th>
+                <th>Auto-Detected Genre</th>
+                <th>Suno Clip Repair</th>
+                <th>Target LUFS / Peak</th>
+                <th>Compliance Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="bulkTableBody">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
   </div>
-  <div class="modal-body">
-    <div class="qr-wrapper">
-      <img src="QRIS.png" alt="QRIS">
-    </div>
-    <div class="label">Scan QRIS</div>
-    <div class="bank">Semua E-Wallet & Mobile Banking</div>
-    <div class="thanks">
-      Berapapun jumlahnya tentu akan sangat berarti, terima kasih.
-    </div>
-  </div>
-  <div class="ticker-wrap">
-    <div class="ticker" id="ticker"></div>
-  </div>
-</div>
-
-<script>
-  const donors = [
-    { name: 'Ahmad Fauzi', amount: 'Rp5.000' },
-    { name: 'Siti Nurhaliza', amount: 'Rp10.000' },
-    { name: 'Budi Santoso', amount: 'Rp5.000' },
-    { name: 'Dewi Lestari', amount: 'Rp5.000' },
-    { name: 'Rudi Hartono', amount: 'Rp10.000' },
-    { name: 'Ani Rahmawati', amount: 'Rp5.000' },
-    { name: 'Dimas Prayoga', amount: 'Rp2.000' },
-    { name: 'Rina Wijaya', amount: 'Rp5.000' },
-    { name: 'Agus Prasetyo', amount: 'Rp6.000' },
-    { name: 'Maya Anggraini', amount: 'Rp9.000' },
-    { name: 'Hendra Gunawan', amount: 'Rp12.000' },
-    { name: 'Fitri Handayani', amount: 'Rp5.000' },
-  ];
-
-  const ticker = document.getElementById('ticker');
-
-  function renderItems(list) {
-    return list.map(d => `
-      <span class="ticker-item">
-        <span class="name">${d.name}</span>
-        <span class="amount">${d.amount}</span>
-      </span>
-    `).join('');
-  }
-
-  ticker.innerHTML = renderItems(donors) + renderItems(donors);
-</script>
+  <script src="app.js"></script>
 </body>
 </html>
