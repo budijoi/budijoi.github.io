@@ -166,7 +166,6 @@
 
       <!-- Sidebar Library + Playlists + Terakhir Diputar -->
       <div class="bg-neutral-900/95 rounded-xl p-4 flex-1 flex flex-col overflow-hidden border border-neutral-800/60">
-        <!-- Koleksi & Playlist -->
         <div class="flex items-center justify-between mb-2 shrink-0">
           <button onclick="switchTab('library')" class="flex items-center gap-2 text-neutral-300 hover:text-white font-bold text-xs uppercase tracking-wider transition">
             <i class="fa-solid fa-book-open text-theme"></i>
@@ -187,11 +186,21 @@
           </div>
         </div>
 
-        <!-- Daftar Playlist Buatan + Terakhir Diputar dalam Area Scroll -->
+        <!-- Playlist Khusus: Billie Eilish Complete Collection -->
+        <div onclick="openArtistSpecialPlaylist('billie_eilish')" class="flex items-center gap-2.5 p-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/25 cursor-pointer transition mb-1.5 shrink-0">
+          <div class="w-8 h-8 rounded-md overflow-hidden shrink-0 shadow">
+            <img src="https://i.ytimg.com/vi/DyDfgMOUjCI/hqdefault.jpg" alt="Billie Eilish" class="w-full h-full object-cover">
+          </div>
+          <div class="min-w-0 flex-1">
+            <p class="text-xs font-bold text-theme truncate">Billie Eilish Complete</p>
+            <p id="sidebar-billie-count" class="text-[10px] text-neutral-400 truncate">Seluruh Lagu & Album</p>
+          </div>
+        </div>
+
         <div class="flex-1 overflow-y-auto pr-1 space-y-3">
           <div id="sidebar-playlists" class="space-y-1"></div>
 
-          <!-- Bagian Baru: Terakhir Diputar (Maks 10 Lagu) -->
+          <!-- Terakhir Diputar (Maks 10 Lagu) -->
           <div class="pt-2.5 border-t border-neutral-800/80">
             <div class="flex items-center justify-between mb-1.5 px-1">
               <span class="flex items-center gap-1.5 text-neutral-300 font-bold text-[11px] uppercase tracking-wider">
@@ -279,6 +288,23 @@
               </span>
             </div>
 
+            <!-- Playlist Spesial Artis Banner -->
+            <div onclick="openArtistSpecialPlaylist('billie_eilish')" class="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-950 via-teal-950 to-neutral-900 border border-emerald-500/35 p-4 md:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 cursor-pointer hover:border-emerald-400/70 transition shadow-xl">
+              <div class="flex items-center gap-4">
+                <img src="https://i.ytimg.com/vi/DyDfgMOUjCI/hqdefault.jpg" alt="Billie Eilish" class="w-16 h-16 md:w-20 md:h-20 rounded-xl object-cover border border-white/15 shadow-lg shrink-0">
+                <div>
+                  <span class="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-black bg-theme px-2.5 py-0.5 rounded-full mb-1">
+                    <i class="fa-solid fa-star"></i> Playlist Khusus Diskografi Lengkap
+                  </span>
+                  <h2 class="text-lg md:text-xl font-extrabold text-white group-hover:text-theme transition">Billie Eilish — Complete Discography</h2>
+                  <p id="banner-billie-subtitle" class="text-xs text-neutral-300 mt-0.5">Seluruh lagu dari semua album studio, EP & single hits (HIT ME HARD AND SOFT, Happier Than Ever, WWAFAWDWG, Don't Smile at Me)</p>
+                </div>
+              </div>
+              <button onclick="event.stopPropagation(); playTrackList(ARTIST_SPECIAL_PLAYLISTS.billie_eilish.tracks, 0, 'Billie Eilish Complete Collection')" class="bg-theme hover-bg-theme text-black font-extrabold text-xs px-5 py-3 rounded-full flex items-center gap-2 shrink-0 shadow-lg transition group-hover:scale-105">
+                <i class="fa-solid fa-play"></i> Putar Semua Lagu
+              </button>
+            </div>
+
             <!-- 5 Daily Rotating Playlists (50 Songs Each) -->
             <div>
               <div class="flex items-center justify-between mb-3">
@@ -364,7 +390,7 @@
             <div>
               <span class="text-[11px] font-bold uppercase tracking-wider text-theme">Top Streamed Artists</span>
               <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight">Best Artist</h2>
-              <p class="text-xs text-neutral-400">12 Musisi & Band terbaik Indonesia dan Dunia — klik untuk memutar</p>
+              <p class="text-xs text-neutral-400">Musisi & Band terbaik Indonesia dan Dunia — klik untuk memutar</p>
             </div>
             <div id="all-artists-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
           </section>
@@ -406,6 +432,7 @@
             </div>
 
             <div class="flex flex-wrap gap-2">
+              <button onclick="quickFillSearch('Billie Eilish official audio')" class="text-xs bg-emerald-500/20 border border-emerald-500/40 hover:bg-emerald-500/30 text-theme font-bold px-3 py-1.5 rounded-full transition">Billie Eilish</button>
               <button onclick="quickFillSearch('Tulus official audio')" class="text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-3 py-1.5 rounded-full transition">Tulus</button>
               <button onclick="quickFillSearch('Bernadya official audio')" class="text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-3 py-1.5 rounded-full transition">Bernadya</button>
               <button onclick="quickFillSearch('Mahalini official audio')" class="text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-3 py-1.5 rounded-full transition">Mahalini</button>
@@ -415,7 +442,6 @@
               <button onclick="quickFillSearch('The Weeknd official audio')" class="text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-3 py-1.5 rounded-full transition">The Weeknd</button>
               <button onclick="quickFillSearch('Coldplay official')" class="text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-3 py-1.5 rounded-full transition">Coldplay</button>
               <button onclick="quickFillSearch('NIKI official audio')" class="text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-3 py-1.5 rounded-full transition">NIKI</button>
-              <button onclick="quickFillSearch('Bruno Mars official')" class="text-xs bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-3 py-1.5 rounded-full transition">Bruno Mars</button>
             </div>
 
             <div id="search-status" class="hidden py-10 text-center text-neutral-400 text-sm">
@@ -444,7 +470,7 @@
             </div>
 
             <div class="space-y-3">
-              <h3 class="text-sm font-bold uppercase tracking-wider text-neutral-400">Playlist Buatanmu</h3>
+              <h3 class="text-sm font-bold uppercase tracking-wider text-neutral-400">Playlist Khusus & Buatanmu</h3>
               <div id="library-playlists-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
             </div>
 
@@ -477,7 +503,7 @@
       <div class="flex items-center justify-between gap-3">
         <div onclick="openFullPlayer()" class="flex items-center gap-3 min-w-0 flex-1 md:flex-initial md:w-[30%] cursor-pointer group">
           <div class="relative w-11 h-11 md:w-13 md:h-13 rounded-lg overflow-hidden bg-neutral-800 shrink-0 shadow-md">
-            <img id="bar-thumb" src="https://i.ytimg.com/vi/F44tk5-p2iM/hqdefault.jpg" alt="Cover" class="w-full h-full object-cover">
+            <img id="bar-thumb" src="https://i.ytimg.com/vi/DyDfgMOUjCI/hqdefault.jpg" alt="Cover" class="w-full h-full object-cover">
             <div id="bar-eq" class="hidden absolute inset-0 bg-black/50 flex items-center justify-center gap-0.5">
               <span class="equalizer-bar"></span>
               <span class="equalizer-bar"></span>
@@ -576,7 +602,7 @@
 
     <div class="my-auto flex flex-col items-center">
       <div class="w-60 h-60 sm:w-72 sm:h-72 rounded-2xl overflow-hidden shadow-2xl shadow-black/80 border border-white/10 mb-6">
-        <img id="full-thumb" src="https://i.ytimg.com/vi/F44tk5-p2iM/hqdefault.jpg" alt="Album Art" class="w-full h-full object-cover">
+        <img id="full-thumb" src="https://i.ytimg.com/vi/DyDfgMOUjCI/hqdefault.jpg" alt="Album Art" class="w-full h-full object-cover">
       </div>
       <div class="w-full flex items-center justify-between gap-4">
         <div class="min-w-0 flex-1">
@@ -623,7 +649,7 @@
     <div class="max-w-3xl w-full mx-auto flex-1 flex flex-col overflow-hidden bg-neutral-900/90 border border-neutral-800 rounded-3xl p-5 md:p-8 shadow-2xl">
       <div class="flex items-center justify-between pb-4 border-b border-neutral-800 gap-3">
         <div class="flex items-center gap-3 min-w-0">
-          <img id="lyrics-thumb" src="https://i.ytimg.com/vi/F44tk5-p2iM/hqdefault.jpg" class="w-12 h-12 rounded-xl object-cover shrink-0">
+          <img id="lyrics-thumb" src="https://i.ytimg.com/vi/DyDfgMOUjCI/hqdefault.jpg" class="w-12 h-12 rounded-xl object-cover shrink-0">
           <div class="min-w-0">
             <span class="text-[10px] font-extrabold uppercase tracking-widest text-theme flex items-center gap-1.5">
               <i class="fa-solid fa-microphone-lines"></i> Mode Karaoke Lirik
@@ -788,60 +814,151 @@
 
   <script src="https://www.youtube.com/iframe_api"></script>
   <script>
+    // --- PLAYLIST KHUSUS: BILLIE EILISH COMPLETE DISCOGRAPHY ---
+    const BILLIE_EILISH_ALL_SONGS = [
+      // Album: HIT ME HARD AND SOFT (2024)
+      { id: 'chart_be_skinny', title: 'SKINNY', artist: 'Billie Eilish', album: 'HIT ME HARD AND SOFT' },
+      { id: 'chart_be_lunch', title: 'LUNCH', artist: 'Billie Eilish', album: 'HIT ME HARD AND SOFT' },
+      { id: 'chart_be_chihiro', title: 'CHIHIRO', artist: 'Billie Eilish', album: 'HIT ME HARD AND SOFT' },
+      { id: 'V9PVRfjEBTI', title: 'BIRDS OF A FEATHER', artist: 'Billie Eilish', album: 'HIT ME HARD AND SOFT' },
+      { id: 'chart_be_wildflower', title: 'WILDFLOWER', artist: 'Billie Eilish', album: 'HIT ME HARD AND SOFT' },
+      { id: 'chart_be_greatest', title: 'THE GREATEST', artist: 'Billie Eilish', album: 'HIT ME HARD AND SOFT' },
+      { id: 'chart_be_lamour', title: "L'AMOUR DE MA VIE", artist: 'Billie Eilish', album: 'HIT ME HARD AND SOFT' },
+      { id: 'chart_be_diner', title: 'THE DINER', artist: 'Billie Eilish', album: 'HIT ME HARD AND SOFT' },
+      { id: 'chart_be_bittersuite', title: 'BITTERSUITE', artist: 'Billie Eilish', album: 'HIT ME HARD AND SOFT' },
+      { id: 'chart_be_blue', title: 'BLUE', artist: 'Billie Eilish', album: 'HIT ME HARD AND SOFT' },
+
+      // Album: Happier Than Ever (2021)
+      { id: 'chart_be_getting_older', title: 'Getting Older', artist: 'Billie Eilish', album: 'Happier Than Ever' },
+      { id: 'chart_be_didnt_change', title: "I Didn't Change My Number", artist: 'Billie Eilish', album: 'Happier Than Ever' },
+      { id: 'chart_be_bossa', title: 'Billie Bossa Nova', artist: 'Billie Eilish', album: 'Happier Than Ever' },
+      { id: 'fzeWc3zh01g', title: 'my future', artist: 'Billie Eilish', album: 'Happier Than Ever' },
+      { id: 'chart_be_oxytocin', title: 'Oxytocin', artist: 'Billie Eilish', album: 'Happier Than Ever' },
+      { id: 'chart_be_goldwing', title: 'GOLDWING', artist: 'Billie Eilish', album: 'Happier Than Ever' },
+      { id: 'S2dRcipMCpw', title: 'Lost Cause', artist: 'Billie Eilish', album: 'Happier Than Ever' },
+      { id: 'chart_be_halleys', title: "Halley's Comet", artist: 'Billie Eilish', album: 'Happier Than Ever' },
+      { id: 'chart_be_not_my_resp', title: 'Not My Responsibility', artist: 'Billie Eilish', album: 'Happier Than Ever' },
+      { id: 'chart_be_overheated', title: 'OverHeated', artist: 'Billie Eilish', album: 'Happier Than Ever' },
+      { id: 'chart_be_everybody_dies', title: 'Everybody Dies', artist: 'Billie Eilish', album: 'Happier Than Ever' },
+      { id: 'fZeA0PbjcdI', title: 'Your Power', artist: 'Billie Eilish', album: 'Happier Than Ever' },
+      { id: 'OORBa32WFcM', title: 'NDA', artist: 'Billie Eilish', album: 'Happier Than Ever' },
+      { id: 'RUQl6YcMalg', title: 'Therefore I Am', artist: 'Billie Eilish', album: 'Happier Than Ever' },
+      { id: '5GJWxDKyk3A', title: 'Happier Than Ever', artist: 'Billie Eilish', album: 'Happier Than Ever' },
+      { id: 'chart_be_male_fantasy', title: 'Male Fantasy', artist: 'Billie Eilish', album: 'Happier Than Ever' },
+
+      // Album: WHEN WE ALL FALL ASLEEP, WHERE DO WE GO? (2019)
+      { id: 'DyDfgMOUjCI', title: 'bad guy', artist: 'Billie Eilish', album: 'WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?' },
+      { id: 'LZyybvVx-js', title: 'xanny', artist: 'Billie Eilish', album: 'WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?' },
+      { id: 'Ah0Ys50CqO8', title: 'you should see me in a crown', artist: 'Billie Eilish', album: 'WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?' },
+      { id: '-PZsSWwc9xA', title: 'all the good girls go to hell', artist: 'Billie Eilish', album: 'WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?' },
+      { id: 'yaJx0Gj_LCY', title: 'wish you were gay', artist: 'Billie Eilish', album: 'WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?' },
+      { id: 'pbMwTqkKSps', title: "when the party's over", artist: 'Billie Eilish', album: 'WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?' },
+      { id: 'chart_be_8', title: '8', artist: 'Billie Eilish', album: 'WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?' },
+      { id: 'chart_be_strange_addiction', title: 'my strange addiction', artist: 'Billie Eilish', album: 'WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?' },
+      { id: 'HUHC9tYz8ik', title: 'bury a friend', artist: 'Billie Eilish', album: 'WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?' },
+      { id: 'NUVCQXMUVnI', title: 'ilomilo', artist: 'Billie Eilish', album: 'WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?' },
+      { id: 'chart_be_listen_before', title: 'listen before i go', artist: 'Billie Eilish', album: 'WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?' },
+      { id: 'WiinVuzh4DA', title: 'i love you', artist: 'Billie Eilish', album: 'WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?' },
+      { id: 'chart_be_goodbye', title: 'goodbye', artist: 'Billie Eilish', album: 'WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?' },
+
+      // EP: Don't Smile at Me (2017) & Guitar Songs (2022)
+      { id: 'ebb5AinIFPR', title: 'COPYCAT', artist: 'Billie Eilish', album: "don't smile at me" },
+      { id: '-tn2S3kJlyU', title: 'idontwannabeyouanymore', artist: 'Billie Eilish', album: "don't smile at me" },
+      { id: 'dVUmSgzgOqs', title: 'my boy', artist: 'Billie Eilish', album: "don't smile at me" },
+      { id: '9dobJDxPEzM', title: 'watch', artist: 'Billie Eilish', album: "don't smile at me" },
+      { id: 'chart_be_party_favor', title: 'party favor', artist: 'Billie Eilish', album: "don't smile at me" },
+      { id: 'gBRi6aZJGj4', title: 'bellyache', artist: 'Billie Eilish', album: "don't smile at me" },
+      { id: 'viimfQi_pUw', title: 'Ocean Eyes', artist: 'Billie Eilish', album: "don't smile at me" },
+      { id: 'skHbZbsYvdw', title: 'hostage', artist: 'Billie Eilish', album: "don't smile at me" },
+      { id: 'chart_be_and_burn', title: '&burn (with Vince Staples)', artist: 'Billie Eilish, Vince Staples', album: "don't smile at me" },
+      { id: 'chart_be_tv', title: 'TV', artist: 'Billie Eilish', album: 'Guitar Songs' },
+      { id: 'chart_be_the_30th', title: 'The 30th', artist: 'Billie Eilish', album: 'Guitar Songs' },
+
+      // Soundtrack & Non-Album Singles
+      { id: 'cW8VLC9nnTo', title: 'What Was I Made For?', artist: 'Billie Eilish', album: 'Barbie The Album' },
+      { id: 'V1Pl8CzNzCw', title: 'lovely (with Khalid)', artist: 'Billie Eilish, Khalid', album: '13 Reasons Why' },
+      { id: 'EgBJmlPo8Xw', title: 'everything i wanted', artist: 'Billie Eilish', album: 'Single' },
+      { id: 'BboMpayJomw', title: 'No Time To Die', artist: 'Billie Eilish', album: 'No Time To Die OST' },
+      { id: 'xXFdnHiGwos', title: 'bored', artist: 'Billie Eilish', album: '13 Reasons Why' },
+      { id: 'Ah0Ys50CqO8', title: 'Six Feet Under', artist: 'Billie Eilish', album: 'Single' },
+      { id: '0I647GU3Jsc', title: 'bitches broken hearts', artist: 'Billie Eilish', album: 'Single' },
+      { id: 'chart_be_come_out', title: 'come out and play', artist: 'Billie Eilish', album: 'Single' },
+      { id: 'chart_be_when_i_was_older', title: 'WHEN I WAS OLDER', artist: 'Billie Eilish', album: 'ROMA' },
+      { id: '8TsWkuWWXgc', title: 'Lo Vas A Olvidar (with ROSALÍA)', artist: 'Billie Eilish, ROSALÍA', album: 'Euphoria' },
+      { id: 'chart_be_hotline', title: 'hotline (edit)', artist: 'Billie Eilish', album: 'Single' },
+      { id: 'chart_be_guess', title: 'Guess featuring Billie Eilish', artist: 'Charli xcx, Billie Eilish', album: 'Brat Remix' }
+    ];
+
+    const ARTIST_SPECIAL_PLAYLISTS = {
+      billie_eilish: {
+        id: 'billie_eilish',
+        title: 'Billie Eilish — Complete Collection',
+        desc: 'Seluruh lagu dari semua album studio, EP, soundtrack & single (HIT ME HARD AND SOFT, Happier Than Ever, WWAFAWDWG, Don\'t Smile at Me)',
+        thumbId: 'DyDfgMOUjCI',
+        tracks: BILLIE_EILISH_ALL_SONGS
+      }
+    };
+
     const BEST_SONGS_PRESETS = {
       daily: [
+        { id: 'V9PVRfjEBTI', title: 'BIRDS OF A FEATHER', artist: 'Billie Eilish', duration: '3:30' },
         { id: 'F44tk5-p2iM', title: 'Hati-Hati di Jalan', artist: 'Tulus', duration: '4:02' },
         { id: '4NRXx6U8ABQ', title: 'Blinding Lights', artist: 'The Weeknd', duration: '3:20' },
+        { id: 'cW8VLC9nnTo', title: 'What Was I Made For?', artist: 'Billie Eilish', duration: '3:42' },
         { id: 'kTJczUoc26U', title: 'STAY', artist: 'The Kid LAROI, Justin Bieber', duration: '2:21' },
         { id: 'G7KNmW9a75Y', title: 'Flowers', artist: 'Miley Cyrus', duration: '3:20' },
         { id: 'H5v3kku4y6Q', title: 'As It Was', artist: 'Harry Styles', duration: '2:47' },
-        { id: 'JGwWNGJdvx8', title: 'Shape of You', artist: 'Ed Sheeran', duration: '3:53' },
-        { id: '2Vv-BfVoq4g', title: 'Perfect', artist: 'Ed Sheeran', duration: '4:23' },
-        { id: 'XXYlFuWEuKI', title: 'Save Your Tears', artist: 'The Weeknd', duration: '3:35' }
+        { id: 'JGwWNGJdvx8', title: 'Shape of You', artist: 'Ed Sheeran', duration: '3:53' }
       ],
       weekly: [
+        { id: 'V9PVRfjEBTI', title: 'BIRDS OF A FEATHER', artist: 'Billie Eilish', duration: '3:30' },
         { id: 'wA5bQ3W2F9c', title: 'Monokrom', artist: 'Tulus', duration: '3:34' },
+        { id: 'DyDfgMOUjCI', title: 'bad guy', artist: 'Billie Eilish', duration: '3:14' },
         { id: 'x34p9X7w2tE', title: 'Dan...', artist: 'Sheila On 7', duration: '4:46' },
         { id: '34Na4j8AVgA', title: 'Starboy', artist: 'The Weeknd ft. Daft Punk', duration: '3:50' },
-        { id: 'SlPhMPnQ58k', title: 'Memories', artist: 'Maroon 5', duration: '3:09' },
-        { id: 'DyDfgMOUjCI', title: 'bad guy', artist: 'Billie Eilish', duration: '3:14' },
+        { id: '5GJWxDKyk3A', title: 'Happier Than Ever', artist: 'Billie Eilish', duration: '4:58' },
         { id: '7wtfhZwyrcc', title: 'Believer', artist: 'Imagine Dragons', duration: '3:24' },
-        { id: 'OPf0YbXqDm0', title: 'Uptown Funk', artist: 'Mark Ronson ft. Bruno Mars', duration: '4:30' },
         { id: 'P7N6eL03r8M', title: 'Separuh Nafas', artist: 'Dewa 19', duration: '4:28' }
       ],
       monthly: [
+        { id: 'V9PVRfjEBTI', title: 'BIRDS OF A FEATHER', artist: 'Billie Eilish', duration: '3:30' },
         { id: 'j3Q0V9p6c2A', title: 'Pamit', artist: 'Tulus', duration: '3:55' },
         { id: '4fndeDfaWCg', title: 'Sephia', artist: 'Sheila On 7', duration: '4:50' },
+        { id: 'V1Pl8CzNzCw', title: 'lovely (with Khalid)', artist: 'Billie Eilish, Khalid', duration: '3:20' },
         { id: 'dvgZkm1xWPE', title: 'Viva La Vida', artist: 'Coldplay', duration: '4:02' },
-        { id: 'PMivT7MJ41M', title: 'That’s What I Like', artist: 'Bruno Mars', duration: '3:26' },
         { id: 'rYEDA3JcQqw', title: 'Rolling in the Deep', artist: 'Adele', duration: '3:48' },
         { id: 'h4B8N6x7W1k', title: 'Risalah Hati', artist: 'Dewa 19', duration: '4:51' },
-        { id: '1G4isv_Fylg', title: 'Paradise', artist: 'Coldplay', duration: '4:38' },
-        { id: 'bnVUHWCynig', title: 'Halo', artist: 'Beyoncé', duration: '4:21' }
+        { id: '1G4isv_Fylg', title: 'Paradise', artist: 'Coldplay', duration: '4:38' }
       ],
       yearly: [
+        { id: 'V9PVRfjEBTI', title: 'BIRDS OF A FEATHER', artist: 'Billie Eilish', duration: '3:30' },
+        { id: 'cW8VLC9nnTo', title: 'What Was I Made For?', artist: 'Billie Eilish', duration: '3:42' },
         { id: 'F44tk5-p2iM', title: 'Hati-Hati di Jalan', artist: 'Tulus', duration: '4:02' },
         { id: 'H5v3kku4y6Q', title: 'As It Was', artist: 'Harry Styles', duration: '2:47' },
         { id: '4NRXx6U8ABQ', title: 'Blinding Lights', artist: 'The Weeknd', duration: '3:20' },
         { id: 'G7KNmW9a75Y', title: 'Flowers', artist: 'Miley Cyrus', duration: '3:20' },
-        { id: 'kTJczUoc26U', title: 'STAY', artist: 'The Kid LAROI, Justin Bieber', duration: '2:21' },
-        { id: 'JGwWNGJdvx8', title: 'Shape of You', artist: 'Ed Sheeran', duration: '3:53' },
-        { id: 'g-1gQ3Q8c6M', title: 'Sepatu', artist: 'Tulus', duration: '3:38' },
-        { id: 'ekzHIouo8Q4', title: 'When I Was Your Man', artist: 'Bruno Mars', duration: '3:33' }
+        { id: 'chart_be_wildflower', title: 'WILDFLOWER', artist: 'Billie Eilish', duration: '4:21' },
+        { id: 'JGwWNGJdvx8', title: 'Shape of You', artist: 'Ed Sheeran', duration: '3:53' }
       ],
       alltime: [
+        { id: 'DyDfgMOUjCI', title: 'bad guy', artist: 'Billie Eilish', duration: '3:14' },
         { id: 'yKNxeF4KMsY', title: 'Yellow', artist: 'Coldplay', duration: '4:29' },
+        { id: 'V1Pl8CzNzCw', title: 'lovely (with Khalid)', artist: 'Billie Eilish, Khalid', duration: '3:20' },
         { id: '5lX-2sP0JFw', title: 'Kangen', artist: 'Dewa 19', duration: '5:35' },
         { id: 'hLQl3WQQoQ0', title: 'Someone Like You', artist: 'Adele', duration: '4:45' },
+        { id: 'viimfQi_pUw', title: 'Ocean Eyes', artist: 'Billie Eilish', duration: '3:20' },
         { id: 'k4V3Mo61fJM', title: 'Fix You', artist: 'Coldplay', duration: '4:55' },
-        { id: 'LjhCEhWiKXk', title: 'Just The Way You Are', artist: 'Bruno Mars', duration: '3:40' },
-        { id: 'x34p9X7w2tE', title: 'Dan...', artist: 'Sheila On 7', duration: '4:46' },
-        { id: '6d5STszrV5Y', title: 'Pupus', artist: 'Dewa 19', duration: '5:05' },
-        { id: '2Vv-BfVoq4g', title: 'Perfect', artist: 'Ed Sheeran', duration: '4:23' }
+        { id: 'x34p9X7w2tE', title: 'Dan...', artist: 'Sheila On 7', duration: '4:46' }
       ]
     };
 
     const BEST_ARTISTS = [
+      {
+        name: 'Billie Eilish',
+        genre: 'Alt-Pop / Indie Electropop',
+        thumbId: 'DyDfgMOUjCI',
+        tracks: BILLIE_EILISH_ALL_SONGS
+      },
       {
         name: 'Tulus',
         genre: 'Pop / Soul Indonesia',
@@ -850,8 +967,7 @@
           { id: 'F44tk5-p2iM', title: 'Hati-Hati di Jalan', artist: 'Tulus' },
           { id: 'wA5bQ3W2F9c', title: 'Monokrom', artist: 'Tulus' },
           { id: 'g-1gQ3Q8c6M', title: 'Sepatu', artist: 'Tulus' },
-          { id: 'j3Q0V9p6c2A', title: 'Pamit', artist: 'Tulus' },
-          { id: '7743211', title: 'Ruang Sendiri', artist: 'Tulus' }
+          { id: 'j3Q0V9p6c2A', title: 'Pamit', artist: 'Tulus' }
         ]
       },
       {
@@ -979,6 +1095,18 @@
 
     const BEST_ALBUMS = [
       {
+        title: 'HIT ME HARD AND SOFT',
+        artist: 'Billie Eilish (2024)',
+        thumbId: 'V9PVRfjEBTI',
+        tracks: BILLIE_EILISH_ALL_SONGS.filter(t => t.album === 'HIT ME HARD AND SOFT')
+      },
+      {
+        title: 'WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?',
+        artist: 'Billie Eilish (2019)',
+        thumbId: 'DyDfgMOUjCI',
+        tracks: BILLIE_EILISH_ALL_SONGS.filter(t => t.album === 'WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?')
+      },
+      {
         title: 'Manusia',
         artist: 'Tulus (2022)',
         thumbId: 'F44tk5-p2iM',
@@ -1065,32 +1193,16 @@
           { id: 'x34p9X7w2tE', title: 'Sahabat Sejati', artist: 'Sheila On 7' },
           { id: '2x8m4k9p1wQ', title: 'Bila Kau Tak Disampingku', artist: 'Sheila On 7' }
         ]
-      },
-      {
-        title: 'A Rush of Blood to the Head',
-        artist: 'Coldplay (2002)',
-        thumbId: 'dvgZkm1xWPE',
-        tracks: [
-          { id: 'RB-RcX5DS5A', title: 'The Scientist', artist: 'Coldplay' },
-          { id: 'd020hcWA_Wg', title: 'Clocks', artist: 'Coldplay' },
-          { id: 'k4V3Mo61fJM', title: 'In My Place', artist: 'Coldplay' },
-          { id: 'yKNxeF4KMsY', title: 'Yellow', artist: 'Coldplay' }
-        ]
-      },
-      {
-        title: '24K Magic',
-        artist: 'Bruno Mars (2016)',
-        thumbId: 'OPf0YbXqDm0',
-        tracks: [
-          { id: 'UqyT8IEBkvY', title: '24K Magic', artist: 'Bruno Mars' },
-          { id: 'PMivT7MJ41M', title: 'That’s What I Like', artist: 'Bruno Mars' },
-          { id: 'dElRVQFqj-k', title: 'Versace on the Floor', artist: 'Bruno Mars' },
-          { id: 'OPf0YbXqDm0', title: 'Finesse', artist: 'Bruno Mars' }
-        ]
       }
     ];
 
     const BASE_HUMAN_TRACK_POOL = [
+      { id: 'V9PVRfjEBTI', title: 'BIRDS OF A FEATHER', artist: 'Billie Eilish' },
+      { id: 'DyDfgMOUjCI', title: 'bad guy', artist: 'Billie Eilish' },
+      { id: 'cW8VLC9nnTo', title: 'What Was I Made For?', artist: 'Billie Eilish' },
+      { id: '5GJWxDKyk3A', title: 'Happier Than Ever', artist: 'Billie Eilish' },
+      { id: 'viimfQi_pUw', title: 'Ocean Eyes', artist: 'Billie Eilish' },
+      { id: 'V1Pl8CzNzCw', title: 'lovely (with Khalid)', artist: 'Billie Eilish, Khalid' },
       { id: 'F44tk5-p2iM', title: 'Hati-Hati di Jalan', artist: 'Tulus' },
       { id: 'wA5bQ3W2F9c', title: 'Monokrom', artist: 'Tulus' },
       { id: 'g-1gQ3Q8c6M', title: 'Sepatu', artist: 'Tulus' },
@@ -1131,15 +1243,11 @@
       { id: 'G7KNmW9a75Y', title: 'Flowers', artist: 'Miley Cyrus' },
       { id: 'H5v3kku4y6Q', title: 'As It Was', artist: 'Harry Styles' },
       { id: 'SlPhMPnQ58k', title: 'Memories', artist: 'Maroon 5' },
-      { id: 'DyDfgMOUjCI', title: 'bad guy', artist: 'Billie Eilish' },
       { id: '7wtfhZwyrcc', title: 'Believer', artist: 'Imagine Dragons' },
       { id: 'fKopy74weus', title: 'Thunder', artist: 'Imagine Dragons' },
       { id: 'ktvTqknDobU', title: 'Radioactive', artist: 'Imagine Dragons' },
       { id: 'mWRsgZuwf_8', title: 'Demons', artist: 'Imagine Dragons' },
       { id: 'bnVUHWCynig', title: 'Halo', artist: 'Beyoncé' },
-      { id: '4Tr0otuiQuU', title: 'Moonlight Sonata (Live Piano)', artist: 'Ludwig van Beethoven' },
-      { id: '9E6b3swbnWg', title: 'Nocturne Op. 9 No. 2', artist: 'Frédéric Chopin' },
-      { id: 'CvFH_6DNRCY', title: 'Clair de Lune', artist: 'Claude Debussy' },
       { id: 'chart_bernadya_1', title: 'Satu Bulan', artist: 'Bernadya' },
       { id: 'chart_bernadya_2', title: 'Untungnya, Hidup Harus Tetap Berjalan', artist: 'Bernadya' },
       { id: 'chart_hindia_1', title: 'Evaluasi', artist: 'Hindia' },
@@ -1285,16 +1393,13 @@
     // --- RECENTLY PLAYED TRACKS (MAX 10) ---
     function recordRecentTrack(track) {
       if (!track || !track.title) return;
-      // Hapus duplikat jika lagu yang sama sudah ada di riwayat
       recentTracks = recentTracks.filter(t => !(t.id === track.id && t.title === track.title));
-      // Tambahkan di urutan paling atas
       recentTracks.unshift({
         id: track.id,
         title: track.title,
         artist: track.artist || 'Musisi Asli',
         artwork: track.artwork || ''
       });
-      // Batasi maksimal 10 lagu
       if (recentTracks.length > 10) {
         recentTracks = recentTracks.slice(0, 10);
       }
@@ -1321,7 +1426,7 @@
       }
 
       if (clearBtn) clearBtn.classList.remove('hidden');
-      container.innerHTML = recentTracks.map((track, idx) => `
+      container.innerHTML = recentTracks.map((track) => `
         <div onclick='playTrackObject(${JSON.stringify(track).replace(/'/g, "&#39;")})' class="group flex items-center gap-2 p-1.5 rounded-lg hover:bg-neutral-800/75 cursor-pointer transition" title="${escapeHtml(track.title)} - ${escapeHtml(track.artist)}">
           <div class="relative w-8 h-8 rounded-md overflow-hidden bg-neutral-800 shrink-0">
             <img src="${getTrackThumb(track)}" alt="Cover" class="w-full h-full object-cover">
@@ -1833,6 +1938,9 @@
     function getTrackThumb(track) {
       if (track.artwork) return track.artwork;
       if (track.id && !track.id.startsWith('chart_')) return `https://i.ytimg.com/vi/${track.id}/hqdefault.jpg`;
+      if (track.artist && track.artist.toLowerCase().includes('billie eilish')) {
+        return 'https://i.ytimg.com/vi/DyDfgMOUjCI/hqdefault.jpg';
+      }
       return 'https://i.ytimg.com/vi/F44tk5-p2iM/hqdefault.jpg';
     }
 
@@ -2109,6 +2217,10 @@
 
     function renderSidebarPlaylists() {
       document.getElementById('sidebar-liked-count').textContent = `${likedTracks.length} lagu tersimpan`;
+      const billieSidebarCount = document.getElementById('sidebar-billie-count');
+      if (billieSidebarCount) {
+        billieSidebarCount.textContent = `${BILLIE_EILISH_ALL_SONGS.length} lagu • Semua Album`;
+      }
       const container = document.getElementById('sidebar-playlists');
       container.innerHTML = customPlaylists.map((pl, idx) => `
         <div onclick="openCustomPlaylist(${idx})" class="group flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-neutral-800/70 cursor-pointer transition">
@@ -2156,6 +2268,11 @@
     }
 
     function renderHomeAndCatalogSections() {
+      const bannerSub = document.getElementById('banner-billie-subtitle');
+      if (bannerSub) {
+        bannerSub.textContent = `${BILLIE_EILISH_ALL_SONGS.length} lagu lengkap dari semua album studio, EP & single hits (HIT ME HARD AND SOFT, Happier Than Ever, WWAFAWDWG, Don't Smile at Me)`;
+      }
+
       document.getElementById('playlists-grid').innerHTML = CURATED_PLAYLISTS.map((pl, idx) => `
         <div onclick="openCollection('playlist', ${idx})" class="group cursor-pointer rounded-xl p-3 bg-neutral-900/80 hover:bg-neutral-800/90 border border-neutral-800/70 transition flex flex-col justify-between">
           <div>
@@ -2196,6 +2313,12 @@
 
       document.getElementById('home-albums-preview').innerHTML = BEST_ALBUMS.slice(0, 5).map((a, i) => renderAlbumCard(a, i)).join('');
       document.getElementById('all-albums-grid').innerHTML = BEST_ALBUMS.map((a, i) => renderAlbumCard(a, i)).join('');
+    }
+
+    function openArtistSpecialPlaylist(key) {
+      const sp = ARTIST_SPECIAL_PLAYLISTS[key];
+      if (!sp) return;
+      renderCollectionDetail('PLAYLIST DISKOGRAFI LENGKAP', sp.title, sp.desc, sp.thumbId, sp.tracks);
     }
 
     function openCollection(type, idx) {
@@ -2252,7 +2375,7 @@
             <img src="${getTrackThumb(t)}" class="w-11 h-11 rounded-lg object-cover shrink-0">
             <div class="min-w-0 flex-1">
               <h4 class="text-sm font-bold text-white truncate group-hover:text-theme">${escapeHtml(t.title)}</h4>
-              <p class="text-xs text-neutral-400 truncate">${escapeHtml(t.artist)}</p>
+              <p class="text-xs text-neutral-400 truncate">${escapeHtml(t.artist)}${t.album ? ` • <span class="text-neutral-500">${escapeHtml(t.album)}</span>` : ''}</p>
             </div>
           </div>
           <button onclick='event.stopPropagation(); openPickPlaylistModal(${JSON.stringify(t).replace(/'/g, "&#39;")})' class="w-8 h-8 rounded-full bg-neutral-800 hover:bg-theme hover:text-black text-neutral-400 flex items-center justify-center transition">
@@ -2264,19 +2387,27 @@
 
     function renderLibrary() {
       const plGrid = document.getElementById('library-playlists-grid');
-      if (customPlaylists.length === 0) {
-        plGrid.innerHTML = '<p class="col-span-full text-xs text-neutral-500">Belum ada playlist buatanmu. Klik "Playlist Baru" untuk membuat.</p>';
-      } else {
-        plGrid.innerHTML = customPlaylists.map((pl, idx) => `
-          <div onclick="openCustomPlaylist(${idx})" class="p-3 rounded-xl bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 cursor-pointer transition">
-            <div class="w-full aspect-square rounded-lg mb-2.5 flex items-center justify-center text-white" style="background:${pl.color}">
-              <i class="fa-solid fa-music text-3xl text-white/30"></i>
-            </div>
-            <p class="text-sm font-bold text-white truncate">${escapeHtml(pl.name)}</p>
-            <p class="text-xs text-neutral-400">${pl.tracks.length} lagu</p>
+      const billieCardHtml = `
+        <div onclick="openArtistSpecialPlaylist('billie_eilish')" class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/35 hover:bg-emerald-900/40 cursor-pointer transition">
+          <div class="w-full aspect-square rounded-lg mb-2.5 overflow-hidden">
+            <img src="https://i.ytimg.com/vi/DyDfgMOUjCI/hqdefault.jpg" alt="Billie Eilish" class="w-full h-full object-cover">
           </div>
-        `).join('');
-      }
+          <p class="text-sm font-bold text-theme truncate">Billie Eilish Complete</p>
+          <p class="text-xs text-neutral-400">${BILLIE_EILISH_ALL_SONGS.length} lagu lengkap</p>
+        </div>
+      `;
+
+      const customCardsHtml = customPlaylists.map((pl, idx) => `
+        <div onclick="openCustomPlaylist(${idx})" class="p-3 rounded-xl bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 cursor-pointer transition">
+          <div class="w-full aspect-square rounded-lg mb-2.5 flex items-center justify-center text-white" style="background:${pl.color}">
+            <i class="fa-solid fa-music text-3xl text-white/30"></i>
+          </div>
+          <p class="text-sm font-bold text-white truncate">${escapeHtml(pl.name)}</p>
+          <p class="text-xs text-neutral-400">${pl.tracks.length} lagu</p>
+        </div>
+      `).join('');
+
+      plGrid.innerHTML = billieCardHtml + customCardsHtml;
 
       const list = document.getElementById('library-list');
       if (likedTracks.length === 0) {
